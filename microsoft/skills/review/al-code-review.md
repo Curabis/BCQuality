@@ -80,27 +80,27 @@ For each sub-skill in the worklist, executed one at a time per the discipline ab
 
 ### Agent self-review pass
 
-After every sub-skill has produced its sub-result, perform a self-review pass against the same task input using the agent's built-in BC and AL knowledge. BCQuality is an **additive** knowledge layer: it augments the agent's review judgement, it does not replace it. The goal of this pass is to surface defects the agent recognises on its own — bugs, anti-patterns, error-handling gaps, AL idioms — that the leaf sub-skills did not catch because no BCQuality knowledge file covers them yet.
+Each leaf sub-skill emits both knowledge-backed findings and, per its own contract, agent findings within its own domain. After every sub-skill has produced its sub-result, perform a super-skill self-review pass against the same task input. The goal of this pass is to surface defects the agent recognises on its own that **no single leaf could have surfaced** because they cross domain boundaries — architecture-level issues that touch performance and reliability at once, error-handling gaps that span security and UX, resource-lifecycle patterns that affect both correctness and performance, and similar cross-cutting concerns. BCQuality is an **additive** knowledge layer: it augments the agent's review judgement, it does not replace it.
 
-This pass is mandatory. An empty agent-findings list is acceptable only when the diff is small enough that the leaves have provably exhausted the surface (in practice: PRs of ≤2 files with ≤30 changed lines and at least one sub-skill emitting findings). For larger diffs, returning an empty agent-findings list is a defect — the agent has built-in BC/AL knowledge that the leaves cannot supply, and refusing to apply it is the most common cause of parity loss against agents that do not have a BCQuality layer at all.
+This pass is mandatory on real-size PRs. An empty agent-findings list at the super-skill level is acceptable only when the diff is small enough that nothing cross-cutting plausibly applies (in practice: PRs of ≤2 files with ≤30 changed lines). For larger diffs, the fact that leaves emitted findings does not exempt the super-skill — the leaves handle within-domain reasoning, the super-skill handles cross-domain reasoning, and a real-size PR with no cross-cutting candidates is rare.
 
-Frame the pass by the domains the sub-skills already cover (performance, security, privacy, style, upgrade, UI) and by the cross-cutting concerns that span them (architecture, error handling, resource lifecycle). For each domain, ask whether the diff exhibits a pattern the agent recognises as a defect from general AL knowledge and that the corresponding sub-skill did not flag. The categories are anchors for completeness, not a script: a candidate from any category is in scope, and a candidate from no category is also in scope when the agent has independent grounds for it.
+Frame the pass by cross-cutting concerns — architecture, error handling, resource lifecycle — and by the seams between leaf domains. Do not duplicate domain-specific reasoning that belongs in a leaf: a security-only concern is the security leaf's responsibility, not the super-skill's. The super-skill pass adds value where no individual leaf has the right scope.
 
 For every candidate the agent identifies in this pass:
 
 1. **Validate against BCQuality knowledge.** Check the candidate against the knowledge files the sub-skills have already loaded for this task (visible via their `references` and `suppressed` lists in `sub-results`).
    - If a BCQuality knowledge file matches the candidate, upgrade it to a knowledge-backed finding: cite the file in `references`, set `id` to the file's path, set `from-sub-skill` to the sub-skill that owns that knowledge domain, and merge with or deduplicate against any sub-skill finding that already covers the same concern at the same location.
    - If a BCQuality knowledge file **explicitly contradicts** the candidate (its `## Best Practice` or `## Anti Pattern` says the opposite of what the agent flagged), suppress the candidate and do not surface it.
-   - Otherwise the candidate has no BCQuality coverage; emit it as an agent finding.
+   - Otherwise the candidate has no BCQuality coverage; emit it as a super-skill agent finding.
 2. **Emit agent finding.** Per DO's *Agent findings* rules:
-   - `from-sub-skill: "agent"`
+   - `from-sub-skill: "agent"` (the super-skill itself produced it)
    - `references: []`
    - `id` is a skill-defined slug prefixed with `agent:` (for example, `agent:missing-error-handling-on-http-call`).
    - `confidence` capped at `medium`.
    - `message` is non-empty and self-contained, describing both the issue and a concrete recommendation. A consumer rendering the finding has no knowledge-file footer to fall back on.
-   - `suggested-code` SHOULD be set when the fix is small and mechanical (e.g. removing a few unreachable lines, replacing a `Count() > 0` test with `not IsEmpty()`, declaring a missing `Label`, adding an `else` branch to a `case` over an enum). Omit it when the appropriate fix depends on context the agent cannot determine.
+   - `suggested-code` SHOULD be set when the fix is small and mechanical. Omit it when the appropriate fix depends on context the agent cannot determine.
 
-Leaf sub-skills MUST NOT emit agent findings: their scope is bounded by the knowledge subset they evaluate. The self-review pass is a super-skill responsibility.
+Leaf-level agent findings (those with `references: []` inside a sub-skill's report) are rolled up into the super-skill's top-level `findings[]` like any other sub-skill finding — they keep their `from-sub-skill: <leaf-id>` attribution and are not rewritten. They are not subject to the "MUST validate against knowledge" step above, because each leaf has already validated within its own domain.
 
 ### Suggested-code guidance
 

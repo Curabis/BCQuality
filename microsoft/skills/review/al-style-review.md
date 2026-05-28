@@ -59,6 +59,8 @@ Set `confidence` to:
 - `medium` when detection relies on heuristics or when any frontmatter dimension was `unknown`.
 - `low` when the finding is an advisory derived only from applicability.
 
+After evaluating each worklist entry, also consider whether the diff exhibits a style defect the agent recognises from its general AL knowledge that no knowledge file in the worklist covers. Such candidates are agent findings within this skill's domain — emit them with `references: []`, an `id` slug prefixed with `agent:`, `confidence` capped at `medium`, and a `message` that is self-contained (describing both the issue and a concrete recommendation, since there is no knowledge-file footer for the consumer to fall back on). The scope is strictly style; defects outside this domain belong to other leaves and MUST NOT be emitted here. Before emitting, check the worklist for a knowledge file that matches the candidate — if one exists, upgrade the candidate to a knowledge-backed finding instead. See `skills/do.md` for the full contract.
+
 When the knowledge file ships an unambiguous `.good.al` companion that names exactly the correction the finding requires (and the diff context makes the substitution mechanical), set `findings[].suggested-code` to the literal replacement for the source lines indicated by `location`. The payload must be a verbatim replacement — no diff markers, no fences, no commentary — that the consumer can render as a one-click suggestion. Skip the field when the appropriate fix depends on context the skill cannot determine, or when more than one defensible replacement exists. See `skills/do.md` for the full contract.
 
 Outcome selection:
