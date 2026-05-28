@@ -134,17 +134,22 @@ An empty `findings` array with `outcome: completed` means the skill ran and foun
 
 When a super-skill rolls up a non-citation finding from a sub-skill (an `id` that is a slug, not a path), the super-skill MUST prefix the `id` with `<from-sub-skill>:` to avoid collisions across sub-skills (for example, a slug `missing-test` from `al-security-review` becomes `al-security-review:missing-test`). Citation-based findings are already globally unique through their repo-relative path and MUST NOT be rewritten.
 
-**Agent findings.** A super-skill MAY emit findings that the agent identified through its own reasoning rather than from a BCQuality knowledge file. BCQuality is an **additive** knowledge layer: it augments the agent's pre-existing review judgement, it does not replace it. An agent finding is encoded by:
+**Agent findings.** A skill MAY emit findings that the agent identified through its own reasoning rather than from a BCQuality knowledge file. BCQuality is an **additive** knowledge layer: it augments the agent's pre-existing review judgement, it does not replace it. An agent finding is encoded by:
 
-- `from-sub-skill: "agent"` — the canonical marker. Use this exact value; do not invent equivalents.
 - `references: []` — required. An agent finding has no knowledge-file citation by definition; if a citation existed, the finding would be a knowledge-backed finding instead.
 - `id` — a skill-defined slug, prefixed with `agent:` (mirroring the `<from-sub-skill>:` rule). For example, `agent:obsolete-find-signature`.
 - `confidence` — capped at `medium`. Without a knowledge-file citation there is no authoritative basis for `high` confidence.
 - `message` — non-empty and self-contained. It MUST describe the issue and a concrete recommendation, since a consumer rendering the finding has no knowledge-file footer to fall back on.
+- `from-sub-skill` — set by super-skills only. The literal string `"agent"` when the super-skill itself produced the finding from its own cross-cutting reasoning; or the producing leaf's `skill.id` when the super-skill is rolling up a leaf's agent finding. Absent on findings emitted directly by a leaf (the leaf's own report carries the finding under its `skill.id` already).
 
-Agent findings are emitted **only by super-skills** (the `al-code-review` super-skill is the canonical example). Leaf sub-skills MUST NOT emit agent findings: a leaf's job is to evaluate one knowledge subset, and a finding it cannot cite from that subset is out of scope for it. Before emitting an agent finding, a super-skill MUST validate the candidate against the BCQuality knowledge it has already loaded for the task — if a knowledge file matches, the candidate is upgraded to a knowledge-backed finding (and merged or deduplicated against any sub-skill output that already covers the same concern); if a knowledge file explicitly contradicts the candidate, it is suppressed.
+Agent findings may be emitted by both leaf sub-skills and super-skills, with different scope boundaries:
 
-Consumers that render output MAY treat agent findings differently from knowledge-backed findings (for example, by labelling them and routing them to a separate review domain). The `from-sub-skill: "agent"` marker is the contract they rely on.
+- A **leaf sub-skill** MAY emit agent findings strictly within its declared `domain`. al-security-review MAY surface an agent security finding that no knowledge file covers (for example, a `case` over a security-relevant enum with no `else` arm), but MUST NOT emit a style or performance agent finding — those are out of scope for the leaf and belong to other leaves or to the super-skill. The leaf's domain is the bounding box.
+- A **super-skill** MAY emit agent findings of any kind, but its self-review pass is most useful for **cross-cutting** concerns that span multiple leaf domains (architecture-level smells, error-handling gaps that touch security and reliability, resource lifecycle issues). Domain-specific agent reasoning is the leaves' job; the super-skill should not duplicate it.
+
+Before emitting an agent finding, a skill MUST validate the candidate against the BCQuality knowledge it has already loaded for the task — if a knowledge file matches, the candidate is upgraded to a knowledge-backed finding (and merged or deduplicated against any existing finding that already covers the same concern); if a knowledge file explicitly contradicts the candidate, it is suppressed. For a super-skill rolling up leaf reports, this validation is done against the union of knowledge files all leaves loaded, not just one leaf's set.
+
+Consumers that render output MAY treat agent findings differently from knowledge-backed findings (for example, by labelling them and routing them to a separate review domain). The `references: []` marker, together with the `agent:` `id` prefix, is the contract they rely on; `from-sub-skill: "agent"` is the additional marker for super-skill-emitted agent findings.
 
 **`findings[].severity`** — see the taxonomy below.
 
@@ -167,7 +172,7 @@ The first reference is the **primary** reference: the knowledge file the finding
 
 **`findings[].confidence`** — the skill's confidence that the finding is a true positive, given the evidence it evaluated. Not applicability confidence, not severity confidence. Values: `high`, `medium`, `low`.
 
-**`findings[].from-sub-skill`** — optional. Set only by super-skills. The `skill.id` of the sub-skill that produced the finding, or the literal string `"agent"` for an agent finding the super-skill produced from its own reasoning. Absent on findings produced directly by a leaf skill.
+**`findings[].from-sub-skill`** — optional. Set only by super-skills. The `skill.id` of the sub-skill that produced the finding, or the literal string `"agent"` for an agent finding the super-skill produced from its own cross-cutting reasoning. Absent on findings emitted directly by a leaf skill — including agent findings the leaf emits within its own domain, which appear in the leaf's own report without this field.
 
 **`findings[].suggested-code`** — optional. A concrete code-replacement payload for the lines indicated by `location`. When present, the string MUST be a literal replacement for the source lines covered by `location.line` (or `location.range` if set) — i.e., what the file would contain after the fix, with no surrounding diff markers, fences, or commentary. Consumers MAY render it as a one-click suggestion in the delivery surface (for example, a GitHub ```` ```suggestion ```` block). Emit `suggested-code` only when the fix is small, mechanical, and unambiguous; omit it when the appropriate fix depends on context the skill cannot determine. The `suggested-code` payload supplements `message`; it does not replace the explanation in `message`.
 
