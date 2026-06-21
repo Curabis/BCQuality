@@ -1,0 +1,34 @@
+{
+  "version": "0.2",
+  "language": "en,da",
+  "ignorePaths": [
+    "**/*.xlf",
+    "**/*.xml",
+    "**/node_modules/**",
+    "projectmemory/**",
+    "CLAUDE.md"
+  ],
+  "words": [
+    "Curabis",
+    "CURABIS",
+    "codeunit",
+    "Codeunits",
+    "xliff",
+    "subpage",
+    "FactBox",
+    "TestPage",
+    "pageextension",
+    "tableextension",
+    "permissionset",
+    "RunModal",
+    "SetValue",
+    "OpenEdit",
+    "OpenNew",
+    "FindFirst",
+    "FindSet",
+    "FindLast",
+    "WorkDate",
+    "CurrExchRate",
+    "NoImplicitWith"
+  ]
+}
