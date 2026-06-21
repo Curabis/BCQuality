@@ -1,0 +1,6 @@
+{
+  "tenantId": "CURABIS-TENANT-ID",
+  "clientId": "CURABIS-CLIENT-ID",
+  "clientSecret": "<indsæt din personlige client secret her>",
+  "baseUrl": "https://api.businesscentral.dynamics.com"
+}
