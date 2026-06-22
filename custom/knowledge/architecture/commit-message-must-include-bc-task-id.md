@@ -1,4 +1,4 @@
----
+﻿---
 name: commit-message-must-include-bc-task-id
 description: >
   Every commit message must begin with the BC task ID in [#id] format,
@@ -47,11 +47,16 @@ The sub-task has two numbers — do not confuse them:
 Always use `taskId` in commit messages. It is unambiguous across all projects
 and repos.
 
+> **Gotcha:** Users and conversations refer to tasks by `taskNo` — e.g. "opgave 51"
+> or "task 42". This is the natural shorthand and is correct for conversation.
+> But `taskNo` is NOT what goes in the commit message. Always look up `taskId`
+> from the MCP response before committing — they are different fields.
+
 ## How to find the taskId before committing
 
 1. Get the current branch: `git branch --show-current`
 2. Find the linked project via BC MCP (see `[[bc-mcp-find-active-task-for-branch]]`)
-3. Read `taskId` from the matching active task
+3. In the MCP response, read the **`taskId`** field — NOT `taskNo`
 4. Prefix every commit on this branch with `[#taskId]`
 
 If no task exists for the branch, create one first (see bc-mcp.agent.md
