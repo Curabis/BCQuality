@@ -43,6 +43,7 @@ BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup
 | bc-mcp.config.template.json | `{BASE}/machine/bc-mcp.config.template.json` |
 | bcquality.agent.md | `{BASE}/templates/bcquality.agent.md` |
 | immanuel.agent.md | `{BASE}/templates/immanuel.agent.md` |
+| francis.agent.md | `{BASE}/templates/francis.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
 
 CLAUDE.md and .mcp.json are generated dynamically — not fetched as static templates
@@ -158,10 +159,12 @@ These rules are always active.
 
 These are invoked only when needed - not at session start:
 
-- `.github/.agents/immanuel.agent.md` - BCQuality rule guardian. Invoke when the user
-  proposes adding a new rule to BCQuality. Runs the Categorical Imperative test and drafts
-  the knowledge file. Only Michael (mid) may approve and push rules to BCQuality.
-
+- `.github/.agents/francis.agent.md` - BCQuality rule proposer. Invoke at session end
+  or when a pattern suggests a rule is missing. Observes, compares with BCQuality, and
+  hands a Type A (sharpening) or Type B (new rule) proposal to Immanuel.
+- `.github/.agents/immanuel.agent.md` - BCQuality rule guardian. Invoke after Francis
+  has a proposal ready. Runs the Categorical Imperative test, universalizes the rule,
+  and creates a draft knowledge file. Michael (mid) merges the BCQuality PR to approve.
 ## AL projects
 
 {AL_PROJECTS_SECTION}
@@ -266,6 +269,7 @@ If `find-altool.ps1` is missing, note after writing .mcp.json:
 Fetch and write verbatim:
 - `{BASE}/templates/bcquality.agent.md` → `.github/.agents/bcquality.agent.md`
 - `{BASE}/templates/immanuel.agent.md`  → `.github/.agents/immanuel.agent.md`
+- `{BASE}/templates/francis.agent.md`   → `.github/.agents/francis.agent.md`
 
 Create `.github/.agents/` if it does not exist.
 
@@ -301,7 +305,7 @@ If yes, stage and commit:
 [SETUP] Konfigurer til CURABIS Standard
 
 - CLAUDE.md med BCQuality knowledge-liste
-- .github/.agents/bcquality.agent.md + immanuel.agent.md
+- .github/.agents/bcquality.agent.md + immanuel.agent.md + francis.agent.md
 - .mcp.json med BC MMP bridge
 - cspell.json
 - projectmemory/ mappe
@@ -325,6 +329,7 @@ Never touches `CLAUDE.md`, `projectmemory/`, or `~/.bc-mcp.config.json`.
 | `~/.claude/bc-mcp-bridge.js` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/bcquality.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/immanuel.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/francis.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `cspell.json` — words from template | Merge new words, keep project words |
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
 
