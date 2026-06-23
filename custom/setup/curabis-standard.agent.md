@@ -44,6 +44,9 @@ BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup
 | bcquality.agent.md | `{BASE}/templates/bcquality.agent.md` |
 | immanuel.agent.md | `{BASE}/templates/immanuel.agent.md` |
 | francis.agent.md | `{BASE}/templates/francis.agent.md` |
+| al-triage.agent.md | `{BASE}/templates/al-triage.agent.md` |
+| al-complexity.agent.md | `{BASE}/templates/al-complexity.agent.md` |
+| bc-mcp.agent.md | `{BASE}/templates/bc-mcp.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
 
 CLAUDE.md and .mcp.json are generated dynamically — not fetched as static templates
@@ -165,6 +168,15 @@ These are invoked only when needed - not at session start:
 - `.github/.agents/immanuel.agent.md` - BCQuality rule guardian. Invoke after Francis
   has a proposal ready. Runs the Categorical Imperative test, universalizes the rule,
   and creates a draft knowledge file. Michael (mid) merges the BCQuality PR to approve.
+- `.github/.agents/al-triage.agent.md` - reactive diagnosis when a build, test, or runtime
+  is already broken. Reproduce -> root-cause -> minimal-fix. Read-only; it recommends,
+  it does not apply. Invoke when the user reports an error, a failing test, or a regression.
+- `.github/.agents/al-complexity.agent.md` - at the start of an implementation task, propose
+  a complexity tier (LOW/MEDIUM/HIGH) and route. Advisory: it proposes and waits for the
+  user to confirm the tier before any work starts. Never routes or codes on its own.
+- `.github/.agents/bc-mcp.agent.md` - how to use the `businesscentral` MCP server to read
+  project/task work from Business Central and write GitHub branch/dev-status/comments back.
+  Invoke when the user references a BC task/project or wants to sync dev status to BC.
 ## AL projects
 
 {AL_PROJECTS_SECTION}
@@ -270,6 +282,9 @@ Fetch and write verbatim:
 - `{BASE}/templates/bcquality.agent.md` → `.github/.agents/bcquality.agent.md`
 - `{BASE}/templates/immanuel.agent.md`  → `.github/.agents/immanuel.agent.md`
 - `{BASE}/templates/francis.agent.md`   → `.github/.agents/francis.agent.md`
+- `{BASE}/templates/al-triage.agent.md`  → `.github/.agents/al-triage.agent.md`
+- `{BASE}/templates/al-complexity.agent.md` → `.github/.agents/al-complexity.agent.md`
+- `{BASE}/templates/bc-mcp.agent.md`     → `.github/.agents/bc-mcp.agent.md`
 
 Create `.github/.agents/` if it does not exist.
 
@@ -330,6 +345,9 @@ Never touches `CLAUDE.md`, `projectmemory/`, or `~/.bc-mcp.config.json`.
 | `.github/.agents/bcquality.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/immanuel.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/francis.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/al-triage.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/al-complexity.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/bc-mcp.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `cspell.json` — words from template | Merge new words, keep project words |
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
 
