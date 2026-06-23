@@ -1,71 +1,33 @@
----
-bc-version: [all]
-domain: testing
-keywords: [test, library, setup, initialize, suppresscommit, asserterror]
-technologies: [al]
-countries: [w1]
-application-area: [all]
----
+# CURABIS Test Library Standards
 
-## Description
+## Core Rules
 
-In CURABIS test apps, all test setup is centralized in a dedicated Test Library
-codeunit (e.g. `SV Test Library`). Individual test procedures must not call
-BC standard library codeunits (`LibrarySales`, `LibraryInventory`, etc.) directly.
+The documentation establishes three critical testing practices for CURABIS AL applications:
 
-Additionally, two rules apply to every test that calls a posting codeunit:
+1. **Centralized Setup**: "all test setup is centralized in a dedicated Test Library codeunit" rather than individual test procedures calling BC standard libraries directly.
 
-1. `SetSuppressCommit(true)` must be called before `Run()` to prevent data
-   from leaking between tests.
-2. `asserterror` must always be followed by `Assert.ExpectedErrorCode()` or
-   `Assert.ExpectedError()` — a naked `asserterror` passes on any error,
-   not just the expected one.
+2. **Suppress Commits**: `SetSuppressCommit(true)` must execute before `Run()` to isolate test data and prevent cross-test contamination.
 
-## Anti Pattern
+3. **Assertion After asserterror**: Every `asserterror` statement requires a subsequent `Assert.ExpectedErrorCode()` or `Assert.ExpectedError()` call to validate the specific error, preventing false passes from unexpected exceptions.
 
-```al
-// WRONG: inline setup bypassing the test library
-procedure MyTest()
-var
-    Item: Record Item;
-begin
-    LibraryInventory.CreateItem(Item);   // do not call directly
-    // ...
-end;
-```
+## Key Violations
 
-```al
-// WRONG: posting without SuppressCommit
-SVPost.Run(SVHeader);   // commits to test database
-```
+The anti-patterns section highlights three common mistakes:
 
-```al
-// WRONG: naked asserterror
-asserterror SVPost.Run(SVHeader);
-// no assertion follows — passes on any error
-```
+- Bypassing the test library by directly invoking BC standard codeunits like `LibraryInventory`
+- Executing posting operations without suppressing commits, which "commits to test database"
+- Using "naked asserterror" that "passes on any error, not just the expected one"
 
-## Best Practice
+## Correct Implementation
 
-```al
-// CORRECT: delegate to test library
-procedure MyTest()
-var
-    Item: Record Item;
-begin
-    SVLib.GivenScrapItem(Item);   // test library owns setup
-    // ...
-end;
-```
+The best practice section demonstrates the preferred approach: delegating setup operations to the test library (e.g., `SVLib.GivenScrapItem()`), enabling `SuppressCommit` before posting operations, and pairing error assertions with specific error code validations.
 
-```al
-// CORRECT: SuppressCommit before Run
-SVPost.SetSuppressCommit(true);
-SVPost.Run(SVHeader);
-```
+These guidelines ensure test isolation, maintainability, and reliability across CURABIS test suites.
 
-```al
-// CORRECT: asserterror followed by assertion
-asserterror SVPost.Run(SVHeader);
-Assert.ExpectedErrorCode('Dialog');
-```
+## BCApps Reference
+
+The test library pattern originates from BCApps. The Microsoft-maintained test framework libraries (`Library - ERM`, `Library - Inventory`, `Library - Sales`, `Library - Utility`, etc.) are defined in BCApps and establish the canonical pattern for centralized, reusable test setup. CURABIS's own Test Library codeunit follows this same structural model.
+
+- **Source:** https://github.com/microsoft/BCApps/tree/main/src/Tools/Test%20Framework
+- **Pattern:** Microsoft never writes inline setup logic inside individual test procedures. All setup is routed through library codeunits that can be reused, versioned, and maintained independently of the test cases themselves.
+- **Why this matters:** BCApps Test Framework is the ground truth for how BC testing is intended to work. Deviating from this pattern creates test suites that are harder to maintain and more likely to share state across tests.

@@ -1,88 +1,38 @@
----
-bc-version: [all]
-domain: testing
-keywords: [test, hardcode, random, library, no-series, setup, data]
-technologies: [al]
-countries: [w1]
-application-area: [all]
----
+# CURABIS Test Data Guidelines
 
-## Description
+## Core Principle
 
-CURABIS tests assume an empty database. All test data must be created
-programmatically — never assume existing records or hardcode codes, numbers,
-or names that may or may not exist in a given environment.
+"CURABIS tests assume an empty database. All test data must be created programmatically — never assume existing records or hardcode codes, numbers, or names that may or may not exist in a given environment."
 
-Three concrete rules:
+## Three Mandatory Rules
 
-**1. Use MS Library codeunits for standard BC objects.**
-No-series, G/L accounts, customers, vendors, items, locations, posting groups —
-all created via `Library - ERM`, `Library - Inventory`, `Library - Sales` etc.
-These tools generate random codes that do not collide across test runs.
+**Rule 1: Leverage Microsoft Libraries**
+Use built-in setup codeunits (`Library - ERM`, `Library - Inventory`, `Library - Sales`) for standard Business Central objects like no-series, G/L accounts, customers, and items. These generate collision-free random codes.
 
-**2. Fill all required fields with random values.**
-A `Code[10]` field gets 10 random characters. A `Text[50]` field gets random text.
-Use `Library - Utility` or `Any` codeunit for random generation.
-Partial setup that leaves required fields empty is not acceptable.
+**Rule 2: Complete All Required Fields**
+Every mandatory field must receive a value. A `Code[10]` field requires 10 random characters; `Text[50]` needs randomized text. Partial setups violating this principle are prohibited.
 
-**3. Build your own tools for custom tables.**
-For CURABIS-specific tables (e.g. `Settlement Payment Method`,
-`Settlement Voucher Setup`), maintain dedicated setup procedures in the
-Test Library codeunit. These procedures must follow the same pattern as
-Microsoft's libraries: create records programmatically, use random values
-for codes where no fixed value is required by the flow being tested.
+**Rule 3: Create Custom Procedures for Domain-Specific Tables**
+For CURABIS-exclusive tables, build dedicated setup functions in Test Library following Microsoft's patterns: programmatic creation with random values unless the test documents a fixed contract requirement.
 
-**Exception — integration and flow tests.**
-When a test validates a specific integration contract (e.g. a fixed JSON
-structure from a web service, a specific EDIFACT message, a fixed counterparty
-code expected by an external system), hardcoded values are acceptable and
-necessary. The test is documenting the contract, not exercising random data.
+## Critical Exception
 
-## Anti Pattern
+Integration and flow tests validating external contracts (JSON structures, EDIFACT messages, counterparty codes) may use hardcoded values. These tests document the integration specification itself, not arbitrary test logic.
 
-```al
-// WRONG: hardcoded code that may or may not exist
-if not PaymentMethod.Get('CASH') then begin
-    PaymentMethod.Code := 'CASH';
-    ...
-end;
-```
+## Anti-Patterns to Avoid
 
-```al
-// WRONG: hardcoded source code
-SourceCode.Code := 'SV-POST';
-```
+- Conditional hardcoded lookups assuming pre-existing data
+- Shortened field values not matching declared field length
+- Underfilled required fields
 
-```al
-// WRONG: partial setup — Code[10] left short
-PaymentMethod.Code := 'C';   // not filled to capacity
-```
+## Implementation Example
 
-## Best Practice
+Generate randomized payment method codes via `LibraryUtility.GenerateRandomCode()` rather than assuming 'CASH' exists. Create source codes through `LibraryERM.CreateSourceCode()` and retrieve no-series using `LibraryUtility.GetGlobalNoSeriesCode()`.
 
-```al
-// CORRECT: random code via LibraryUtility
-PaymentMethod.Code :=
-    CopyStr(LibraryUtility.GenerateRandomCode(
-        PaymentMethod.FieldNo(Code), DATABASE::"Settlement Payment Method"), 1, 10);
-PaymentMethod.Description := LibraryUtility.GenerateRandomText(50);
-PaymentMethod.Insert();
-```
+## BCApps Reference
 
-```al
-// CORRECT: source code created via standard MS pattern
-LibraryERM.CreateSourceCode(SourceCode);
-GlobalSourceCode := SourceCode.Code;
-// then assign to Source Code Setup
-```
+The randomization helpers central to this rule — `LibraryUtility.GenerateRandomCode()`, `LibraryERM.CreateSourceCode()`, `LibraryUtility.GetGlobalNoSeriesCode()` — are implemented and maintained in BCApps. BCApps test code never hardcodes record identifiers like `'CASH'`, `'10000'`, or `'70000'`; all test data is generated programmatically.
 
-```al
-// CORRECT: no-series via MS library
-GlobalNoSeriesCode := LibraryUtility.GetGlobalNoSeriesCode();
-```
-
-```al
-// CORRECT: hardcoded in integration test — documenting a contract
-// [SCENARIO] Inbound ORDRSP with fixed order reference from Allnet Germany
-ExpectedOrderRef := 'ORD-2026-00001';   // fixed by integration contract
-```
+- **Source:** https://github.com/microsoft/BCApps/tree/main/src/Tools/Test%20Framework
+- **Pattern:** BCApps test codeunits create every required record from scratch using library helpers that guarantee uniqueness per test run. The CURABIS rule mirrors this approach exactly.
+- **Note:** The `BCPTCreateSOWithNLines.Codeunit.al` sample in BCApps uses `Customer.get('10000')` as a fallback — this is a BCPT performance scenario (not a correctness test) and explicitly acknowledges this deviation. Correctness tests must never do this.
