@@ -136,31 +136,15 @@ This file is read automatically by Claude Code at the start of every session.
 At the start of every session, before doing anything else:
 
 1. Read `.github/.agents/bcquality.agent.md`
-2. Fetch and read ALL knowledge files listed under Source - Layer 2:
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/pages-must-not-contain-business-logic.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/namespace-must-be-verified-from-source.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/al-identifiers-must-be-english.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/clarify-before-building.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/xliff-translation-workflow.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/new-file-requires-vscode-refresh.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/exposed-objects-must-be-in-a-permission-set.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/shared-project-memory-must-be-in-repo.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/commit-message-must-include-bc-task-id.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/branch-merge-to-main-workflow.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-setup-must-use-library-codeunit.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-data-must-be-random-and-complete.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/tests-must-adapt-to-existing-code.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-one-when-per-test.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/ui-test-codeunit-naming.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-feature-scenario-tags.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-flowfields-must-be-calcfields.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/stored-derived-fields-must-not-be-exposed-directly.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-key-fields-must-be-editable-on-insert.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-least-privilege-write-access.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/agent-must-not-write-business-process-status.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/bc-mcp-find-active-task-for-branch.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/agent-must-resolve-developer-identity-from-bc.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/ai-eval-scores-must-be-posted-to-bc-table.md
+2. Read BCQuality knowledge files from local cache (no network — fast):
+   ```
+   C:\Users\mid\.claude\bcquality-knowledge\architecture\*.md
+   C:\Users\mid\.claude\bcquality-knowledge\testing\*.md
+   C:\Users\mid\.claude\bcquality-knowledge\mcp\*.md
+   ```
+   The cache is populated automatically when BCQuality updates (via global CLAUDE.md
+   auto-update). If the cache is missing or empty on first run, the auto-update will
+   populate it. Do not fetch URLs manually unless explicitly asked.
 
 These rules are always active.
 
