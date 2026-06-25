@@ -89,17 +89,17 @@ Se `florence.agent.md` for den fulde checkprotokol.
 
 ---
 
-### 8. Developer AI Interaction Quality
-Invoke Weber (`weber.agent.md`) kun hvis session-transskripter eller BC-opgave-kommentarer
-er tilgængelige for review.
+### 8. Den rette and
+Kald Weber (`weber.agent.md`) hvis der ligger nye dokumenter i `.decisions/` siden
+sidste runde. Spørgsmålet er: *vidste udvikleren hvilken and der skulle bygges?*
 
 | Klassifikation | Kriterium |
 |---|---|
-| Routine | Alle tilgængelige prompts klassificeret Specific eller Partially specific |
-| Notable | 1 Vague prompt — Weber har coaching-note klar |
-| Concerning | 2+ Vague prompts i samme session, eller samme gap gentager sig |
+| Routine | Alle specs denne uge: Klar and |
+| Notable | Én Uklar and — coaching-note sendt til udvikleren |
+| Concerning | Blind and observeret, eller samme gap to uger i træk |
 
-Weber rapporterer kun til udvikleren — aldrig direkte til ledelsen.
+Weber rapporterer kun til udvikleren. Aggregerede mønstre, uden navne, til ledelsen.
 
 ---
 
