@@ -58,6 +58,26 @@ improvise the checklist — she follows it exactly, and flags if it is outdated.
 
 ## Round protocol
 
+### Step 0 — Timestamp gate
+
+Before doing anything, check `~/.claude/.florence-timestamp`:
+
+```
+$ts = Get-Content ~/.claude/.florence-timestamp -ErrorAction SilentlyContinue
+$age = if ($ts) { ((Get-Date) - [datetime]$ts).TotalMinutes } else { 999 }
+```
+
+- If `$age < 30`: skip the round entirely. Silence is the report.
+- If `$age >= 30` (or file missing): proceed to Step 1.
+
+After completing Step 4 (report), always write the current timestamp:
+```
+(Get-Date -Format "o") | Set-Content ~/.claude/.florence-timestamp
+```
+
+This prevents Florence from running more than once per 30 minutes,
+regardless of how many sessions are opened.
+
 ### Step 1 — Read the checklist
 Open HEARTBEAT.md. Note the last round timestamp. Proceed item by item.
 
