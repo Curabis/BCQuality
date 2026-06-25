@@ -48,6 +48,7 @@ AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/ag
 | al-triage.agent.md | `{BASE}/templates/al-triage.agent.md` |
 | al-complexity.agent.md | `{BASE}/templates/al-complexity.agent.md` |
 | bc-mcp.agent.md | `{BASE}/templates/bc-mcp.agent.md` |
+| algo-settings.agent.md | `{BASE}/templates/algo-settings.agent.md` |
 | columbo.agent.md | `{AGENTS_BASE}/columbo.agent.md` |
 | florence.agent.md | `{AGENTS_BASE}/florence.agent.md` |
 | m365.agent.md | `{AGENTS_BASE}/m365.agent.md` |
