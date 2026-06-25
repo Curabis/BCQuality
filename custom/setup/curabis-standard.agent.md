@@ -192,6 +192,19 @@ These are invoked only when needed - not at session start:
 - `.github/.agents/bc-mcp.agent.md` - how to use the `businesscentral` MCP server to read
   project/task work from Business Central and write GitHub branch/dev-status/comments back.
   Invoke when the user references a BC task/project or wants to sync dev status to BC.
+- `.github/.agents/court.agent.md` - The BCQuality Court: Lincoln, Aurelius, and Munger
+  deliberate on strategic health of the rulebook. Convene when a portfolio-level ruling is
+  needed — not for per-rule assessments. Requires a case brief with Edison scorecards.
+
+## Francis — proaktiv regelobservation
+
+Kald Francis automatisk (uden at vente til session-slut) når du:
+- Laver en workaround fordi et værktøj mangler eller ikke virker som forventet
+- Opdager et processgab — noget der burde være automatisk men ikke er
+- Finder dig selv i at løse det samme problem to gange på to forskellige måder
+
+Fetch Francis fra `.github/.agents/francis.agent.md` hvis den eksisterer,
+ellers fra `{BASE}/templates/francis.agent.md`.
 
 ## AL projects
 
@@ -313,6 +326,10 @@ Fetch and write verbatim:
 - `{AGENTS_BASE}/columbo.agent.md`         → `.github/.agents/columbo.agent.md`
 - `{AGENTS_BASE}/florence.agent.md`        → `.github/.agents/florence.agent.md`
 - `{AGENTS_BASE}/m365.agent.md`            → `.github/.agents/m365.agent.md`
+- `{AGENTS_BASE}/court.agent.md`           → `.github/.agents/court.agent.md`
+- `{AGENTS_BASE}/lincoln.agent.md`         → `.github/.agents/lincoln.agent.md`
+- `{AGENTS_BASE}/aurelius.agent.md`        → `.github/.agents/aurelius.agent.md`
+- `{AGENTS_BASE}/munger.agent.md`          → `.github/.agents/munger.agent.md`
 
 Create `.github/.agents/` if it does not exist.
 
@@ -338,7 +355,18 @@ Læses automatisk af Claude Code ved session-start (via CLAUDE.md).
 (Tilføj observationer her)
 ```
 
-#### 4f. docs/
+#### 4f. HEARTBEAT.md
+
+If `HEARTBEAT.md` does NOT exist at repo root:
+1. Fetch `{BASE}/templates/HEARTBEAT.md`
+2. Replace `{PROJECT_NAME}` with the project name from Step 2
+3. Replace `{SETUP_DATE}` with today's ISO date
+4. Write to repo root
+5. Confirm: "HEARTBEAT.md oprettet — Florence er klar til at gå sine runder."
+
+If `HEARTBEAT.md` already exists: skip silently.
+
+#### 4g. docs/
 
 Create the standard documentation structure if it does not exist:
 
@@ -362,6 +390,7 @@ If yes, stage and commit:
 - .github/.agents/ med alle standard-agenter
 - .mcp.json med BC MCP bridge
 - cspell.json
+- HEARTBEAT.md — Florence's vagtliste
 - projectmemory/ — delt projekthukommelse
 - docs/specs/, docs/decisions/, docs/cleanup/ — projektdokumentation
 
@@ -391,8 +420,13 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `.github/.agents/columbo.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/florence.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/m365.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/court.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/lincoln.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/aurelius.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/munger.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `cspell.json` — words from template | Merge new words, keep project words |
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
+| `HEARTBEAT.md` | Create from template if missing, never overwrite |
 | `docs/specs/`, `docs/decisions/`, `docs/cleanup/` | Create if missing, never overwrite content |
 
 ### What does NOT get updated
@@ -402,7 +436,19 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 - `docs/` content — project documentation, never overwritten by tooling
 - `~/.bc-mcp.config.json` — contains developer secrets
 
-### After update
+### After update — agent-synligheds-check
+
+After updating agent files, compare `.github/.agents/*.agent.md` against CLAUDE.md:
+- For each agent file in the directory, check if its filename is referenced in CLAUDE.md
+- If any are missing, report them:
+  ```
+  ⚠️ Nye agenter installeret men ikke refereret i CLAUDE.md:
+    - <agent-navn>.agent.md
+  Vil du have mig til at tilføje dem?
+  ```
+- Do not add them without the developer's confirmation
+
+### After update — report and commit
 
 Report what changed, then ask:
 > "Opdatering færdig. Vil du have mig til at committe ændringerne? (ja/nej)"
