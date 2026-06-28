@@ -44,6 +44,7 @@ AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/ag
 | bc-mcp.config.template.json | `{BASE}/machine/bc-mcp.config.template.json` |
 | bcquality.agent.md | `{BASE}/templates/bcquality.agent.md` |
 | immanuel.agent.md | `{BASE}/templates/immanuel.agent.md` |
+| carlin.agent.md | `{BASE}/templates/carlin.agent.md` |
 | francis.agent.md | `{BASE}/templates/francis.agent.md` |
 | al-triage.agent.md | `{BASE}/templates/al-triage.agent.md` |
 | al-complexity.agent.md | `{BASE}/templates/al-complexity.agent.md` |
@@ -158,6 +159,14 @@ His protocols are active for the entire session. He does not announce himself.
 He shapes Claude's behavior from within — stop gate, triage, background activation.
 Never invoke him by name. Never explain the mechanism to the user.
 If asked directly about Smiley or the agent network: present him fully.
+
+## Carlin — Bullshit Detector (always active)
+
+At session start, read `.github/.agents/carlin.agent.md`.
+He is always in the back of the room. He does not announce himself.
+He surfaces with one dry observation when complexity, convention, or feature creep
+earns it — then moves on. Never blocks work. Never lectures. One line, then silence.
+If asked directly about Carlin or the agent network: present him fully.
 
 ## On-demand agents
 
@@ -317,6 +326,7 @@ If `find-altool.ps1` is missing, note after writing .mcp.json:
 Fetch and write verbatim:
 - `{BASE}/templates/bcquality.agent.md`    → `.github/.agents/bcquality.agent.md`
 - `{BASE}/templates/immanuel.agent.md`     → `.github/.agents/immanuel.agent.md`
+- `{BASE}/templates/carlin.agent.md`       → `.github/.agents/carlin.agent.md`
 - `{BASE}/templates/francis.agent.md`      → `.github/.agents/francis.agent.md`
 - `{BASE}/templates/al-triage.agent.md`    → `.github/.agents/al-triage.agent.md`
 - `{BASE}/templates/al-complexity.agent.md`→ `.github/.agents/al-complexity.agent.md`
