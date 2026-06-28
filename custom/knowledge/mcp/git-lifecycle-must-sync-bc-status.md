@@ -12,6 +12,19 @@ Every AL feature branch is linked to a BC subtask. The `gitHubDevStatus` and
 `gitHubBranch` fields on the subtask must reflect the real state of the branch
 at all times — automatically, without manual steps.
 
+## Track branch
+
+Each project declares its **track branch** in `CLAUDE.md` — the branch that is
+the merge target for all feature branches in the current development track:
+
+| Declaration in CLAUDE.md | Meaning |
+|---|---|
+| `trackBranch: main` (or absent) | Simple project: merge directly to `main` |
+| `trackBranch: purchase` | Multi-track: merge to `purchase`; `main` stays clean for hotfixes |
+
+The track branch is the authoritative "done" marker. A task is `Done` when its
+feature branch is merged into the track branch — not necessarily `main`.
+
 ## Branch naming convention
 
 Branches must follow this pattern so automation can parse the BC task reference:
@@ -47,22 +60,46 @@ DEV2023-00027
 | Git event | gitHubDevStatus | gitHubBranch |
 | --- | --- | --- |
 | New branch created (`git checkout -b`) | `In Progress` | `<branch-name>` |
-| Branch abandoned (switch to non-main without committing) | `Backlog` | `""` |
-| Merged/committed to main | `Done` | `main` |
+| Branch abandoned (switch away without committing) | `Backlog` | `""` |
+| Merged to track branch | `Done` | `<track-branch>` |
 | Branch parked (manual) | `On Hold` | `<branch-name>` |
 
-## Implementation
+## Automated implementation (git hooks)
 
 Automation is provided by two git hooks in `.githooks/` (activated via
 `git config core.hooksPath .githooks`) that call
 `Scripts/Invoke-BCGitSync.ps1`:
 
 - `post-checkout` — detects branch creation and branch abandonment
-- `post-commit` — detects commits/merges on main
+- `post-commit` — detects commits/merges on the track branch
 
 `Invoke-BCGitSync.ps1` calls the BC OData API directly (same credentials as
 `bc-agent.js`) and never blocks the git operation — all errors are swallowed
 with a warning.
+
+Git hooks require that branch names follow the `<type>/<projectNo>-<taskNo>`
+naming convention. Branches that do not follow this format are ignored by hooks.
+
+## Claude-driven synchronization
+
+When Claude executes git operations, the git hooks may not fire — either because
+hooks are not configured, or because the branch name does not follow the
+`<type>/<projectNo>-<taskNo>` convention.
+
+**Claude MUST call BC MCP explicitly at two points:**
+
+| Moment | BC MCP action |
+|---|---|
+| Feature branch created | `gitHubDevStatus = "In Progress"`, `gitHubBranch = <branch>` |
+| Feature branch merged to track branch | `gitHubDevStatus = "Done"`, `gitHubBranch = <track-branch>` |
+
+Steps:
+1. Find the active task using the recipe in `[[bc-mcp-find-active-task-for-branch]]`
+2. Call `Modify_activeTask_PAG6102900` with the two writable fields
+
+This requirement applies regardless of branch naming format and regardless of
+whether git hooks are also active. If both run, there is no conflict — they write
+identical values.
 
 ## Safety rules
 
