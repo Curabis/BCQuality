@@ -43,6 +43,7 @@ BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup
 | bc-mcp.config.template.json | `{BASE}/machine/bc-mcp.config.template.json` |
 | bcquality.agent.md | `{BASE}/templates/bcquality.agent.md` |
 | immanuel.agent.md | `{BASE}/templates/immanuel.agent.md` |
+| carlin.agent.md | `{BASE}/templates/carlin.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
 
 CLAUDE.md and .mcp.json are generated dynamically — not fetched as static templates
@@ -153,6 +154,14 @@ At the start of every session, before doing anything else:
    - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/bc-mcp-find-active-task-for-branch.md
 
 These rules are always active.
+
+## Carlin — Bullshit Detector (always active)
+
+At session start, read `.github/.agents/carlin.agent.md`.
+He is always in the back of the room. He does not announce himself.
+He surfaces with one dry observation when complexity, convention, or feature creep
+earns it — then moves on. Never blocks work. Never lectures. One line, then silence.
+If asked directly about Carlin or the agent network: present him fully.
 
 ## On-demand agents
 
@@ -266,6 +275,7 @@ If `find-altool.ps1` is missing, note after writing .mcp.json:
 Fetch and write verbatim:
 - `{BASE}/templates/bcquality.agent.md` → `.github/.agents/bcquality.agent.md`
 - `{BASE}/templates/immanuel.agent.md`  → `.github/.agents/immanuel.agent.md`
+- `{BASE}/templates/carlin.agent.md`    → `.github/.agents/carlin.agent.md`
 
 Create `.github/.agents/` if it does not exist.
 
