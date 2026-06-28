@@ -1,40 +1,43 @@
-# CURABIS MCP: ODataKeyFields Must Be Editable for Create Operations
+# CURABIS MCP: ODataKeyFields Editability Rule
 
-## Core Principle
+## The Rule
 
-Fields declared in `ODataKeyFields` that identify the record must not have `Editable = false` when the API page allows insert. If they are read-only, the OData API rejects them as unknown properties on POST — the create operation fails and the caller receives a `BadRequest` error.
+Key fields declared in `ODataKeyFields` cannot have `Editable = false` when the API page permits inserts and **the field is consumer-provided**. This restriction causes the OData layer to reject the field as an unknown property during POST operations.
 
-## Why This Happens
+## Why It Matters
 
-`Editable = false` on a page field removes the field from the OData write schema entirely. When a consumer POSTs a new record and includes the key field in the body, BC cannot match it to any writable property and rejects the request.
+When a field is marked read-only, Business Central removes it from the OData write schema. If a consumer attempts to POST a new record with that key field in the request body, the system cannot match it to any writable property and returns a `BadRequest` error.
 
-## Pattern to Avoid
+## Problematic vs. Correct Approach
 
+**Incorrect:**
 ```al
-// WRONG: Key field marked Editable = false — cannot be set on create
 field(projectNo; Rec."Project No.")
 {
-    Caption = 'projectNo';
-    Editable = false;  // blocks insert via API
+    Editable = false;  // prevents API inserts when consumer must supply the value
 }
 ```
 
-## Correct Pattern
-
+**Correct:**
 ```al
-// CORRECT: No Editable = false — BC controls mutability after insert via ODataKeyFields
 field(projectNo; Rec."Project No.")
 {
-    Caption = 'projectNo';
+    // No Editable = false — consumer supplies this on POST
 }
 ```
 
-## Requirements
+## Key Takeaways
 
-- Fields listed in `ODataKeyFields` must not carry `Editable = false` on pages where `InsertAllowed = true`
-- Fields that should be read-only after creation but writable on insert need no special property — OData key semantics handle immutability after the record exists
-- Non-key fields that are genuinely read-only may still use `Editable = false`
+- Every **consumer-provided** field referenced in `ODataKeyFields` on pages where `InsertAllowed = true` must remain editable
+- The OData specification itself enforces immutability of key fields post-creation — no additional markup required
+- Non-key fields can still use `Editable = false` without triggering this issue
+- Test create operations via your OData endpoint to verify compliance
 
-## Verification
+## BCApps Reference
 
-On any API page with `InsertAllowed = true`, confirm that every field referenced in `ODataKeyFields` does not have `Editable = false` in its field definition. A create test via the OData endpoint is the definitive check.
+BCApps `BCPTSuiteAPI.Page.al` uses `ODataKeyFields = SystemId` with `SystemId` marked `Editable = false`. This is a **valid exception** — `SystemId` is a system-generated GUID that BC assigns automatically on insert. The consumer never provides it in a POST body, so marking it non-editable does not break API inserts.
+
+- **Source:** https://github.com/microsoft/BCApps/blob/main/src/Tools/Performance%20Toolkit/App/src/BCPTSuiteAPI.Page.al
+- **Clarification from BCApps:** The rule distinguishes two key field types:
+  - **Auto-generated keys** (`SystemId`, auto-numbered codes): May be `Editable = false` — BC supplies the value, not the consumer.
+  - **Consumer-provided keys** (`"Project No."`, `"Code"`, `"Entry No."`): Must remain editable — the POST request must include this value and BC must accept it.

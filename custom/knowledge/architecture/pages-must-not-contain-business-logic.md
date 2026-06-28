@@ -1,65 +1,39 @@
----
-bc-version: [all]
-domain: architecture
-keywords: [page, trigger, onaction, modify, codeunit, logic]
-technologies: [al]
-countries: [w1]
-application-area: [all]
----
+# CURABIS Architecture: Page Presentation vs. Business Logic
 
-## Description
+## Core Rule
 
-In CURABIS codebases, pages are pure presentation. Business logic, calculations,
-validations, and record modifications belong in codeunits — not in page triggers
-or actions. This is stricter than the general BC guidance and applies to all
-CURABIS PTE apps.
+In CURABIS codebases, pages serve exclusively as presentation layers. All business logic—including calculations, validations, and record modifications—must reside in codeunits, not in page triggers or actions. This standard is more rigorous than general Business Central guidance and applies uniformly across all CURABIS PTE applications.
 
-A page procedure that calculates a value and assigns it to a field, calls
-`Rec.Modify()` directly, or implements business rules is an architecture violation
-even if it compiles.
+## Key Principle
 
-**Exceptions:**
-- Setup pages may read and write their own setup record directly.
-- The designated "Run Conversion" page may call the conversion codeunit directly.
+"A page procedure that calculates a value and assigns it to a field, calls `Rec.Modify()` directly, or implements business rules is an architecture violation even if it compiles."
 
-## Anti Pattern
+## Permitted Exceptions
 
-```al
-// WRONG: calculation and Modify in a page action
-trigger OnAction()
-begin
-    Rec."Total Amount" := Rec.Quantity * Rec."Unit Price";
-    Rec."VAT Amount" := Rec."Total Amount" * 0.25;
-    Rec.Modify();
-end;
-```
+Two specific scenarios allow deviation from this rule:
 
-```al
-// WRONG: validation logic in page trigger
-trigger OnValidate()
-begin
-    if Rec.Quantity < 0 then
-        Error('Quantity cannot be negative');
-    Rec."Total Amount" := Rec.Quantity * Rec."Unit Price";
-end;
-```
+1. **Setup Pages**: May directly read and write their own setup records
+2. **Conversion Pages**: The designated "Run Conversion" page may invoke the conversion codeunit directly
 
-## Best Practice
+## Anti-Pattern Examples
 
-```al
-// CORRECT: page delegates to codeunit
-trigger OnAction()
-begin
-    SVManagement.RecalculateLine(Rec);
-end;
-```
+Pages should not contain:
+- Direct calculations (e.g., `Rec."Total Amount" := Rec.Quantity * Rec."Unit Price"`)
+- Calls to `Rec.Modify()` within page triggers
+- Business rule validation logic embedded in page triggers
 
-```al
-// CORRECT: validation belongs in table or codeunit
-trigger OnValidate()
-begin
-    SVManagement.ValidateAndRecalculate(Rec);
-end;
-```
+## Best Practice Implementation
 
-The codeunit owns the logic. The page owns the presentation.
+Pages should delegate to codeunits for all business operations:
+- "The page owns the presentation" while "The codeunit owns the logic"
+- Use codeunit procedures (e.g., `SVManagement.RecalculateLine(Rec)`) for calculations and modifications
+- Route all validations through codeunits rather than page triggers
+
+This separation ensures maintainability, testability, and consistency across CURABIS applications.
+
+## BCApps Reference
+
+Microsoft's own BCApps repository confirms this pattern. In the Performance Toolkit, `BCPTSetupCard.Page.al` and `BCPTSetupList.Page.al` contain no business logic — all operations are delegated to `BCPTStartTests.Codeunit.al` and `BCPTHeader.Codeunit.al`. This is consistent across all BCApps pages.
+
+- **Source:** https://github.com/microsoft/BCApps/tree/main/src/Tools/Performance%20Toolkit/App/src
+- **Pattern:** Pages only bind data and invoke actions; codeunits own all state mutations and business rules. Microsoft applies this uniformly across thousands of pages in BCApps.

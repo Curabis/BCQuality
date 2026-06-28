@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 1
+version: 3
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -9,7 +9,7 @@ description: >
   from authoritative templates in BCQuality. Deploys bc-mcp-bridge.js to the
   developer's machine. Also handles updates to an already-configured project.
 inputs: [repo-root]
-outputs: [CLAUDE.md, .mcp.json, .github/.agents/*, cspell.json, projectmemory/]
+outputs: [CLAUDE.md, .mcp.json, .github/.agents/*, cspell.json, projectmemory/, docs/]
 domain: setup
 keywords: [setup, bootstrap, update, mcp, bcquality, standard, new-project]
 ---
@@ -34,7 +34,8 @@ Detect which mode based on the trigger phrase and proceed accordingly.
 ## Source URLs (BCQuality — always fetch fresh)
 
 ```
-BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup
+BASE        = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup
+AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/agents
 ```
 
 | Artefakt | URL |
@@ -44,6 +45,16 @@ BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup
 | bcquality.agent.md | `{BASE}/templates/bcquality.agent.md` |
 | immanuel.agent.md | `{BASE}/templates/immanuel.agent.md` |
 | carlin.agent.md | `{BASE}/templates/carlin.agent.md` |
+| francis.agent.md | `{BASE}/templates/francis.agent.md` |
+| al-triage.agent.md | `{BASE}/templates/al-triage.agent.md` |
+| al-complexity.agent.md | `{BASE}/templates/al-complexity.agent.md` |
+| bc-mcp.agent.md | `{BASE}/templates/bc-mcp.agent.md` |
+| algo-settings.agent.md | `{BASE}/templates/algo-settings.agent.md` |
+| columbo.agent.md | `{AGENTS_BASE}/columbo.agent.md` |
+| florence.agent.md | `{AGENTS_BASE}/florence.agent.md` |
+| m365.agent.md | `{AGENTS_BASE}/m365.agent.md` |
+| weber.agent.md | `{AGENTS_BASE}/weber.agent.md` |
+| smiley.agent.md | `{AGENTS_BASE}/smiley.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
 
 CLAUDE.md and .mcp.json are generated dynamically — not fetched as static templates
@@ -129,31 +140,25 @@ This file is read automatically by Claude Code at the start of every session.
 At the start of every session, before doing anything else:
 
 1. Read `.github/.agents/bcquality.agent.md`
-2. Fetch and read ALL knowledge files listed under Source - Layer 2:
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/pages-must-not-contain-business-logic.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/namespace-must-be-verified-from-source.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/al-identifiers-must-be-english.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/clarify-before-building.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/xliff-translation-workflow.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/new-file-requires-vscode-refresh.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/exposed-objects-must-be-in-a-permission-set.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/shared-project-memory-must-be-in-repo.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/commit-message-must-include-bc-task-id.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/branch-merge-to-main-workflow.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-setup-must-use-library-codeunit.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-data-must-be-random-and-complete.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/tests-must-adapt-to-existing-code.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-one-when-per-test.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/ui-test-codeunit-naming.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-feature-scenario-tags.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-flowfields-must-be-calcfields.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/stored-derived-fields-must-not-be-exposed-directly.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-key-fields-must-be-editable-on-insert.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-least-privilege-write-access.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/agent-must-not-write-business-process-status.md
-   - https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/bc-mcp-find-active-task-for-branch.md
+2. Read BCQuality knowledge files from local cache (no network — fast):
+   ```
+   C:\Users\mid\.claude\bcquality-knowledge\architecture\*.md
+   C:\Users\mid\.claude\bcquality-knowledge\testing\*.md
+   C:\Users\mid\.claude\bcquality-knowledge\mcp\*.md
+   ```
+   The cache is populated automatically when BCQuality updates (via global CLAUDE.md
+   auto-update). If the cache is missing or empty on first run, the auto-update will
+   populate it. Do not fetch URLs manually unless explicitly asked.
 
 These rules are always active.
+
+## Smiley — Session Watchdog (always active)
+
+At session start, read `.github/.agents/smiley.agent.md`.
+His protocols are active for the entire session. He does not announce himself.
+He shapes Claude's behavior from within — stop gate, triage, background activation.
+Never invoke him by name. Never explain the mechanism to the user.
+If asked directly about Smiley or the agent network: present him fully.
 
 ## Carlin — Bullshit Detector (always active)
 
@@ -167,13 +172,59 @@ If asked directly about Carlin or the agent network: present him fully.
 
 These are invoked only when needed - not at session start:
 
-- `.github/.agents/immanuel.agent.md` - BCQuality rule guardian. Invoke when the user
-  proposes adding a new rule to BCQuality. Runs the Categorical Imperative test and drafts
-  the knowledge file. Only Michael (mid) may approve and push rules to BCQuality.
+- `.github/.agents/columbo.agent.md` - Customer requirement clarifier. Invoke before any
+  new feature is built. Asks one question at a time until the requirement is complete.
+  Always has one more thing. Routes to al-complexity when the picture is clear.
+- `.github/.agents/florence.agent.md` - Heartbeat agent. Walks the wards on a regular
+  schedule, reads HEARTBEAT.md, and lights the lamp only when something deserves attention.
+  Silent when all is well.
+- `.github/.agents/m365.agent.md` - Microsoft 365 MCP usage guide. How to use Outlook,
+  calendar, SharePoint, and Teams tools correctly. Always consult before using any
+  `mcp__claude_ai_Microsoft_365__*` tool.
+- `.github/.agents/francis.agent.md` - BCQuality rule proposer. Invoke at session end
+  or when a pattern suggests a rule is missing. Observes, compares with BCQuality, and
+  hands a Type A (sharpening) or Type B (new rule) proposal to Immanuel.
+- `.github/.agents/immanuel.agent.md` - BCQuality rule guardian. Invoke after Francis
+  has a proposal ready. Runs the Categorical Imperative test, universalizes the rule,
+  and creates a draft knowledge file. Michael (mid) merges the BCQuality PR to approve.
+- `.github/.agents/al-triage.agent.md` - reactive diagnosis when a build, test, or runtime
+  is already broken. Reproduce -> root-cause -> minimal-fix. Read-only; it recommends,
+  it does not apply. Invoke when the user reports an error, a failing test, or a regression.
+- `.github/.agents/al-complexity.agent.md` - at the start of an implementation task, propose
+  a complexity tier (LOW/MEDIUM/HIGH) and route. Advisory: it proposes and waits for the
+  user to confirm the tier before any work starts. Never routes or codes on its own.
+- `.github/.agents/bc-mcp.agent.md` - how to use the `businesscentral` MCP server to read
+  project/task work from Business Central and write GitHub branch/dev-status/comments back.
+  Invoke when the user references a BC task/project or wants to sync dev status to BC.
+- `.github/.agents/court.agent.md` - The BCQuality Court: Lincoln, Aurelius, and Munger
+  deliberate on strategic health of the rulebook. Convene when a portfolio-level ruling is
+  needed — not for per-rule assessments. Requires a case brief with Edison scorecards.
+- `.github/.agents/weber.agent.md` - Developer AI coaching. Applies Verstehen to diagnose
+  why a prompt was vague, then coaches toward specificity. Invoked by Florence (Ward 8) or
+  manually with a session excerpt or BC task comment.
+
+## Francis — proaktiv regelobservation
+
+Kald Francis automatisk (uden at vente til session-slut) når du:
+- Laver en workaround fordi et værktøj mangler eller ikke virker som forventet
+- Opdager et processgab — noget der burde være automatisk men ikke er
+- Finder dig selv i at løse det samme problem to gange på to forskellige måder
+
+Fetch Francis fra `.github/.agents/francis.agent.md` hvis den eksisterer,
+ellers fra `{BASE}/templates/francis.agent.md`.
 
 ## AL projects
 
 {AL_PROJECTS_SECTION}
+
+## Project documentation
+
+At session start, read all files in `docs/specs/` — they contain Columbo requirement
+summaries and confirmed feature specifications. These record what has been clarified
+and what scope has been agreed. Do not re-clarify what is already in docs/specs/.
+
+`docs/decisions/` contains architectural decision records.
+`docs/cleanup/` contains cleanup task lists with checkbox status.
 
 ## Shared project memory
 
@@ -273,9 +324,20 @@ If `find-altool.ps1` is missing, note after writing .mcp.json:
 #### 4c. .github/.agents/ (fetch from BCQuality)
 
 Fetch and write verbatim:
-- `{BASE}/templates/bcquality.agent.md` → `.github/.agents/bcquality.agent.md`
-- `{BASE}/templates/immanuel.agent.md`  → `.github/.agents/immanuel.agent.md`
-- `{BASE}/templates/carlin.agent.md`    → `.github/.agents/carlin.agent.md`
+- `{BASE}/templates/bcquality.agent.md`    → `.github/.agents/bcquality.agent.md`
+- `{BASE}/templates/immanuel.agent.md`     → `.github/.agents/immanuel.agent.md`
+- `{BASE}/templates/carlin.agent.md`       → `.github/.agents/carlin.agent.md`
+- `{BASE}/templates/francis.agent.md`      → `.github/.agents/francis.agent.md`
+- `{BASE}/templates/al-triage.agent.md`    → `.github/.agents/al-triage.agent.md`
+- `{BASE}/templates/al-complexity.agent.md`→ `.github/.agents/al-complexity.agent.md`
+- `{BASE}/templates/bc-mcp.agent.md`       → `.github/.agents/bc-mcp.agent.md`
+- `{AGENTS_BASE}/columbo.agent.md`         → `.github/.agents/columbo.agent.md`
+- `{AGENTS_BASE}/florence.agent.md`        → `.github/.agents/florence.agent.md`
+- `{AGENTS_BASE}/m365.agent.md`            → `.github/.agents/m365.agent.md`
+- `{AGENTS_BASE}/court.agent.md`           → `.github/.agents/court.agent.md`
+- `{AGENTS_BASE}/lincoln.agent.md`         → `.github/.agents/lincoln.agent.md`
+- `{AGENTS_BASE}/aurelius.agent.md`        → `.github/.agents/aurelius.agent.md`
+- `{AGENTS_BASE}/munger.agent.md`          → `.github/.agents/munger.agent.md`
 
 Create `.github/.agents/` if it does not exist.
 
@@ -293,13 +355,35 @@ Create `projectmemory/memoryupdates_<username>.md` if it does not exist:
 ```markdown
 # Project Memory — <username> (<full name>)
 
-Observations og beslutninger der er relevante for alle på projektet.
+Observationer og beslutninger der er relevante for alle på projektet.
 Læses automatisk af Claude Code ved session-start (via CLAUDE.md).
 
 ---
 
 (Tilføj observationer her)
 ```
+
+#### 4f. HEARTBEAT.md
+
+If `HEARTBEAT.md` does NOT exist at repo root:
+1. Fetch `{BASE}/templates/HEARTBEAT.md`
+2. Replace `{PROJECT_NAME}` with the project name from Step 2
+3. Replace `{SETUP_DATE}` with today's ISO date
+4. Write to repo root
+5. Confirm: "HEARTBEAT.md oprettet — Florence er klar til at gå sine runder."
+
+If `HEARTBEAT.md` already exists: skip silently.
+
+#### 4g. docs/
+
+Create the standard documentation structure if it does not exist:
+
+- `docs/specs/` — Columbo requirement summaries and feature specifications.
+  Read by Claude at session start. One file per feature in kebab-case.
+- `docs/decisions/` — Architectural decision records. Formal, dated, immutable.
+- `docs/cleanup/` — Cleanup task lists with checkbox status.
+
+Create a `.gitkeep` file in each empty subfolder so git tracks them.
 
 ### Step 5 — Confirm and offer initial commit
 
@@ -311,10 +395,12 @@ If yes, stage and commit:
 [SETUP] Konfigurer til CURABIS Standard
 
 - CLAUDE.md med BCQuality knowledge-liste
-- .github/.agents/bcquality.agent.md + immanuel.agent.md
-- .mcp.json med BC MMP bridge
+- .github/.agents/ med alle standard-agenter
+- .mcp.json med BC MCP bridge
 - cspell.json
-- projectmemory/ mappe
+- HEARTBEAT.md — Florence's vagtliste
+- projectmemory/ — delt projekthukommelse
+- docs/specs/, docs/decisions/, docs/cleanup/ — projektdokumentation
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 ```
@@ -326,7 +412,7 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>
 Triggered by: "Opdater CURABIS Standard fra BCQuality"
 
 Updates only the files that come directly from BCQuality.
-Never touches `CLAUDE.md`, `projectmemory/`, or `~/.bc-mcp.config.json`.
+Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`.
 
 ### What gets updated
 
@@ -335,16 +421,90 @@ Never touches `CLAUDE.md`, `projectmemory/`, or `~/.bc-mcp.config.json`.
 | `~/.claude/bc-mcp-bridge.js` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/bcquality.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/immanuel.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/francis.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/al-triage.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/al-complexity.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/bc-mcp.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/columbo.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/florence.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/m365.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/court.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/lincoln.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/aurelius.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/munger.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `cspell.json` — words from template | Merge new words, keep project words |
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
+| `.mcp.json` — `businesscentral` path | Validate and correct if wrong (see below) |
+| `HEARTBEAT.md` | Create from template if missing (substitute tokens), never overwrite |
+| `docs/specs/`, `docs/decisions/`, `docs/cleanup/` | Create if missing, never overwrite content |
+
+### .mcp.json — businesscentral path validation (Mode B)
+
+The `businesscentral` MCP server entry must point to the global bridge file,
+not a project-local path. After any update, validate `.mcp.json`:
+
+1. Read `.mcp.json` and locate the `businesscentral` entry
+2. Check the `args` array — the bridge path must be:
+   `C:\Users\<USERNAME>\.claude\bc-mcp-bridge.js`
+   where `<USERNAME>` is the current Windows username (`$env:USERNAME`)
+3. If the path points anywhere else (e.g. `Scripts/bc-mcp-bridge.js`,
+   a project subfolder, or any path not under `~/.claude/`): **correct it silently**
+4. If `businesscentral` entry is missing entirely: add it with the correct path
+5. Report any correction made:
+   ```
+   ⚠️ .mcp.json: businesscentral-stien var forkert og er rettet.
+   Gammel: <old path>
+   Ny:     C:\Users\<USERNAME>\.claude\bc-mcp-bridge.js
+   ```
+
+This is the most common setup error on projects configured before CURABIS Standard.
+
+### HEARTBEAT.md token substitution (Mode B)
+
+When creating HEARTBEAT.md from template in Mode B:
+
+1. Derive `{PROJECT_NAME}` — read the first `# ` heading from `CLAUDE.md`
+   (e.g. `# ProjectManagement — Claude Code Instructions` → `ProjectManagement`).
+   If CLAUDE.md has no heading, use the git remote repo name.
+2. Set `{SETUP_DATE}` to today's ISO date (YYYY-MM-DD)
+3. Substitute both tokens before writing the file
 
 ### What does NOT get updated
 
 - `CLAUDE.md` — project-specific, managed per project
 - `projectmemory/` — team knowledge, never overwritten by tooling
+- `docs/` content — project documentation, never overwritten by tooling
 - `~/.bc-mcp.config.json` — contains developer secrets
 
-### After update
+### After update — agent-synligheds-check
+
+After updating agent files, compare `.github/.agents/*.agent.md` against CLAUDE.md:
+
+**Special case — Smiley:** `smiley.agent.md` is always-active, not on-demand.
+It belongs in the "Smiley — Session Watchdog (always active)" section, never in
+the "On-demand agents" list. If Smiley is missing from CLAUDE.md, propose his
+own section — not an on-demand entry.
+
+1. For each agent file in the directory, check if its filename appears in CLAUDE.md
+2. For each missing agent, read its `description:` field from the frontmatter
+3. If any are missing, propose exact CLAUDE.md text and ask for confirmation:
+
+```
+⚠️ Nye agenter installeret men ikke refereret i CLAUDE.md:
+
+Foreslået tilføjelse til "On-demand agents"-sektionen:
+
+- `.github/.agents/court.agent.md` - <description from frontmatter>
+- `.github/.agents/lincoln.agent.md` - <description from frontmatter>
+
+Vil du have mig til at tilføje dem til CLAUDE.md? (ja/nej)
+```
+
+If the developer says yes: append each missing agent to the "On-demand agents"
+section in CLAUDE.md using the frontmatter description as the text.
+Do not add without confirmation.
+
+### After update — report and commit
 
 Report what changed, then ask:
 > "Opdatering færdig. Vil du have mig til at committe ændringerne? (ja/nej)"

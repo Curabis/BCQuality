@@ -1,81 +1,36 @@
----
-bc-version: [all]
-domain: architecture
-keywords: [naming, english, enu, variable, procedure, field, caption, translation, xliff]
-technologies: [al]
-countries: [w1]
-application-area: [all]
----
+# AL Naming Convention: English Identifiers Only
 
-## Description
+## Core Rule
 
-All AL identifiers must be written in English (ENU) regardless of the language
-used in conversation with the developer. Translations are handled separately
-via XLIFF files — never by writing Danish, German or other language identifiers
-in AL source code.
+All AL identifiers must be written in English, regardless of the developer's native language. "Translations are handled separately via XLIFF files — never by writing Danish, German or other language identifiers in AL source code."
 
-This applies to:
-- Variable names
-- Procedure names
-- Parameter names
-- Field names
-- Object names (tables, codeunits, pages, enums, reports)
+## What This Covers
+
+The rule applies to:
+- Variable and procedure names
+- Parameter and field names
+- Object identifiers (tables, codeunits, pages, enums, reports)
 - Enum value names
-- Local and global labels (Label data type) — both the identifier and the default text
+- Label identifiers and default text
 
-**Captions and ToolTips** may be in the target language in the source file,
-but must also be covered by XLIFF translations for all supported locales.
+Captions and ToolTips may use target language in source files but require XLIFF translations for supported locales.
 
-## Anti Pattern
+## Practical Example
 
-```al
-// WRONG: Danish identifiers
-var
-    Kreditor: Record Vendor;
-    Beløb: Decimal;
-    AntalKilo: Decimal;
+**Wrong approach:** Using Danish identifiers like `Beløb` (amount) or `BeregnTotalbeløb` (calculate total amount)
 
-procedure BeregnTotalbeløb(Antal: Decimal; Pris: Decimal): Decimal
-begin
-    exit(Antal * Pris);
-end;
+**Correct approach:** Write `Amount: Decimal` and `CalculateTotalAmount()` in code, with Danish translations managed separately through XLIFF configuration files.
 
-field(50101; "Indgående Mængde"; Decimal) { Caption = 'Indgående Mængde'; }
-```
+## Developer Conversation Handling
 
-## Best Practice
+When developers describe requirements in their native language—such as "opret en variabel til beløbet"—the agent translates the *intent* into English identifiers (`Amount: Decimal`) rather than transliterating the original words directly into code.
 
-```al
-// CORRECT: English identifiers, Danish captions handled via XLIFF
-var
-    Vendor: Record Vendor;
-    Amount: Decimal;
-    QuantityKg: Decimal;
+This separation ensures source code remains universally readable while localization remains flexible and maintainable.
 
-procedure CalculateTotalAmount(Quantity: Decimal; UnitPrice: Decimal): Decimal
-begin
-    exit(Quantity * UnitPrice);
-end;
+## BCApps Reference
 
-field(50101; "Inbound Quantity"; Decimal) { Caption = 'Inbound Quantity'; }
-// Caption translation → da-DK XLIFF: 'Indgående Mængde'
+The entire BCApps codebase — maintained by Microsoft engineers across many nationalities, including Danes — uses exclusively English identifiers without exception. Across hundreds of thousands of lines of AL, no native-language identifiers appear anywhere in the source.
 
-// WRONG: Danish label identifier and text
-var
-    BeløbFejlTxt: Label 'Beløbet må ikke være negativt';
-
-// CORRECT: English label identifier and default text — translated via XLIFF
-var
-    AmountMustNotBeNegativeErr: Label 'Amount must not be negative.', Comment = '%1 = Amount';
-```
-
-## Conversation vs. code
-
-The developer may describe requirements in Danish. The agent must translate
-the intent into English identifiers when writing AL code:
-
-- "opret en variabel til beløbet" → `var Amount: Decimal;`
-- "procedure der beregner lagerværdien" → `procedure CalculateInventoryValue(...)`
-- "felt til indgående mængde" → `field(... ; "Inbound Quantity"; Decimal)`
-
-Never echo Danish words from the conversation directly into AL identifiers.
+- **Source:** https://github.com/microsoft/BCApps
+- **Pattern:** Every variable, procedure, field, and object name in BCApps is English. All localization is handled via caption properties and XLIFF files — never by changing identifier names.
+- **Why this matters:** BCApps is a multi-contributor open source project. Non-English identifiers would make the code unreadable to international contributors — the same argument applies to any CURABIS PTE shared across teams.
