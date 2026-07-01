@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 4
+version: 5
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -55,6 +55,10 @@ AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/ag
 | m365.agent.md | `{AGENTS_BASE}/m365.agent.md` |
 | weber.agent.md | `{AGENTS_BASE}/weber.agent.md` |
 | smiley.agent.md | `{AGENTS_BASE}/smiley.agent.md` |
+| court.agent.md | `{AGENTS_BASE}/court.agent.md` |
+| lincoln.agent.md | `{AGENTS_BASE}/lincoln.agent.md` |
+| aurelius.agent.md | `{AGENTS_BASE}/aurelius.agent.md` |
+| munger.agent.md | `{AGENTS_BASE}/munger.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
 
 CLAUDE.md and .mcp.json are generated dynamically — not fetched as static templates
@@ -342,6 +346,9 @@ Fetch and write verbatim:
 - `{AGENTS_BASE}/lincoln.agent.md`         → `.github/.agents/lincoln.agent.md`
 - `{AGENTS_BASE}/aurelius.agent.md`        → `.github/.agents/aurelius.agent.md`
 - `{AGENTS_BASE}/munger.agent.md`          → `.github/.agents/munger.agent.md`
+- `{AGENTS_BASE}/weber.agent.md`           → `.github/.agents/weber.agent.md`
+- `{AGENTS_BASE}/smiley.agent.md`          → `.github/.agents/smiley.agent.md`
+- `{BASE}/templates/algo-settings.agent.md`→ `.github/.agents/algo-settings.agent.md`
 
 Create `.github/.agents/` if it does not exist.
 
@@ -436,6 +443,10 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `.github/.agents/lincoln.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/aurelius.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/munger.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/carlin.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
+| `.github/.agents/weber.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
+| `.github/.agents/algo-settings.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
+| `.github/.agents/smiley.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `cspell.json` — words from template | Merge new words, keep project words |
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
 | `.mcp.json` — `businesscentral` path | Validate and correct if wrong (see below) |
