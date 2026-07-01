@@ -1,12 +1,15 @@
 ---
-rule: CURABIS-BCMCP-008
-title: Git lifecycle must sync BC subtask dev status
-severity: warning
-domain: git, mcp, bc-integration
-applies-to: [feature branches, bugfix branches, hotfix branches]
+bc-version: [all]
+domain: mcp
+keywords: [git, lifecycle, bc-status, dev-status, sync]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # Git lifecycle must sync BC subtask dev status
+
+## Description
 
 Every AL feature branch is linked to a BC subtask. The `gitHubDevStatus` and
 `gitHubBranch` fields on the subtask must reflect the real state of the branch
@@ -14,8 +17,8 @@ at all times — automatically, without manual steps.
 
 ## Track branch
 
-Each project declares its **track branch** in `CLAUDE.md` — the branch that is
-the merge target for all feature branches in the current development track:
+Each project declares its **track branch** in `CLAUDE.md` — the merge target for
+all feature branches in the current development track:
 
 | Declaration in CLAUDE.md | Meaning |
 |---|---|
@@ -27,33 +30,16 @@ feature branch is merged into the track branch — not necessarily `main`.
 
 ## Branch naming convention
 
-Branches must follow this pattern so automation can parse the BC task reference:
+Branches must follow this pattern so automation can parse the BC task reference —
+type is `feature`/`bugfix`/`hotfix`, projectNo matches `[A-Z]{2,4}\d{4}-\d{5}`,
+taskNo is a plain or zero-padded integer, description is optional:
 
-```
-<type>/<projectNo>-<taskNo>[-optional-description]
-```
+    <type>/<projectNo>-<taskNo>[-optional-description]
 
-| Segment | Format | Example |
-| --- | --- | --- |
-| type | `feature`, `bugfix`, `hotfix` | `feature` |
-| projectNo | `[A-Z]{2,4}\d{4}-\d{5}` | `DEV2023-00027` |
-| taskNo | zero-padded or plain integer | `004` or `4` |
-| description | optional, hyphen-separated | `bc-agent-semantic-tools` |
-
-**Valid examples:**
-```
-feature/DEV2023-00027-004-bc-agent-semantic-tools
-bugfix/DEV2023-00027-003-odata-string-key
-hotfix/DEV2023-00012-001-invoicing-crash
-feature/DEV2023-00027-4
-```
-
-**Invalid (no automation):**
-```
-my-feature
-fix-thing
-DEV2023-00027
-```
+    Valid:   feature/DEV2023-00027-004-bc-agent-semantic-tools
+             bugfix/DEV2023-00027-003-odata-string-key
+             feature/DEV2023-00027-4
+    Invalid: my-feature / fix-thing / DEV2023-00027   (no automation)
 
 ## Status mapping
 
@@ -66,47 +52,34 @@ DEV2023-00027
 
 ## Automated implementation (git hooks)
 
-Automation is provided by two git hooks in `.githooks/` (activated via
-`git config core.hooksPath .githooks`) that call
-`Scripts/Invoke-BCGitSync.ps1`:
-
-- `post-checkout` — detects branch creation and branch abandonment
-- `post-commit` — detects commits/merges on the track branch
-
-`Invoke-BCGitSync.ps1` calls the BC OData API directly (same credentials as
-`bc-agent.js`) and never blocks the git operation — all errors are swallowed
-with a warning.
-
-Git hooks require that branch names follow the `<type>/<projectNo>-<taskNo>`
-naming convention. Branches that do not follow this format are ignored by hooks.
+Two git hooks in `.githooks/` (activated via `git config core.hooksPath .githooks`)
+call `Scripts/Invoke-BCGitSync.ps1`: `post-checkout` detects branch creation and
+abandonment; `post-commit` detects commits/merges on the track branch. The script
+calls the BC OData API directly (same credentials as `bc-agent.js`), never blocks
+the git operation, and ignores branches that do not follow the naming convention.
 
 ## Claude-driven synchronization
 
-When Claude executes git operations, the git hooks may not fire — either because
-hooks are not configured, or because the branch name does not follow the
-`<type>/<projectNo>-<taskNo>` convention.
-
-**Claude MUST call BC MCP explicitly at two points:**
+When Claude executes git operations, the hooks may not fire — hooks unconfigured,
+or branch name outside the convention. **Claude MUST call BC MCP explicitly at
+two points:**
 
 | Moment | BC MCP action |
 |---|---|
 | Feature branch created | `gitHubDevStatus = "In Progress"`, `gitHubBranch = <branch>` |
 | Feature branch merged to track branch | `gitHubDevStatus = "Done"`, `gitHubBranch = <track-branch>` |
 
-Steps:
-1. Find the active task using the recipe in `[[bc-mcp-find-active-task-for-branch]]`
-2. Call `Modify_activeTask_PAG6102900` with the two writable fields
-
-This requirement applies regardless of branch naming format and regardless of
-whether git hooks are also active. If both run, there is no conflict — they write
-identical values.
+Steps: find the active task using the recipe in
+`[[bc-mcp-find-active-task-for-branch]]`, then call
+`Modify_activeTask_PAG6102900` with the two writable fields. This applies
+regardless of branch naming and regardless of whether hooks are also active —
+if both run they write identical values.
 
 ## Safety rules
 
 CURABIS-BCMCP-008 The sync script NEVER writes BC subtask `status`
   (Created/Accepted/In progress/Finished/Invoiced). It only writes
-  `gitHubDevStatus` and `gitHubBranch`. These are the only two fields
-  the agent is allowed to modify (see CURABIS-BCMCP-001).
+  `gitHubDevStatus` and `gitHubBranch` (see CURABIS-BCMCP-001).
 
 CURABIS-BCMCP-009 The sync script exits 0 on all errors. It must never
   block a git commit, checkout, or merge. BC sync is best-effort.
@@ -117,7 +90,6 @@ CURABIS-BCMCP-010 Only tasks in `activeTasks` (status = Accepted or In progress)
 
 ## BCApps reference
 
-Branch naming conventions and git workflow integration follow the patterns used
-in [microsoft/BCApps](https://github.com/microsoft/BCApps) — see
-`.github/CONTRIBUTING.md` for Microsoft's own conventions on feature branches
-and PR titles that reference work items.
+Branch naming and git workflow integration follow
+[microsoft/BCApps](https://github.com/microsoft/BCApps) conventions — see its
+`.github/CONTRIBUTING.md` for feature-branch and work-item-referencing patterns.

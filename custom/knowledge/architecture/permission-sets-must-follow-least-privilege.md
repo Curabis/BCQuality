@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: architecture
+keywords: [permission-set, least-privilege, tiers, security]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS Architecture: Permission Sets Must Follow Least-Privilege Hierarchy
 
-## Core Rule
+## Description
 
 Permission sets in CURABIS apps must be structured in access tiers following the least-privilege principle. Tiers must be **additive** — each tier includes the one below it via `IncludedPermissionSets`. No single permission set should bundle user-level and administrative access in a flat structure.
 
@@ -19,87 +27,69 @@ Permission sets in CURABIS apps must be structured in access tiers following the
 
 ## Implementation Pattern
 
-```al
-permissionset 50100 "PM365 - View"
-{
-    Access = Public;
-    Assignable = true;
-    Caption = 'Project Mgmt 365 - View';
-    Permissions =
-        tabledata "PM Project" = R,
-        tabledata "PM Project Task" = R,
-        page "PM Project List" = X,
-        page "PM Project Card" = X;
-}
+    permissionset 50100 "PM365 - View"
+    {
+        Access = Public;
+        Assignable = true;
+        Caption = 'Project Mgmt 365 - View';
+        Permissions =
+            tabledata "PM Project" = R,
+            page "PM Project List" = X;
+    }
 
-permissionset 50101 "PM365 - Edit"
-{
-    Access = Public;
-    Assignable = true;
-    Caption = 'Project Mgmt 365 - Edit';
-    IncludedPermissionSets = "PM365 - View";
-    Permissions =
-        tabledata "PM Project" = RIMD,
-        tabledata "PM Project Task" = RIMD,
-        codeunit "PM Project Management" = X;
-}
+    permissionset 50101 "PM365 - Edit"
+    {
+        Access = Public;
+        Assignable = true;
+        Caption = 'Project Mgmt 365 - Edit';
+        IncludedPermissionSets = "PM365 - View";
+        Permissions =
+            tabledata "PM Project" = RIMD,
+            tabledata "PM Project Task" = RIMD,
+            codeunit "PM Project Management" = X;
+    }
 
-permissionset 50102 "PM365 - Admin"
-{
-    Access = Public;
-    Assignable = false;
-    Caption = 'Project Mgmt 365 - Admin';
-    IncludedPermissionSets = "PM365 - Edit";
-    Permissions =
-        tabledata "PM Setup" = RIMD,
-        page "PM Setup" = X;
-}
-```
+    permissionset 50102 "PM365 - Admin"
+    {
+        Access = Public;
+        Assignable = false;
+        Caption = 'Project Mgmt 365 - Admin';
+        IncludedPermissionSets = "PM365 - Edit";
+        Permissions =
+            tabledata "PM Setup" = RIMD,
+            page "PM Setup" = X;
+    }
 
 ## Relationship to CURABIS-ARCH-011
 
-This rule is a **companion to CURABIS-ARCH-011** (`exposed-objects-must-be-in-a-permission-set`):
-
-- **CURABIS-ARCH-011**: Every exposed object *must exist* in at least one permission set
-- **This rule**: Permission sets *themselves* must follow the hierarchical least-privilege structure
-
-Both must be satisfied simultaneously: it is not enough that objects appear in a permission set if that set grants excessive access.
+Companion to **CURABIS-ARCH-011** (`exposed-objects-must-be-in-a-permission-set`):
+ARCH-011 requires every exposed object to *exist* in a permission set; this rule
+requires the sets *themselves* to follow the tiered least-privilege structure.
+Both must hold — objects in a set that grants excessive access is not enough.
 
 ## Anti-Pattern
 
-```al
-// Violation: flat "full access" set bundles user and admin access
-permissionset 50100 "PM365 - Full Access"
-{
-    Assignable = true;
-    Permissions =
-        tabledata "PM Project" = RIMD,
-        tabledata "PM Setup" = RIMD,    // admin data mixed with user data
-        tabledata "PM Project Task" = RIMD,
-        codeunit "PM Post Codeunit" = X;
-}
-```
+    // Violation: flat "full access" set bundles user and admin access
+    permissionset 50100 "PM365 - Full Access"
+    {
+        Assignable = true;
+        Permissions =
+            tabledata "PM Project" = RIMD,
+            tabledata "PM Setup" = RIMD,    // admin data mixed with user data
+            tabledata "PM Project Task" = RIMD,
+            codeunit "PM Post Codeunit" = X;
+    }
 
 ## BCApps Reference
 
-BCApps Business Foundation defines exactly this tiered pattern:
-
-```al
-// BusFoundEdit.PermissionSet.al
-permissionset 4 "Bus. Found. - Edit"
-{
-    Access = Public;
-    Assignable = true;
-    Caption = 'Business Foundation - Edit';
-    IncludedPermissionSets = "Bus. Found. - View";
-}
-```
-
-Microsoft uses Admin, Edit, View, Obj, and Read tiers with `IncludedPermissionSets` throughout BCApps — never a single flat "full access" set.
+BCApps Business Foundation defines exactly this tiered pattern: Microsoft uses
+Admin, Edit, View, Obj, and Read tiers with `IncludedPermissionSets` throughout —
+never a single flat "full access" set. Each tier inherits from the tier below;
+Admin sets use `Assignable = false` to prevent accidental assignment to regular
+users.
 
 - **Source:** https://github.com/microsoft/BCApps/tree/main/src/Business%20Foundation/App/Permissions
 - **Files:** `BusFoundAdmin`, `BusFoundEdit`, `BusFoundView`, `BusFoundObj`, `BusFoundRead`
-- **Pattern:** Each tier inherits from the tier below via `IncludedPermissionSets`. Admin sets use `Assignable = false` to prevent accidental assignment to regular users.
 
 ## Verification
 

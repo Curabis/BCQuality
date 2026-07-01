@@ -70,12 +70,10 @@ stale symbol cache issue — not a missing implementation.
 
 When this situation occurs, output exactly this message before stopping:
 
-```
-WARNING: VS Code needs a refresh before I can check for real compilation errors.
+    WARNING: VS Code needs a refresh before I can check for real compilation errors.
 
-Please run: Ctrl+Shift+P -> AL: Reload Extension
+    Please run: Ctrl+Shift+P -> AL: Reload Extension
 
-Let me know when the refresh is done and I will re-check diagnostics.
-```
+    Let me know when the refresh is done and I will re-check diagnostics.
 
 Do not continue with any other activity until the developer confirms the refresh.

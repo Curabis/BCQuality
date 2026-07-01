@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: mcp
+keywords: [api-page, flowfield, calcfields, odata]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS MCP: FlowFields on API Pages Rule Summary
 
-## The Rule
+## Description
 **FlowFields on API pages must be explicitly calculated** via `CalcFields()` in the `OnAfterGetRecord` trigger, or they return empty values in OData responses.
 
 ## Key Points
@@ -15,12 +23,10 @@
 
 The provided example demonstrates proper implementation:
 
-```al
-trigger OnAfterGetRecord()
-begin
-    Rec.CalcFields("Elapsed time (Chargeable)", "Customer Name");
-end;
-```
+    trigger OnAfterGetRecord()
+    begin
+        Rec.CalcFields("Elapsed time (Chargeable)", "Customer Name");
+    end;
 
 ## Verification Approach
 

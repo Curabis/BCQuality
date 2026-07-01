@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: mcp
+keywords: [api-page, key-fields, editable, insert, odata]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS MCP: ODataKeyFields Editability Rule
 
-## The Rule
+## Description
 
 Key fields declared in `ODataKeyFields` cannot have `Editable = false` when the API page permits inserts and **the field is consumer-provided**. This restriction causes the OData layer to reject the field as an unknown property during POST operations.
 
@@ -11,20 +19,16 @@ When a field is marked read-only, Business Central removes it from the OData wri
 ## Problematic vs. Correct Approach
 
 **Incorrect:**
-```al
-field(projectNo; Rec."Project No.")
-{
-    Editable = false;  // prevents API inserts when consumer must supply the value
-}
-```
+    field(projectNo; Rec."Project No.")
+    {
+        Editable = false;  // prevents API inserts when consumer must supply the value
+    }
 
 **Correct:**
-```al
-field(projectNo; Rec."Project No.")
-{
-    // No Editable = false — consumer supplies this on POST
-}
-```
+    field(projectNo; Rec."Project No.")
+    {
+        // No Editable = false — consumer supplies this on POST
+    }
 
 ## Key Takeaways
 

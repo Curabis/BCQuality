@@ -1,3 +1,11 @@
+---
+bc-version: [all]
+domain: architecture
+keywords: [claude-md, agents, routing, visibility, setup]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 ﻿bc-version: [all]
 domain: architecture
 keywords: [claude-md, agents, visibility, setup, mode-b, curabis-standard]
@@ -35,9 +43,7 @@ with a proposed addition before the session continues.
 
 After running Mode B (or any agent install), compare:
 
-```
-Get-ChildItem .github/.agents/*.agent.md | Select-Object -ExpandProperty BaseName
-```
+    Get-ChildItem .github/.agents/*.agent.md | Select-Object -ExpandProperty BaseName
 
 against the agent references in CLAUDE.md. Any filename present in the directory
 but absent from CLAUDE.md is a gap that must be surfaced.
@@ -46,13 +52,11 @@ but absent from CLAUDE.md is a gap that must be surfaced.
 
 When a gap is found, output exactly this before continuing:
 
-```
-⚠️ Ny agent installeret men ikke refereret i CLAUDE.md:
+    ⚠️ Ny agent installeret men ikke refereret i CLAUDE.md:
 
-  - <agent-navn>.agent.md
+      - <agent-navn>.agent.md
 
-Claude kan ikke kalde denne agent medmindre den tilføjes til CLAUDE.md.
-Vil du have mig til at tilføje den nu?
-```
+    Claude kan ikke kalde denne agent medmindre den tilføjes til CLAUDE.md.
+    Vil du have mig til at tilføje den nu?
 
 Do not continue with other activity until the developer has responded.

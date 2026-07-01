@@ -1,14 +1,15 @@
 ---
-rule: mcp-config-must-not-hardcode-developer-paths
-title: Shared MCP configuration must not hardcode developer-specific paths
-category: mcp
-severity: error
-version: 1
+bc-version: [all]
+domain: mcp
+keywords: [mcp-config, hardcoded-paths, userprofile, portability]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # Shared MCP configuration must not hardcode developer-specific paths
 
-## Rule
+## Description
 
 A git-committed `.mcp.json` must not hardcode an absolute path that is specific to
 one developer's machine — a repository clone location on a particular drive or
@@ -39,20 +40,18 @@ Claude Code expands two forms of variable inside `.mcp.json`'s `command`, `args`
 
 Example:
 
-```json
-{
-  "mcpServers": {
-    "example": {
-      "command": "powershell",
-      "args": ["-File", "${CLAUDE_PROJECT_DIR:-.}\\.vscode\\launch-server.ps1"]
-    },
-    "bridge": {
-      "command": "node",
-      "args": ["${USERPROFILE}\\.claude\\bridge.js"]
+    {
+      "mcpServers": {
+        "example": {
+          "command": "powershell",
+          "args": ["-File", "${CLAUDE_PROJECT_DIR:-.}\\.vscode\\launch-server.ps1"]
+        },
+        "bridge": {
+          "command": "node",
+          "args": ["${USERPROFILE}\\.claude\\bridge.js"]
+        }
+      }
     }
-  }
-}
-```
 
 ## What NOT to do
 

@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: architecture
+keywords: [namespace, verification, bcapps, source-of-truth]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # AL Language Namespace Verification Rule
 
-## Core Requirement
+## Description
 
 When adding variables or references to Business Central objects, agents must **verify namespaces by reading the actual source file**—not by inference or training data assumptions.
 

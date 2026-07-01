@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: mcp
+keywords: [mcp, agent, business-process, status, write-scope]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS MCP: Agents Must Not Write Business Process Status Fields
 
-## Core Principle
+## Description
 
 MCP agents must only write developer-managed tracking fields — never fields that drive business process workflows such as invoicing, approval, or time registration. Writing a business status field from an agent can block downstream operations for users working in Business Central.
 
@@ -22,10 +30,8 @@ Developer tracking fields are independent of BC workflow. Business process statu
 
 ## Example Agent Instruction
 
-```
-Write only gitHubDevStatus and gitHubBranch on tasks.
-Never write Status — it controls the invoicing workflow.
-```
+    Write only gitHubDevStatus and gitHubBranch on tasks.
+    Never write Status — it controls the invoicing workflow.
 
 ## Verification
 

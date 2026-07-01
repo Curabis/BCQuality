@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: mcp
+keywords: [api-page, least-privilege, write-access, odata, security]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS MCP: API Pages Must Use Least-Privilege Write Access
 
-## Core Principle
+## Description
 
 A general-purpose API page that exposes many fields should not be widened to allow writes on a single additional field. Instead, create a dedicated minimal API page that exposes only the fields the consumer needs to read and write. This limits the blast radius of any agent or integration mistake.
 
@@ -10,26 +18,22 @@ An MCP agent operates with the permissions of its service identity, not an indiv
 
 ## Pattern to Avoid
 
-```al
-// WRONG: General page widened with write access to one field
-// Now the agent can accidentally (or intentionally) write to all other fields too
-field(status; Rec.Status) { }                          // should be read-only
-field(gitHubRepository; Rec."GitHub Repository") { }   // the one field we want writable
-field(estimatedHours; Rec."Estimated Hours") { }        // should be read-only
-```
+    // WRONG: General page widened with write access to one field
+    // Now the agent can accidentally (or intentionally) write to all other fields too
+    field(status; Rec.Status) { }                          // should be read-only
+    field(gitHubRepository; Rec."GitHub Repository") { }   // the one field we want writable
+    field(estimatedHours; Rec."Estimated Hours") { }        // should be read-only
 
 ## Correct Pattern
 
 Create a separate, minimal API page:
 
-```al
-page 6102904 "CUR MCP Project Repository"
-{
-    // Only two fields: the key and the one writable field
-    field(no; Rec."No.") { Editable = false; }
-    field(gitHubRepository; Rec."GitHub Repository") { }
-}
-```
+    page 6102904 "CUR MCP Project Repository"
+    {
+        // Only two fields: the key and the one writable field
+        field(no; Rec."No.") { Editable = false; }
+        field(gitHubRepository; Rec."GitHub Repository") { }
+    }
 
 ## Requirements
 

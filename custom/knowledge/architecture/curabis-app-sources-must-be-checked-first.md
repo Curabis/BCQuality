@@ -1,7 +1,7 @@
 ---
 bc-version: [all]
 domain: architecture
-keywords: [dependency, source, add_repo, github, curabis, closed-source, test, symbol, black-box]
+keywords: [dependency, source, add-repo, github, curabis, closed-source, test, symbol, black-box]
 technologies: [al]
 countries: [w1]
 application-area: [all]
@@ -49,26 +49,22 @@ the current project.
 
 ## Anti Pattern
 
-```
-// WRONG: reverse-engineering the compiled symbol package instead of reading source
-// Agent parses SymbolReference.json from .alpackages/*.app to learn
-// Contract Management table fields and public procedure signatures.
-// Result: incomplete picture, missed validation logic, excluded feature from tests.
-```
+    // WRONG: reverse-engineering the compiled symbol package instead of reading source
+    // Agent parses SymbolReference.json from .alpackages/*.app to learn
+    // Contract Management table fields and public procedure signatures.
+    // Result: incomplete picture, missed validation logic, excluded feature from tests.
 
 ## Best Practice
 
-```
-// CORRECT: add the source repo and read it directly
-add_repo Curabis/ContractMgmt365app
+    // CORRECT: add the source repo and read it directly
+    add_repo Curabis/ContractMgmt365app
 
-// Then read the actual table definitions, codeunits, and any Test Library
-// codeunits that may already exist in the repo's own test app.
+    // Then read the actual table definitions, codeunits, and any Test Library
+    // codeunits that may already exist in the repo's own test app.
 
-// If no Test Library exists in the dependency's test app:
-// build GIVEN helpers in the consuming project's own Test Library codeunit
-// based on the REAL table field definitions and trigger logic you can now read.
-```
+    // If no Test Library exists in the dependency's test app:
+    // build GIVEN helpers in the consuming project's own Test Library codeunit
+    // based on the REAL table field definitions and trigger logic you can now read.
 
 ## When to apply this rule
 

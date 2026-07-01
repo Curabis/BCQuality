@@ -1,7 +1,7 @@
 ---
 bc-version: [all]
 domain: architecture
-keywords: [build, output, alpackages, duplicate, language-server, app-package, project-root, AL0197]
+keywords: [build, output, alpackages, duplicate, language-server, app-package, project-root, al0197]
 technologies: [al]
 countries: [w1]
 application-area: [all]
@@ -20,16 +20,12 @@ AL build output (`.app` files) **must not** accumulate in the project root folde
 Configure the build output path to a dedicated subfolder that is excluded from language server scanning.
 
 In `.vscode/settings.json`:
-```json
-{
-  "al.outputPath": ".output"
-}
-```
+    {
+      "al.outputPath": ".output"
+    }
 
 When using the MCP `al_build` tool, pass `outputPath` explicitly:
-```
-al_build projectPath="..." outputPath=".output/AppName.app"
-```
+    al_build projectPath="..." outputPath=".output/AppName.app"
 
 Add `.output/` to `.gitignore` if not already excluded.
 

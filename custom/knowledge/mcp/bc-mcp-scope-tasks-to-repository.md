@@ -1,16 +1,15 @@
 ---
-name: bc-mcp-scope-tasks-to-repository
-description: >
-  When a developer asks for their open tasks, scope the result to the current
-  git repository only. If no BC project is linked to the repo, raise it as a
-  flag instead of returning all tasks.
-layer: 2
-category: mcp
+bc-version: [all]
+domain: mcp
+keywords: [mcp, bc-task, repository-scope, project]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # BC MCP: Scope Task Lists to the Current Repository
 
-## Rule
+## Description
 
 When a developer asks "what tasks do I have", "what are my open tasks", or any
 equivalent question about their work queue, **only return tasks that belong to
@@ -29,20 +28,18 @@ wrong project.
 
 ## Standard recipe
 
-```
-1. git remote get-url origin
-   → e.g. "https://github.com/Curabis/Wareco.git"
+    1. git remote get-url origin
+       → e.g. "https://github.com/Curabis/Wareco.git"
 
-2. List_ProjectRepositories_PAG6102904
-      filter: "gitHubRepository eq '<url>'"
-   → get projectNo(s) for this repo
+    2. List_ProjectRepositories_PAG6102904
+          filter: "gitHubRepository eq '<url>'"
+       → get projectNo(s) for this repo
 
-3. IF no projects found → STOP and flag (see "No linked project" below)
+    3. IF no projects found → STOP and flag (see "No linked project" below)
 
-4. List_ActiveTasks_PAG6102900
-      filter: "projectNo eq '<projectNo>' and taskResponsible eq '<employeeCode>'"
-   → return only tasks in this repo's project(s)
-```
+    4. List_ActiveTasks_PAG6102900
+          filter: "projectNo eq '<projectNo>' and taskResponsible eq '<employeeCode>'"
+       → return only tasks in this repo's project(s)
 
 For developer identity (resolving `employeeCode` from git email), see
 `[[bc-mcp-find-active-task-for-branch]]`.

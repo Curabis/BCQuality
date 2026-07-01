@@ -1,14 +1,15 @@
 ---
-rule: CURABIS-MCP-003
-title: MCP bridge JavaScript-filer skal gemmes uden UTF-8 BOM
-category: mcp
-severity: high
-tags: [mcp, encoding, node, bridge, windows]
+bc-version: [all]
+domain: mcp
+keywords: [mcp, bridge, encoding, utf-8, stdio]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # CURABIS-MCP-003 — MCP bridge JavaScript-filer skal gemmes uden UTF-8 BOM
 
-## Regel
+## Description
 
 JavaScript-filer der fungerer som MCP bridge-scripts (fx `bc-mcp-bridge.js`) skal gemmes med UTF-8-enkodning **uden** BOM (Byte Order Mark). En UTF-8 BOM (0xEF 0xBB 0xBF) placeret foran shebang-linjen får Node.js til at crashe med `SyntaxError: Invalid or unexpected token`, og MCP-serveren starter aldrig — uden at producere en brugbar fejlbesked til udvikleren.
 
@@ -25,28 +26,22 @@ BOM introduceres typisk på Windows via:
 
 **Download og gem korrekt (uden BOM):**
 
-```powershell
-$content = (Invoke-WebRequest -Uri $url -UseBasicParsing).Content
-[System.IO.File]::WriteAllText($destPath, $content, [System.Text.UTF8Encoding]::new($false))
-```
+    $content = (Invoke-WebRequest -Uri $url -UseBasicParsing).Content
+    [System.IO.File]::WriteAllText($destPath, $content, [System.Text.UTF8Encoding]::new($false))
 
 **Verifikation efter gem:**
 
-```powershell
-$bytes = [System.IO.File]::ReadAllBytes($filePath)
-if ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
-    throw "BOM detected in $filePath — file cannot be used as Node.js entry point"
-}
-```
+    $bytes = [System.IO.File]::ReadAllBytes($filePath)
+    if ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+        throw "BOM detected in $filePath — file cannot be used as Node.js entry point"
+    }
 
 **Strip af eksisterende BOM (remediation):**
 
-```powershell
-$bytes = [System.IO.File]::ReadAllBytes($path)
-if ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
-    [System.IO.File]::WriteAllBytes($path, $bytes[3..($bytes.Length - 1)])
-}
-```
+    $bytes = [System.IO.File]::ReadAllBytes($path)
+    if ($bytes[0] -eq 0xEF -and $bytes[1] -eq 0xBB -and $bytes[2] -eq 0xBF) {
+        [System.IO.File]::WriteAllBytes($path, $bytes[3..($bytes.Length - 1)])
+    }
 
 ## Hvad der IKKE må ske
 
@@ -63,17 +58,13 @@ Setup scripts der installerer MCP bridge-filer (fx curabis-standard.agent.md) sk
 Symptom: MCP-server er konfigureret i `.mcp.json`, men eksponerer ingen tools i sessionen.
 
 Diagnose:
-```powershell
-# Tjek første bytes
-$b = [System.IO.File]::ReadAllBytes("path\to\bridge.js")
-"0x{0:X2} 0x{1:X2} 0x{2:X2}" -f $b[0], $b[1], $b[2]
-# Hvis output er "0xEF 0xBB 0xBF" er BOM årsagen
-```
+    # Tjek første bytes
+    $b = [System.IO.File]::ReadAllBytes("path\to\bridge.js")
+    "0x{0:X2} 0x{1:X2} 0x{2:X2}" -f $b[0], $b[1], $b[2]
+    # Hvis output er "0xEF 0xBB 0xBF" er BOM årsagen
 
-```bash
-# Kør bridge direkte og se om Node.js fejler
-node path/to/bridge.js 2>&1 | head -5
-```
+    # Kør bridge direkte og se om Node.js fejler
+    node path/to/bridge.js 2>&1 | head -5
 
 ## Evidens
 

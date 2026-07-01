@@ -1,13 +1,15 @@
 ---
-name: feature-branch-must-merge-to-track-branch
-title: Feature branches must merge into the project's declared track branch
-category: architecture
-severity: required
+bc-version: [all]
+domain: architecture
+keywords: [git, feature-branch, track-branch, merge, workflow]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # Feature branches must merge into the project's declared track branch
 
-## Rule
+## Description
 
 When a project declares a track branch in `CLAUDE.md`, all feature branches
 MUST merge into that track branch — not into `main` directly. `main` is
@@ -17,10 +19,8 @@ reserved for releases and hotfixes.
 
 The track branch is declared once in `CLAUDE.md`:
 
-```yaml
-# Declares the integration target for this development sprint/module
-trackBranch: purchase
-```
+    # Declares the integration target for this development sprint/module
+    trackBranch: purchase
 
 If no `trackBranch` is declared, `main` is the default and feature branches
 merge there directly.
@@ -46,33 +46,27 @@ The rule protects the invariant: **`main` is deployable at any moment.**
 
 ## The branching model
 
-```
-main
- └── <track-branch>          (e.g. "purchase" — lives for one sprint/module)
-       └── feature/<name>    ← development happens here
-       └── feature/<name>
-       └── bugfix/<name>
- └── hotfix/<name>           ← branches from main, merges back to main
-```
+    main
+     └── <track-branch>          (e.g. "purchase" — lives for one sprint/module)
+           └── feature/<name>    ← development happens here
+           └── feature/<name>
+           └── bugfix/<name>
+     └── hotfix/<name>           ← branches from main, merges back to main
 
 At release: track-branch → main (via PR, after full QA).
 
 ## Non-compliant
 
-```bash
-# Merging a feature directly to main when a track branch is declared in CLAUDE.md
-git checkout main
-git merge feature/my-feature   # violates rule
-```
+    # Merging a feature directly to main when a track branch is declared in CLAUDE.md
+    git checkout main
+    git merge feature/my-feature   # violates rule
 
 ## Compliant
 
-```bash
-# Read track branch from CLAUDE.md → merge there
-git checkout purchase
-git merge --no-ff feature/my-feature
-# Then sync BC: gitHubDevStatus = "Done"
-```
+    # Read track branch from CLAUDE.md → merge there
+    git checkout purchase
+    git merge --no-ff feature/my-feature
+    # Then sync BC: gitHubDevStatus = "Done"
 
 ## Scope
 

@@ -1,15 +1,15 @@
 ---
-rule-id: CURABIS-MCP-007
-title: Agent must resolve developer identity from BC
-category: mcp
-severity: warning
-applies-to: [agent-files, bc-mcp]
 bc-version: [all]
+domain: mcp
+keywords: [mcp, s2s, developer-identity, users-api, bc]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # Agent must resolve developer identity from BC
 
-## Rule
+## Description
 
 Agent files must not contain static employee-to-code mappings.
 Developer identity must always be resolved at runtime from the BC users tool (PAG6102903).

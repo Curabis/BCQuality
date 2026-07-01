@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: architecture
+keywords: [identifiers, naming, english, captions, translation]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # AL Naming Convention: English Identifiers Only
 
-## Core Rule
+## Description
 
 All AL identifiers must be written in English, regardless of the developer's native language. "Translations are handled separately via XLIFF files — never by writing Danish, German or other language identifiers in AL source code."
 
