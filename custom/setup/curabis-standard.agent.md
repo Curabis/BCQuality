@@ -1,17 +1,18 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 6
+version: 7
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
   environment. Writes CLAUDE.md, BCQuality agents, .mcp.json and cspell.json
-  from authoritative templates in BCQuality. Deploys bc-mcp-bridge.js to the
-  developer's machine. Syncs a local three-layer BCQuality knowledge mirror
-  (custom/community/microsoft + INDEX.md) into the repo. Also handles updates
-  to an already-configured project.
+  from authoritative templates in BCQuality. Deploys bc-mcp-bridge.js and the
+  three-layer BCQuality knowledge mirror (custom/community/microsoft + INDEX.md)
+  to the developer's machine (~/.claude/) — the mirror is machine-local and is
+  never committed to a project repository. Also handles updates to an
+  already-configured project, including cleanup of v6-era repo-local mirrors.
 inputs: [repo-root]
-outputs: [CLAUDE.md, .mcp.json, .github/.agents/*, .github/.agents/bcquality-knowledge/, cspell.json, projectmemory/, docs/]
+outputs: [CLAUDE.md, .mcp.json, .github/.agents/*, ~/.claude/bcquality-knowledge/, cspell.json, projectmemory/, docs/]
 domain: setup
 keywords: [setup, bootstrap, update, mcp, bcquality, standard, new-project]
 ---
@@ -147,20 +148,27 @@ This file is read automatically by Claude Code at the start of every session.
 At the start of every session, before doing anything else:
 
 1. Read `.github/.agents/bcquality.agent.md`
-2. Read knowledge files vendored locally under `.github/.agents/bcquality-knowledge/`:
+2. Read BCQuality knowledge files from the machine-local mirror at
+   `~/.claude/bcquality-knowledge/` (Windows: `%USERPROFILE%\.claude\bcquality-knowledge\`):
    - **`custom/`** — always read in full (CURABIS-specific rules, always active)
    - **`community/`** and **`microsoft/`** — do NOT read in full (~200 files is too
      much to preload every session). Instead read `INDEX.md` first and open only
      the files whose domain/keywords match the task at hand.
 
-These files are a local copy of the Curabis BCQuality knowledge base, spanning
-all three layers (custom/community/microsoft). They are read from disk each
-session — no network fetch required. Refresh them from upstream periodically
-(e.g. monthly, or whenever a session flags the mirror as stale) by running:
+The mirror covers all three BCQuality layers and lives on the developer's
+machine, shared by every CURABIS repo on it. It is deliberately NOT committed
+to this repository (BCQuality rule
+`bcquality-knowledge-must-mirror-to-machine-not-repo`) — one sync per machine
+covers every repo, and the repo history stays free of upstream rule churn.
 
-    powershell -File .github/.agents/sync-bcquality-knowledge.ps1
+If `~/.claude/bcquality-knowledge/` is missing or empty, self-heal before continuing:
 
-Then review the diff and commit any changes.
+    powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.claude\sync-bcquality-knowledge.ps1"
+
+If the sync script itself is missing, first download it AS RAW BYTES (do not
+decode/re-encode — use `Invoke-WebRequest -OutFile`) from
+`https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup/sync-bcquality-knowledge.ps1`
+to `~/.claude/sync-bcquality-knowledge.ps1`, then run it.
 
 These rules are always active.
 
@@ -360,20 +368,32 @@ Fetch and write verbatim:
 
 Create `.github/.agents/` if it does not exist.
 
-#### 4c-2. bcquality-knowledge/ (local mirror of all three BCQuality layers)
+#### 4c-2. bcquality-knowledge — machine-local mirror (NEVER in the repo)
 
-1. Fetch `{BASE}/sync-bcquality-knowledge.ps1` → write to
-   `.github/.agents/sync-bcquality-knowledge.ps1`
-2. Run it once: `powershell -ExecutionPolicy Bypass -File .github/.agents/sync-bcquality-knowledge.ps1`
-   This populates `.github/.agents/bcquality-knowledge/{custom,community,microsoft}/`
+The knowledge mirror lives on the developer's machine and is shared by every
+CURABIS repo on that machine: `~/.claude/bcquality-knowledge/`. It must never
+be committed to a project repository (BCQuality rule
+`bcquality-knowledge-must-mirror-to-machine-not-repo`). Rationale: developers
+switch between many repos daily — N per-repo mirrors are permanently out of
+sync with each other, while one machine mirror needs exactly one sync per
+upstream change.
+
+1. Fetch `{BASE}/sync-bcquality-knowledge.ps1` → write AS RAW BYTES
+   (`Invoke-WebRequest -OutFile`, never via string content — re-encoding
+   corrupts UTF-8) to `~/.claude/sync-bcquality-knowledge.ps1`
+2. Run it once:
+   `powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.claude\sync-bcquality-knowledge.ps1"`
+   This populates `~/.claude/bcquality-knowledge/{custom,community,microsoft}/`
    plus an `INDEX.md` (domain + keywords per file, for relevance-based lookup —
    `custom/` is always read in full, `community/` and `microsoft/` are scanned via
    the index rather than preloaded, since together they run into the hundreds of files).
-3. Confirm: "bcquality-knowledge/ synkroniseret — [antal] filer på tværs af 3 lag."
+3. Add `.github/.agents/bcquality-knowledge/` to the repo's `.gitignore`, so no
+   future session can accidentally commit a repo-local mirror.
+4. Confirm: "bcquality-knowledge synkroniseret til din maskine — [antal] filer, 3 lag."
 
 This mirror is what Step 4a's generated CLAUDE.md instructs Claude to read at
 session start. Without this step, the CLAUDE.md reference in 4a points at a
-folder that doesn't exist yet.
+folder that doesn't exist yet on a fresh machine.
 
 #### 4d. cspell.json
 
@@ -470,8 +490,9 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `.github/.agents/weber.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/algo-settings.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/smiley.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
-| `.github/.agents/sync-bcquality-knowledge.ps1` | Fetch fresh from BCQuality, overwrite (add if missing) |
-| `.github/.agents/bcquality-knowledge/` | Re-run the sync script (see below), commit the diff |
+| `~/.claude/sync-bcquality-knowledge.ps1` | Fetch fresh from BCQuality (raw bytes), overwrite (add if missing) |
+| `~/.claude/bcquality-knowledge/` | Re-run the sync script (see below) — machine-local, nothing to commit |
+| `.github/.agents/bcquality-knowledge/` + `.github/.agents/sync-bcquality-knowledge.ps1` | v6-era repo-local mirror: propose removal (see below) |
 | `cspell.json` — words from template | Merge new words, keep project words |
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
 | `.mcp.json` — `businesscentral` path | Validate and correct if wrong (see below) |
@@ -479,26 +500,48 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `HEARTBEAT.md` | Create from template if missing (substitute tokens), never overwrite |
 | `docs/specs/`, `docs/decisions/`, `docs/cleanup/` | Create if missing, never overwrite content |
 
-### bcquality-knowledge/ re-sync (Mode B)
+### bcquality-knowledge — machine re-sync (Mode B)
 
-After overwriting `.github/.agents/sync-bcquality-knowledge.ps1`, always re-run it:
+After overwriting `~/.claude/sync-bcquality-knowledge.ps1`, always re-run it:
 
 ```
-powershell -ExecutionPolicy Bypass -File .github/.agents/sync-bcquality-knowledge.ps1
+powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.claude\sync-bcquality-knowledge.ps1"
 ```
 
-This refreshes `.github/.agents/bcquality-knowledge/{custom,community,microsoft}/`
+This refreshes `~/.claude/bcquality-knowledge/{custom,community,microsoft}/`
 and regenerates `INDEX.md` from the live BCQuality tree. Run this every time Mode B
 runs, not just when the script itself changed — the mirror goes stale independently
-of the script (new upstream knowledge files land on their own schedule). Stage the
-resulting diff for the update commit in "After update — report and commit" below.
+of the script (new upstream knowledge files land on their own schedule). The mirror
+is machine-local: there is no repo diff to stage.
 
-If `.github/.agents/sync-bcquality-knowledge.ps1` does not exist yet (project set up
-before this mechanism existed): fetch it, run it, and also check whether the
-project's CLAUDE.md still has the old flat `architecture/*.md, testing/*.md, mcp/*.md`
-BCQuality-reading instruction from before the three-layer mirror existed. If so, propose
-replacing it with the current template from Step 4a and ask for confirmation before
-editing CLAUDE.md (same confirmation gate as the agent-synligheds-check below).
+### v6-era repo-local mirror — cleanup (Mode B)
+
+Projects configured under setup v6 have the mirror committed INSIDE the repo.
+Detect and clean up:
+
+1. If `.github/.agents/bcquality-knowledge/` exists in the repo (tracked or not),
+   propose removing it — ask for confirmation first:
+
+   ```
+   ⚠️ Dette repo indeholder en v6-æra repo-lokal BCQuality-mirror
+   (.github/.agents/bcquality-knowledge/, ~[antal] filer). Standarden er nu
+   maskin-lokal mirror (~/.claude/bcquality-knowledge/). Må jeg fjerne
+   repo-mirroren og gitignore stien? (ja/nej)
+   ```
+
+   On yes: `git rm -r --cached .github/.agents/bcquality-knowledge/` (if tracked),
+   delete the folder, delete `.github/.agents/sync-bcquality-knowledge.ps1` (its
+   `$PSScriptRoot`-relative destination is what created the repo mirror), and add
+   `.github/.agents/bcquality-knowledge/` to `.gitignore`.
+
+2. Check the project's CLAUDE.md `## BCQuality` section for obsolete forms:
+   - a flat list of `raw.githubusercontent.com/...` knowledge URLs (pre-mirror era)
+   - a reference to `.github/.agents/bcquality-knowledge/` (v6 repo-mirror era)
+   - a literal per-developer path such as `C:\Users\<name>\.claude\...` — must be
+     `~/.claude/...` / `%USERPROFILE%`, never one developer's username
+   If any match, propose replacing the section with the current template from
+   Step 4a and ask for confirmation before editing CLAUDE.md (same confirmation
+   gate as the agent-synligheds-check below).
 
 ### .mcp.json — hardcoded developer-path validation (Mode B)
 
