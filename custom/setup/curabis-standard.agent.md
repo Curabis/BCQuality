@@ -1,15 +1,17 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 5
+version: 6
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
   environment. Writes CLAUDE.md, BCQuality agents, .mcp.json and cspell.json
   from authoritative templates in BCQuality. Deploys bc-mcp-bridge.js to the
-  developer's machine. Also handles updates to an already-configured project.
+  developer's machine. Syncs a local three-layer BCQuality knowledge mirror
+  (custom/community/microsoft + INDEX.md) into the repo. Also handles updates
+  to an already-configured project.
 inputs: [repo-root]
-outputs: [CLAUDE.md, .mcp.json, .github/.agents/*, cspell.json, projectmemory/, docs/]
+outputs: [CLAUDE.md, .mcp.json, .github/.agents/*, .github/.agents/bcquality-knowledge/, cspell.json, projectmemory/, docs/]
 domain: setup
 keywords: [setup, bootstrap, update, mcp, bcquality, standard, new-project]
 ---
@@ -60,6 +62,7 @@ AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/ag
 | aurelius.agent.md | `{AGENTS_BASE}/aurelius.agent.md` |
 | munger.agent.md | `{AGENTS_BASE}/munger.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
+| sync-bcquality-knowledge.ps1 | `{BASE}/sync-bcquality-knowledge.ps1` |
 
 CLAUDE.md and .mcp.json are generated dynamically — not fetched as static templates
 because they contain project-specific paths.
@@ -144,15 +147,20 @@ This file is read automatically by Claude Code at the start of every session.
 At the start of every session, before doing anything else:
 
 1. Read `.github/.agents/bcquality.agent.md`
-2. Read BCQuality knowledge files from local cache (no network — fast):
-   ```
-   C:\Users\mid\.claude\bcquality-knowledge\architecture\*.md
-   C:\Users\mid\.claude\bcquality-knowledge\testing\*.md
-   C:\Users\mid\.claude\bcquality-knowledge\mcp\*.md
-   ```
-   The cache is populated automatically when BCQuality updates (via global CLAUDE.md
-   auto-update). If the cache is missing or empty on first run, the auto-update will
-   populate it. Do not fetch URLs manually unless explicitly asked.
+2. Read knowledge files vendored locally under `.github/.agents/bcquality-knowledge/`:
+   - **`custom/`** — always read in full (CURABIS-specific rules, always active)
+   - **`community/`** and **`microsoft/`** — do NOT read in full (~200 files is too
+     much to preload every session). Instead read `INDEX.md` first and open only
+     the files whose domain/keywords match the task at hand.
+
+These files are a local copy of the Curabis BCQuality knowledge base, spanning
+all three layers (custom/community/microsoft). They are read from disk each
+session — no network fetch required. Refresh them from upstream periodically
+(e.g. monthly, or whenever a session flags the mirror as stale) by running:
+
+    powershell -File .github/.agents/sync-bcquality-knowledge.ps1
+
+Then review the diff and commit any changes.
 
 These rules are always active.
 
@@ -352,6 +360,21 @@ Fetch and write verbatim:
 
 Create `.github/.agents/` if it does not exist.
 
+#### 4c-2. bcquality-knowledge/ (local mirror of all three BCQuality layers)
+
+1. Fetch `{BASE}/sync-bcquality-knowledge.ps1` → write to
+   `.github/.agents/sync-bcquality-knowledge.ps1`
+2. Run it once: `powershell -ExecutionPolicy Bypass -File .github/.agents/sync-bcquality-knowledge.ps1`
+   This populates `.github/.agents/bcquality-knowledge/{custom,community,microsoft}/`
+   plus an `INDEX.md` (domain + keywords per file, for relevance-based lookup —
+   `custom/` is always read in full, `community/` and `microsoft/` are scanned via
+   the index rather than preloaded, since together they run into the hundreds of files).
+3. Confirm: "bcquality-knowledge/ synkroniseret — [antal] filer på tværs af 3 lag."
+
+This mirror is what Step 4a's generated CLAUDE.md instructs Claude to read at
+session start. Without this step, the CLAUDE.md reference in 4a points at a
+folder that doesn't exist yet.
+
 #### 4d. cspell.json
 
 Fetch `{BASE}/templates/cspell.json` and write to repo root.
@@ -447,12 +470,35 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `.github/.agents/weber.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/algo-settings.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/smiley.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
+| `.github/.agents/sync-bcquality-knowledge.ps1` | Fetch fresh from BCQuality, overwrite (add if missing) |
+| `.github/.agents/bcquality-knowledge/` | Re-run the sync script (see below), commit the diff |
 | `cspell.json` — words from template | Merge new words, keep project words |
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
 | `.mcp.json` — `businesscentral` path | Validate and correct if wrong (see below) |
 | `.mcp.json` — `al` `-File` path | Validate and correct if wrong (see below) |
 | `HEARTBEAT.md` | Create from template if missing (substitute tokens), never overwrite |
 | `docs/specs/`, `docs/decisions/`, `docs/cleanup/` | Create if missing, never overwrite content |
+
+### bcquality-knowledge/ re-sync (Mode B)
+
+After overwriting `.github/.agents/sync-bcquality-knowledge.ps1`, always re-run it:
+
+```
+powershell -ExecutionPolicy Bypass -File .github/.agents/sync-bcquality-knowledge.ps1
+```
+
+This refreshes `.github/.agents/bcquality-knowledge/{custom,community,microsoft}/`
+and regenerates `INDEX.md` from the live BCQuality tree. Run this every time Mode B
+runs, not just when the script itself changed — the mirror goes stale independently
+of the script (new upstream knowledge files land on their own schedule). Stage the
+resulting diff for the update commit in "After update — report and commit" below.
+
+If `.github/.agents/sync-bcquality-knowledge.ps1` does not exist yet (project set up
+before this mechanism existed): fetch it, run it, and also check whether the
+project's CLAUDE.md still has the old flat `architecture/*.md, testing/*.md, mcp/*.md`
+BCQuality-reading instruction from before the three-layer mirror existed. If so, propose
+replacing it with the current template from Step 4a and ask for confirmation before
+editing CLAUDE.md (same confirmation gate as the agent-synligheds-check below).
 
 ### .mcp.json — hardcoded developer-path validation (Mode B)
 
