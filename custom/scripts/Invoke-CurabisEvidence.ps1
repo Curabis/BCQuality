@@ -29,7 +29,7 @@ param(
     [string]$BCQualityHome,
 
     # Bruges naar der ikke er en lokal klon: knowledge-filer HTTP-tjekkes herfra.
-    [string]$RawBase = 'https://raw.githubusercontent.com/Curabis/BCQuality/main',
+    [string]$RawBase = 'https://raw.githubusercontent.com/Curabis/BCQuality/stable',
 
     [switch]$Quiet
 )

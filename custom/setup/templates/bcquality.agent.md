@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-al-code-review
-version: 1
+version: 2
 title: CURABIS AL code review
 description: Reviews AL source changes against BCQuality knowledge and CURABIS-specific architecture rules.
 inputs: [pr-diff, file-path]
@@ -46,29 +46,22 @@ of the quality in the code they write.
 
 Layer 1 - Microsoft BCQuality: https://github.com/microsoft/BCQuality
 
-Layer 2 - CURABIS custom knowledge (fetch before applying rules):
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/pages-must-not-contain-business-logic.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/namespace-must-be-verified-from-source.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/al-identifiers-must-be-english.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/clarify-before-building.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/xliff-translation-workflow.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/new-file-requires-vscode-refresh.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/exposed-objects-must-be-in-a-permission-set.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/shared-project-memory-must-be-in-repo.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/commit-message-must-include-bc-task-id.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/branch-merge-to-main-workflow.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-setup-must-use-library-codeunit.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-data-must-be-random-and-complete.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/tests-must-adapt-to-existing-code.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-one-when-per-test.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/ui-test-codeunit-naming.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-feature-scenario-tags.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-flowfields-must-be-calcfields.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/stored-derived-fields-must-not-be-exposed-directly.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-key-fields-must-be-editable-on-insert.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-least-privilege-write-access.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/agent-must-not-write-business-process-status.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/bc-mcp-find-active-task-for-branch.md
+Layer 2 - CURABIS custom knowledge. Never a hardcoded file list — the rulebook
+grows, and a frozen list silently drops every rule added after it was written.
+Resolve the current rule set at review time, in this order:
+
+1. **Machine mirror (preferred — Claude Code sessions):** read ALL files under
+   `~/.claude/bcquality-knowledge/custom/` (Windows:
+   `%USERPROFILE%\.claude\bcquality-knowledge\custom\`). The mirror is synced
+   from the `stable` release channel and is always the complete custom layer.
+2. **Fallback (no mirror — Copilot, fresh machine, CI):** list the tree via
+   `https://api.github.com/repos/Curabis/BCQuality/git/trees/stable?recursive=1`
+   filtered to `custom/knowledge/**/*.md`, and fetch each file from
+   `https://raw.githubusercontent.com/Curabis/BCQuality/stable/<path>`.
+
+Relevance filtering: `custom/` rules are always active in CURABIS repos — read
+them all; use each file's frontmatter `domain`/`keywords` only to prioritize,
+never to skip.
 
 ## Action
 

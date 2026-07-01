@@ -78,7 +78,7 @@ reviews what happened. He asks one question about every significant event:
 
 He compares against the full BCQuality knowledge base:
 ```
-BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge
+BASE = https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge
 ```
 Domains: `architecture/`, `testing/`, `mcp/`
 

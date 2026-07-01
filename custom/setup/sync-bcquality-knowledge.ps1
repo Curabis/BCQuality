@@ -20,7 +20,7 @@
 $ErrorActionPreference = 'Stop'
 
 $repo    = 'Curabis/BCQuality'
-$branch  = 'main'
+$branch  = 'stable'
 $dest    = Join-Path $env:USERPROFILE '.claude\bcquality-knowledge'
 $staging = "$dest.tmp"
 $rawBase = "https://raw.githubusercontent.com/$repo/$branch"
