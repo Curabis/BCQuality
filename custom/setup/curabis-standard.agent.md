@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 7
+version: 8
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -62,6 +62,7 @@ AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/ag
 | lincoln.agent.md | `{AGENTS_BASE}/lincoln.agent.md` |
 | aurelius.agent.md | `{AGENTS_BASE}/aurelius.agent.md` |
 | munger.agent.md | `{AGENTS_BASE}/munger.agent.md` |
+| edison.agent.md | `{AGENTS_BASE}/edison.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
 | sync-bcquality-knowledge.ps1 | `{BASE}/sync-bcquality-knowledge.ps1` |
 
@@ -219,6 +220,11 @@ These are invoked only when needed - not at session start:
 - `.github/.agents/court.agent.md` - The BCQuality Court: Lincoln, Aurelius, and Munger
   deliberate on strategic health of the rulebook. Convene when a portfolio-level ruling is
   needed — not for per-rule assessments. Requires a case brief with Edison scorecards.
+- `.github/.agents/edison.agent.md` - BCQuality eval runner. Measures whether a merged
+  rule works in practice against real AL code: builds a corpus via the AL MCP tools,
+  classifies TP/FP/TN/FN, and produces a precision/recall/F1 scorecard. Low scorers route
+  to Francis for sharpening. Read-only — never modifies code or rules. Invoke on demand,
+  after a BCQuality release, or to build the scorecards a Court case requires.
 - `.github/.agents/weber.agent.md` - Developer AI coaching. Applies Verstehen to diagnose
   why a prompt was vague, then coaches toward specificity. Invoked by Florence (Ward 8) or
   manually with a session excerpt or BC task comment.
@@ -362,6 +368,7 @@ Fetch and write verbatim:
 - `{AGENTS_BASE}/lincoln.agent.md`         → `.github/.agents/lincoln.agent.md`
 - `{AGENTS_BASE}/aurelius.agent.md`        → `.github/.agents/aurelius.agent.md`
 - `{AGENTS_BASE}/munger.agent.md`          → `.github/.agents/munger.agent.md`
+- `{AGENTS_BASE}/edison.agent.md`          → `.github/.agents/edison.agent.md`
 - `{AGENTS_BASE}/weber.agent.md`           → `.github/.agents/weber.agent.md`
 - `{AGENTS_BASE}/smiley.agent.md`          → `.github/.agents/smiley.agent.md`
 - `{BASE}/templates/algo-settings.agent.md`→ `.github/.agents/algo-settings.agent.md`
@@ -486,6 +493,7 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `.github/.agents/lincoln.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/aurelius.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/munger.agent.md` | Fetch fresh from BCQuality, overwrite |
+| `.github/.agents/edison.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/carlin.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/weber.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/algo-settings.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
