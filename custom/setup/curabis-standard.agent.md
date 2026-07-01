@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 9
+version: 10
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -37,8 +37,8 @@ Detect which mode based on the trigger phrase and proceed accordingly.
 ## Source URLs (BCQuality — always fetch fresh)
 
 ```
-BASE        = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup
-AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/agents
+BASE        = https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/setup
+AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/agents
 ```
 
 | Artefakt | URL |
@@ -168,7 +168,7 @@ If `~/.claude/bcquality-knowledge/` is missing or empty, self-heal before contin
 
 If the sync script itself is missing, first download it AS RAW BYTES (do not
 decode/re-encode — use `Invoke-WebRequest -OutFile`) from
-`https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/setup/sync-bcquality-knowledge.ps1`
+`https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/setup/sync-bcquality-knowledge.ps1`
 to `~/.claude/sync-bcquality-knowledge.ps1`, then run it.
 
 These rules are always active.

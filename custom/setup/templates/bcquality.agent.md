@@ -47,28 +47,28 @@ of the quality in the code they write.
 Layer 1 - Microsoft BCQuality: https://github.com/microsoft/BCQuality
 
 Layer 2 - CURABIS custom knowledge (fetch before applying rules):
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/pages-must-not-contain-business-logic.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/namespace-must-be-verified-from-source.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/al-identifiers-must-be-english.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/clarify-before-building.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/xliff-translation-workflow.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/new-file-requires-vscode-refresh.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/exposed-objects-must-be-in-a-permission-set.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/shared-project-memory-must-be-in-repo.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/commit-message-must-include-bc-task-id.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/architecture/branch-merge-to-main-workflow.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-setup-must-use-library-codeunit.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-data-must-be-random-and-complete.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/tests-must-adapt-to-existing-code.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-one-when-per-test.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/ui-test-codeunit-naming.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/testing/test-feature-scenario-tags.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-flowfields-must-be-calcfields.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/stored-derived-fields-must-not-be-exposed-directly.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-key-fields-must-be-editable-on-insert.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/api-page-least-privilege-write-access.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/agent-must-not-write-business-process-status.md
-- https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/knowledge/mcp/bc-mcp-find-active-task-for-branch.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/pages-must-not-contain-business-logic.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/namespace-must-be-verified-from-source.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/al-identifiers-must-be-english.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/clarify-before-building.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/xliff-translation-workflow.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/new-file-requires-vscode-refresh.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/exposed-objects-must-be-in-a-permission-set.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/shared-project-memory-must-be-in-repo.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/commit-message-must-include-bc-task-id.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/architecture/feature-branch-must-merge-to-track-branch.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/testing/test-setup-must-use-library-codeunit.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/testing/test-data-must-be-random-and-complete.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/testing/tests-must-adapt-to-existing-code.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/testing/test-one-when-per-test.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/testing/ui-test-codeunit-naming.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/testing/test-feature-scenario-tags.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/mcp/api-page-flowfields-must-be-calcfields.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/mcp/stored-derived-fields-must-not-be-exposed-directly.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/mcp/api-page-key-fields-must-be-editable-on-insert.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/mcp/api-page-least-privilege-write-access.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/mcp/agent-must-not-write-business-process-status.md
+- https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/knowledge/mcp/bc-mcp-find-active-task-for-branch.md
 
 ## Action
 

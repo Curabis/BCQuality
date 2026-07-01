@@ -38,6 +38,31 @@ future CI/PR-review integration:
   currently consumed by nothing. Keep it — but do not mistake it for active
   configuration of the session model.
 
+## Release channel: `stable`
+
+Merging to `main` is **not** a deployment. All consumers — the machine
+CLAUDE.md auto-update, `sync-bcquality-knowledge.ps1`, the setup agent's
+fetch URLs, and the agent templates' knowledge references — read from the
+**`stable`** branch, never from `main`. `main` is where PRs land and CI runs;
+`stable` is what every developer machine actually executes.
+
+Deploying is a deliberate act (Michael only):
+
+    git checkout stable
+    git merge --ff-only main
+    git push origin stable
+    git checkout main
+
+Optionally cut a version tag at the same commit (`git tag vX.Y.Z && git push
+origin vX.Y.Z`) for a historical record. If a bad change reaches `stable`,
+roll back by force-moving `stable` to the previous good commit — consumers
+follow the branch, so recovery is one push.
+
+Rationale: `main` used to be the live deploy channel — any merge silently
+overwrote `bc-mcp-bridge.js` (which handles S2S credentials) on every
+developer machine at next session start. The `stable` gate separates "CI
+accepted it" from "the organization runs it".
+
 ## Known deltas to close before activating the Entry flow
 
 1. **`custom/skills/` is empty.** The CURABIS review pass lives in the
