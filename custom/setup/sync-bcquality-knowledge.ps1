@@ -1,4 +1,4 @@
-# Refresh the local mirror of the Curabis BCQuality knowledge base.
+# Refresh the MACHINE-LOCAL mirror of the Curabis BCQuality knowledge base.
 #
 # Mirrors three layers from https://github.com/Curabis/BCQuality:
 #   custom/    - Curabis org-specific rules   (ALWAYS read in full each session)
@@ -11,14 +11,17 @@
 # keywords from each file's frontmatter) so an agent can scan and pull only the
 # files relevant to a task instead of loading all ~100 every session.
 #
-# Run periodically, then review the diff and commit:
-#   pwsh .github/.agents/sync-bcquality-knowledge.ps1
+# The mirror is per developer machine (~/.claude/bcquality-knowledge/), shared
+# by every CURABIS repo on it. It is NEVER committed to a project repository -
+# see BCQuality rule bcquality-knowledge-must-mirror-to-machine-not-repo.
+# One sync per machine covers every repo. Run periodically:
+#   powershell -ExecutionPolicy Bypass -File "$env:USERPROFILE\.claude\sync-bcquality-knowledge.ps1"
 
 $ErrorActionPreference = 'Stop'
 
 $repo    = 'Curabis/BCQuality'
 $branch  = 'main'
-$dest    = Join-Path $PSScriptRoot 'bcquality-knowledge'
+$dest    = Join-Path $env:USERPROFILE '.claude\bcquality-knowledge'
 $staging = "$dest.tmp"
 $rawBase = "https://raw.githubusercontent.com/$repo/$branch"
 $treeUrl = "https://api.github.com/repos/$repo/git/trees/$branch" + '?recursive=1'
@@ -121,5 +124,5 @@ Rename-Item -Path $staging -NewName (Split-Path $dest -Leaf)
 
 Write-Host ''
 Write-Host "Done. $($files.Count) files across $($layerMap.Count) layers."
-Write-Host "Review changes with: git diff $dest"
+Write-Host "Machine-local mirror updated: $dest"
 exit $rc
