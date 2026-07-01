@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 8
+version: 9
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -46,9 +46,9 @@ AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/main/custom/ag
 | bc-mcp-bridge.js | `{BASE}/bc-mcp-bridge.js` |
 | bc-mcp.config.template.json | `{BASE}/machine/bc-mcp.config.template.json` |
 | bcquality.agent.md | `{BASE}/templates/bcquality.agent.md` |
-| immanuel.agent.md | `{BASE}/templates/immanuel.agent.md` |
-| carlin.agent.md | `{BASE}/templates/carlin.agent.md` |
-| francis.agent.md | `{BASE}/templates/francis.agent.md` |
+| immanuel.agent.md | `{AGENTS_BASE}/immanuel.agent.md` |
+| carlin.agent.md | `{AGENTS_BASE}/carlin.agent.md` |
+| francis.agent.md | `{AGENTS_BASE}/francis.agent.md` |
 | al-triage.agent.md | `{BASE}/templates/al-triage.agent.md` |
 | al-complexity.agent.md | `{BASE}/templates/al-complexity.agent.md` |
 | bc-mcp.agent.md | `{BASE}/templates/bc-mcp.agent.md` |
@@ -237,7 +237,7 @@ Kald Francis automatisk (uden at vente til session-slut) når du:
 - Finder dig selv i at løse det samme problem to gange på to forskellige måder
 
 Fetch Francis fra `.github/.agents/francis.agent.md` hvis den eksisterer,
-ellers fra `{BASE}/templates/francis.agent.md`.
+ellers fra `{AGENTS_BASE}/francis.agent.md`.
 
 ## AL projects
 
@@ -355,9 +355,9 @@ If `find-altool.ps1` is missing, note after writing .mcp.json:
 
 Fetch and write verbatim:
 - `{BASE}/templates/bcquality.agent.md`    → `.github/.agents/bcquality.agent.md`
-- `{BASE}/templates/immanuel.agent.md`     → `.github/.agents/immanuel.agent.md`
-- `{BASE}/templates/carlin.agent.md`       → `.github/.agents/carlin.agent.md`
-- `{BASE}/templates/francis.agent.md`      → `.github/.agents/francis.agent.md`
+- `{AGENTS_BASE}/immanuel.agent.md`        → `.github/.agents/immanuel.agent.md`
+- `{AGENTS_BASE}/carlin.agent.md`          → `.github/.agents/carlin.agent.md`
+- `{AGENTS_BASE}/francis.agent.md`         → `.github/.agents/francis.agent.md`
 - `{BASE}/templates/al-triage.agent.md`    → `.github/.agents/al-triage.agent.md`
 - `{BASE}/templates/al-complexity.agent.md`→ `.github/.agents/al-complexity.agent.md`
 - `{BASE}/templates/bc-mcp.agent.md`       → `.github/.agents/bc-mcp.agent.md`
