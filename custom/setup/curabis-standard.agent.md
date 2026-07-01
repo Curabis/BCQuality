@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 3
+version: 4
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -290,13 +290,13 @@ If `.vscode/find-altool.ps1` exists:
       "command": "powershell",
       "args": [
         "-ExecutionPolicy", "Bypass",
-        "-File", "<ABS_PATH_TO_VSCODE>/find-altool.ps1",
+        "-File", "${CLAUDE_PROJECT_DIR:-.}\\.vscode\\find-altool.ps1",
         "launchmcpserver", "--transport", "stdio"
       ]
     },
     "businesscentral": {
       "command": "node",
-      "args": ["C:\\Users\\<USERNAME>\\.claude\\bc-mcp-bridge.js"]
+      "args": ["${USERPROFILE}\\.claude\\bc-mcp-bridge.js"]
     }
   }
 }
@@ -308,13 +308,17 @@ If `.vscode/find-altool.ps1` does NOT exist:
   "mcpServers": {
     "businesscentral": {
       "command": "node",
-      "args": ["C:\\Users\\<USERNAME>\\.claude\\bc-mcp-bridge.js"]
+      "args": ["${USERPROFILE}\\.claude\\bc-mcp-bridge.js"]
     }
   }
 }
 ```
 
-Substitute `<ABS_PATH_TO_VSCODE>` and `<USERNAME>` from detected values.
+Use Claude Code's built-in environment-variable expansion — `${CLAUDE_PROJECT_DIR:-.}`
+and `${USERPROFILE}` — instead of substituting literal detected paths. `.mcp.json` is
+git-committed and shared; a path baked in for one developer's machine or username
+breaks every other developer's clone (see BCQuality rule
+`mcp-config-must-not-hardcode-developer-paths`).
 
 If `find-altool.ps1` is missing, note after writing .mcp.json:
 > "ℹ️ AL MCP er ikke konfigureret endnu. Kør `Ctrl+Shift+P → AL: Configure MCP Server`
@@ -435,27 +439,39 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `cspell.json` — words from template | Merge new words, keep project words |
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
 | `.mcp.json` — `businesscentral` path | Validate and correct if wrong (see below) |
+| `.mcp.json` — `al` `-File` path | Validate and correct if wrong (see below) |
 | `HEARTBEAT.md` | Create from template if missing (substitute tokens), never overwrite |
 | `docs/specs/`, `docs/decisions/`, `docs/cleanup/` | Create if missing, never overwrite content |
 
-### .mcp.json — businesscentral path validation (Mode B)
+### .mcp.json — hardcoded developer-path validation (Mode B)
 
-The `businesscentral` MCP server entry must point to the global bridge file,
-not a project-local path. After any update, validate `.mcp.json`:
+`.mcp.json` is git-committed and shared — it must not contain a path baked in for
+one developer's machine or username (BCQuality rule
+`mcp-config-must-not-hardcode-developer-paths`). After any update, validate both
+entries:
 
+**`businesscentral` entry** — the bridge path must use env-var expansion, not a
+literal username or drive path:
 1. Read `.mcp.json` and locate the `businesscentral` entry
-2. Check the `args` array — the bridge path must be:
-   `C:\Users\<USERNAME>\.claude\bc-mcp-bridge.js`
-   where `<USERNAME>` is the current Windows username (`$env:USERNAME`)
-3. If the path points anywhere else (e.g. `Scripts/bc-mcp-bridge.js`,
-   a project subfolder, or any path not under `~/.claude/`): **correct it silently**
-4. If `businesscentral` entry is missing entirely: add it with the correct path
-5. Report any correction made:
-   ```
-   ⚠️ .mcp.json: businesscentral-stien var forkert og er rettet.
-   Gammel: <old path>
-   Ny:     C:\Users\<USERNAME>\.claude\bc-mcp-bridge.js
-   ```
+2. Check the `args` array — the bridge path must be `${USERPROFILE}\.claude\bc-mcp-bridge.js`
+3. If it is anything else (e.g. `Scripts/bc-mcp-bridge.js`, a project subfolder,
+   `C:\Users\<literal-name>\.claude\bc-mcp-bridge.js`, or any path not built from
+   `${USERPROFILE}`): **correct it silently** to `${USERPROFILE}\.claude\bc-mcp-bridge.js`
+4. If the `businesscentral` entry is missing entirely: add it with the correct path
+
+**`al` entry** — the `-File` path to `find-altool.ps1` must use
+`${CLAUDE_PROJECT_DIR:-.}`, not a literal absolute path to the repo clone:
+1. Read the `al` entry's `args` array
+2. Check the `-File` value is `${CLAUDE_PROJECT_DIR:-.}\.vscode\find-altool.ps1`
+3. If it is a literal absolute path (e.g. `C:\Curabis\ProjectX\.vscode\find-altool.ps1`
+   or any drive-letter path): **correct it silently** to use `${CLAUDE_PROJECT_DIR:-.}`
+
+Report any correction made:
+```
+⚠️ .mcp.json: <entry>-stien indeholdt en hardcodet udvikler-sti og er rettet.
+Gammel: <old path>
+Ny:     <new path with env-var expansion>
+```
 
 This is the most common setup error on projects configured before CURABIS Standard.
 
