@@ -30,71 +30,65 @@ in the same codeunit.
 
 ## Anti Pattern
 
-```al
-// WRONG: UI test codeunit without _UT suffix
-codeunit 99007 "Find Price Page Testing"
-{
-    Subtype = Test;
-    // contains TestPage calls — should be named "Find Price Testing_UT"
-    ...
-}
-```
-
-```al
-// WRONG: mixing direct codeunit calls and TestPage calls in the same codeunit
-codeunit 99007 "Find Price Testing"
-{
-    Subtype = Test;
-
-    [Test]
-    procedure GetPrice_LogicTest()   // logic test — fine here
-    begin
-        FindPriceMgt.GetSalesPrice(...);
-    end;
-
-    [Test]
-    procedure Page_ShowsPrice_UT()   // UI test — belongs in separate _UT codeunit
-    var
-        FindPricePage: TestPage "Find Price";
-    begin
-        FindPricePage.OpenNew();
+    // WRONG: UI test codeunit without _UT suffix
+    codeunit 99007 "Find Price Page Testing"
+    {
+        Subtype = Test;
+        // contains TestPage calls — should be named "Find Price Testing_UT"
         ...
-    end;
-}
-```
+    }
+
+    // WRONG: mixing direct codeunit calls and TestPage calls in the same codeunit
+    codeunit 99007 "Find Price Testing"
+    {
+        Subtype = Test;
+
+        [Test]
+        procedure GetPrice_LogicTest()   // logic test — fine here
+        begin
+            FindPriceMgt.GetSalesPrice(...);
+        end;
+
+        [Test]
+        procedure Page_ShowsPrice_UT()   // UI test — belongs in separate _UT codeunit
+        var
+            FindPricePage: TestPage "Find Price";
+        begin
+            FindPricePage.OpenNew();
+            ...
+        end;
+    }
 
 ## Best Practice
 
-```al
-// CORRECT: separate codeunits per layer
+    // CORRECT: separate codeunits per layer
 
-// Logic tests — no _UT suffix
-codeunit 99006 "Find Price Testing"
-{
-    Subtype = Test;
-    [Test]
-    procedure GetPrice_CustomerPrice_ReturnsUnitPrice()
-    begin
-        FindPriceMgt.GetSalesPrice(...);
-    end;
-}
+    // Logic tests — no _UT suffix
+    codeunit 99006 "Find Price Testing"
+    {
+        Subtype = Test;
+        [Test]
+        procedure GetPrice_CustomerPrice_ReturnsUnitPrice()
+        begin
+            FindPriceMgt.GetSalesPrice(...);
+        end;
+    }
 
-// UI tests — _UT suffix
-codeunit 99007 "Find Price Testing_UT"
-{
-    Subtype = Test;
-    [Test]
-    procedure Page_EnterCustomerAndItem_FactBoxShowsPrice()
-    var
-        FindPricePage: TestPage "Find Price";
-    begin
-        FindPricePage.OpenNew();
-        FindPricePage.CustomerNo.SetValue(Customer."No.");
-        FindPricePage.ItemNo.SetValue(Item."No.");
-        Assert.AreEqual('100,00', FindPricePage.FindPriceInfo.UnitPrice.Value(), '');
-    end;
-}
-```
+    // UI tests — _UT suffix
+    codeunit 99007 "Find Price Testing_UT"
+    {
+        Subtype = Test;
+        [Test]
+        procedure Page_EnterCustomerAndItem_FactBoxShowsPrice()
+        var
+            FindPricePage: TestPage "Find Price";
+        begin
+            FindPricePage.OpenNew();
+            FindPricePage.CustomerNo.SetValue(Customer."No.");
+            FindPricePage.ItemNo.SetValue(Item."No.");
+            Assert.AreEqual('100,00', FindPricePage.FindPriceInfo.UnitPrice.Value(), '');
+        end;
+    }
 
 ## Object ID allocation
 

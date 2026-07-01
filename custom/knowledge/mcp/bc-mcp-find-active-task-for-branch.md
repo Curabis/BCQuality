@@ -1,10 +1,10 @@
 ---
-name: bc-mcp-find-active-task-for-branch
-description: >
-  Standard recipe for finding the BC sub-task linked to the current git branch,
-  including exact action names and field names for each BC MCP endpoint.
-layer: 2
-category: mcp
+bc-version: [all]
+domain: mcp
+keywords: [mcp, bc-task, branch, active-task, recipe]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # BC MCP: Find Active Task for Branch
@@ -38,16 +38,14 @@ Derived from the AL page source (EntityName property + PAG + page ID):
 
 ## Standard recipe: find task for current branch
 
-```
-1. git branch --show-current          → e.g. "PriceLookup"
-2. git remote get-url origin          → e.g. "https://github.com/Curabis/Wareco.git"
-3. bc_actions_invoke List_project_PAG6102901
-      filter: "gitHubRepository eq 'https://github.com/Curabis/Wareco.git'"
-   → get projectNo (e.g. "W-2024-001")
-4. bc_actions_invoke List_activeTask_PAG6102900
-      filter: "projectNo eq 'W-2024-001' and gitHubBranch eq 'PriceLookup'"
-   → get taskId (global commit-message ID), taskNo, description, status
-```
+    1. git branch --show-current          → e.g. "PriceLookup"
+    2. git remote get-url origin          → e.g. "https://github.com/Curabis/Wareco.git"
+    3. bc_actions_invoke List_project_PAG6102901
+          filter: "gitHubRepository eq 'https://github.com/Curabis/Wareco.git'"
+       → get projectNo (e.g. "W-2024-001")
+    4. bc_actions_invoke List_activeTask_PAG6102900
+          filter: "projectNo eq 'W-2024-001' and gitHubBranch eq 'PriceLookup'"
+       → get taskId (global commit-message ID), taskNo, description, status
 
 If step 3 returns no project, the repo is not linked — see `[[bc-mcp-link-repo-to-project]]`.
 If step 4 returns no task, the branch has no registered task — create one or ask the PM.
@@ -75,15 +73,13 @@ Never write `gitHubRepository` on the task (obsolete, will be removed in v29).
 
 The bridge runs as app identity `BC_DevelopmentMCP`. To attribute work:
 
-```
-1. git config user.email             → developer's git email
-2. bc_actions_invoke List_consultant_PAG50009
-      filter: "email eq 'mic.dieringer@gmail.com'"
-   → get employeeCode (e.g. "MID")
-3. Use employeeCode to filter "my tasks":
-   List_activeTask_PAG6102900 filter: "taskResponsible eq 'MID'"
-4. Sign status comments: end with "— Michael" so attribution survives S2S
-```
+    1. git config user.email             → developer's git email
+    2. bc_actions_invoke List_consultant_PAG50009
+          filter: "email eq 'mic.dieringer@gmail.com'"
+       → get employeeCode (e.g. "MID")
+    3. Use employeeCode to filter "my tasks":
+       List_activeTask_PAG6102900 filter: "taskResponsible eq 'MID'"
+    4. Sign status comments: end with "— Michael" so attribution survives S2S
 
 Some developers use personal email for git but have a Curabis email as secondary
 on GitHub. If the git email doesn't match, try the `@curabis.dk` variant.

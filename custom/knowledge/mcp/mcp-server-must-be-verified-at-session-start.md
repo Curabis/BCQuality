@@ -1,14 +1,15 @@
 ---
-rule: mcp-server-must-be-verified-at-session-start
-title: MCP server availability must be verified at session start
-category: mcp
-severity: error
-version: 1
+bc-version: [all]
+domain: mcp
+keywords: [mcp-server, verification, session-start]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # MCP server availability must be verified at session start
 
-## Rule
+## Description
 
 When an MCP server is configured in `.mcp.json`, the agent must at session start verify
 that the server's tools appear in the active deferred-tools list. If they are missing,

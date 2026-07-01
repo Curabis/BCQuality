@@ -1,14 +1,15 @@
 ---
-rule: mcp-tool-invocation-must-be-documented
-title: MCP tool documentation must include the invocation model
-category: mcp
-severity: warning
-version: 1
+bc-version: [all]
+domain: mcp
+keywords: [mcp, tool-invocation, documentation, transparency]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # MCP tool documentation must include the invocation model
 
-## Rule
+## Description
 
 An MCP agent's documentation must describe the actual invocation model — including
 whether a tool call is direct or wrapped via a generic action tool with a parameter value.

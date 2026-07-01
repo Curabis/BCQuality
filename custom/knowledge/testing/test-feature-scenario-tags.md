@@ -1,7 +1,7 @@
 ---
 bc-version: [all]
 domain: testing
-keywords: [test, feature, scenario, given, when, then, tags, bdd, atdd, comments, structure]
+keywords: [test, feature, scenario, given, when, then, tags, bdd, atdd, comments]
 technologies: [al]
 countries: [w1]
 application-area: [all]
@@ -31,69 +31,52 @@ what is covered without reading AL.
 
 ## Anti Pattern
 
-```al
-// WRONG: no structure — tests as anonymous procedures
-codeunit 99006 "Find Price Testing"
-{
-    Subtype = Test;
+    // WRONG: no structure — tests as anonymous procedures
+    codeunit 99006 "Find Price Testing"
+    {
+        Subtype = Test;
 
-    [Test]
-    procedure Test1()   // what does this test?
-    begin
-        // setup mixed with assertions, no clear layers
-        Customer.Insert(false);
-        FindPriceMgt.GetSalesPrice(Customer."No.", Item."No.", '', Price, Disc);
-        Assert.AreEqual(100, Price, '');
-    end;
-}
-```
+        [Test]
+        procedure Test1()   // what does this test?
+        begin
+            // setup mixed with assertions, no clear layers
+            Customer.Insert(false);
+            FindPriceMgt.GetSalesPrice(Customer."No.", Item."No.", '', Price, Disc);
+            Assert.AreEqual(100, Price, '');
+        end;
+    }
 
 ## Best Practice
 
-```al
-// [FEATURE] Find Price — price cascade (Customer → Price Group → All Customers)
-codeunit 99006 "Find Price Testing"
-{
-    Subtype = Test;
+    // [FEATURE] Find Price — price cascade (Customer → Price Group → All Customers)
+    codeunit 99006 "Find Price Testing"
+    {
+        Subtype = Test;
 
-    var
-        WarecoLib: Codeunit "Wareco Test Library";
-        Assert: Codeunit "Library Assert";
+        var
+            WarecoLib: Codeunit "Wareco Test Library";
+            Assert: Codeunit "Library Assert";
 
-    // [SCENARIO] Customer with a specific price list line gets that unit price
-    [Test]
-    procedure GetPrice_CustomerPrice_ReturnsUnitPrice()
-    var
-        Customer: Record Customer;
-        Item: Record Item;
-        UnitPrice, LineDiscPct: Decimal;
-    begin
-        // [GIVEN] a customer with a price list line at 100 LCY
-        WarecoLib.GivenCustomerWithPrice(Customer, Item, '', 100);
-        // [WHEN]
-        FindPriceMgt.GetSalesPrice(Customer."No.", Item."No.", '', UnitPrice, LineDiscPct);
-        // [THEN]
-        Assert.AreEqual(100, UnitPrice, 'Unit price must match customer price list');
-    end;
+        // [SCENARIO] Customer with a specific price list line gets that unit price
+        [Test]
+        procedure GetPrice_CustomerPrice_ReturnsUnitPrice()
+        var
+            Customer: Record Customer;
+            Item: Record Item;
+            UnitPrice, LineDiscPct: Decimal;
+        begin
+            // [GIVEN] a customer with a price list line at 100 LCY
+            WarecoLib.GivenCustomerWithPrice(Customer, Item, '', 100);
+            // [WHEN]
+            FindPriceMgt.GetSalesPrice(Customer."No.", Item."No.", '', UnitPrice, LineDiscPct);
+            // [THEN]
+            Assert.AreEqual(100, UnitPrice, 'Unit price must match customer price list');
+        end;
+    }
 
-    // [SCENARIO] Customer with no price list line falls back to item unit price
-    [Test]
-    procedure GetPrice_NoCustomerPrice_FallsBackToItemPrice()
-    var
-        Customer: Record Customer;
-        Item: Record Item;
-        UnitPrice, LineDiscPct: Decimal;
-    begin
-        // [GIVEN] a customer with no price list, item priced at 200
-        WarecoLib.GivenCustomer(Customer);
-        WarecoLib.GivenItem(Item, 200);
-        // [WHEN]
-        FindPriceMgt.GetSalesPrice(Customer."No.", Item."No.", '', UnitPrice, LineDiscPct);
-        // [THEN]
-        Assert.AreEqual(200, UnitPrice, 'Must fall back to item unit price');
-    end;
-}
-```
+Every further `[Test]` procedure in the codeunit repeats the same pattern: its
+own `[SCENARIO]` comment above the attribute, and `[GIVEN]`/`[WHEN]`/`[THEN]`
+layers inside the body.
 
 ## Relationship to procedure naming
 

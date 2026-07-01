@@ -25,55 +25,51 @@ belongs in `[WHEN]`.
 
 ## Anti Pattern
 
-```al
-// WRONG: two actions in one test
-[Test]
-procedure GetPrice_ThenGetDiscount_ReturnsCorrectValues()
-var
-    UnitPrice, LineDiscPct: Decimal;
-begin
-    // [GIVEN] ...
-    // [WHEN] first action
-    FindPriceMgt.GetSalesPrice(CustomerNo, ItemNo, '', UnitPrice, LineDiscPct);
-    // [WHEN] second action — this is a second test in disguise
-    FindPriceMgt.GetSalesPriceTiers(CustomerNo, ItemNo, '', TempBuffer);
-    // [THEN] asserting two unrelated things
-    Assert.AreEqual(100, UnitPrice, '');
-    Assert.IsFalse(TempBuffer.IsEmpty(), '');
-end;
-```
+    // WRONG: two actions in one test
+    [Test]
+    procedure GetPrice_ThenGetDiscount_ReturnsCorrectValues()
+    var
+        UnitPrice, LineDiscPct: Decimal;
+    begin
+        // [GIVEN] ...
+        // [WHEN] first action
+        FindPriceMgt.GetSalesPrice(CustomerNo, ItemNo, '', UnitPrice, LineDiscPct);
+        // [WHEN] second action — this is a second test in disguise
+        FindPriceMgt.GetSalesPriceTiers(CustomerNo, ItemNo, '', TempBuffer);
+        // [THEN] asserting two unrelated things
+        Assert.AreEqual(100, UnitPrice, '');
+        Assert.IsFalse(TempBuffer.IsEmpty(), '');
+    end;
 
 ## Best Practice
 
-```al
-// CORRECT: split into two focused tests
+    // CORRECT: split into two focused tests
 
-[Test]
-procedure GetPrice_CustomerPrice_ReturnsCorrectUnitPrice()
-var
-    UnitPrice, LineDiscPct: Decimal;
-begin
-    // [GIVEN] a customer with a price list line at 100
-    WarecoLib.GivenCustomerWithPrice(Customer, Item, '', 100);
-    // [WHEN]
-    FindPriceMgt.GetSalesPrice(Customer."No.", Item."No.", '', UnitPrice, LineDiscPct);
-    // [THEN]
-    Assert.AreEqual(100, UnitPrice, 'Unit price must match price list');
-end;
+    [Test]
+    procedure GetPrice_CustomerPrice_ReturnsCorrectUnitPrice()
+    var
+        UnitPrice, LineDiscPct: Decimal;
+    begin
+        // [GIVEN] a customer with a price list line at 100
+        WarecoLib.GivenCustomerWithPrice(Customer, Item, '', 100);
+        // [WHEN]
+        FindPriceMgt.GetSalesPrice(Customer."No.", Item."No.", '', UnitPrice, LineDiscPct);
+        // [THEN]
+        Assert.AreEqual(100, UnitPrice, 'Unit price must match price list');
+    end;
 
-[Test]
-procedure GetPriceTiers_CustomerTier_ReturnsOneTierLine()
-var
-    TempBuffer: Record "Find Price Tier Buffer" temporary;
-begin
-    // [GIVEN] a customer with a tier price at min qty 10
-    WarecoLib.GivenCustomerWithTierPrice(Customer, Item, '', 10, 90);
-    // [WHEN]
-    FindPriceMgt.GetSalesPriceTiers(Customer."No.", Item."No.", '', TempBuffer);
-    // [THEN]
-    Assert.AreEqual(1, TempBuffer.Count(), 'Exactly one tier line expected');
-end;
-```
+    [Test]
+    procedure GetPriceTiers_CustomerTier_ReturnsOneTierLine()
+    var
+        TempBuffer: Record "Find Price Tier Buffer" temporary;
+    begin
+        // [GIVEN] a customer with a tier price at min qty 10
+        WarecoLib.GivenCustomerWithTierPrice(Customer, Item, '', 10, 90);
+        // [WHEN]
+        FindPriceMgt.GetSalesPriceTiers(Customer."No.", Item."No.", '', TempBuffer);
+        // [THEN]
+        Assert.AreEqual(1, TempBuffer.Count(), 'Exactly one tier line expected');
+    end;
 
 ## Naming implication
 

@@ -1,3 +1,11 @@
+---
+bc-version: [all]
+domain: architecture
+keywords: [commit-message, bc-task, task-id, traceability, git]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 ﻿---
 name: commit-message-must-include-bc-task-id
 description: >
@@ -21,19 +29,15 @@ used across Curabis teams.
 
 ## Anti Pattern
 
-```
-Add Price Lookup feature — FindPrice page, tier prices, currency conversion
-```
+    Add Price Lookup feature — FindPrice page, tier prices, currency conversion
 
 No traceability. Impossible to find the BC task from git history.
 
 ## Best Practice
 
-```
-[#8738] Add Price Lookup feature — FindPrice page, tier prices, currency conversion
-[#8738] Add 22 UI tests for PRICING LOOKUP feature
-[#8738] Add translations, shared project memory and cspell config
-```
+    [#8738] Add Price Lookup feature — FindPrice page, tier prices, currency conversion
+    [#8738] Add 22 UI tests for PRICING LOOKUP feature
+    [#8738] Add translations, shared project memory and cspell config
 
 ## The two task numbers — use taskId, not taskNo
 

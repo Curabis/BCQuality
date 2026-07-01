@@ -1,14 +1,15 @@
 ---
-id: CURABIS-MCP-SHEBANG-001
-title: Shebang-integritet ved deploy af script-filer
-category: mcp
-severity: error
-applies-to: [claude-code, windows, mcp-setup]
+bc-version: [all]
+domain: mcp
+keywords: [write, shebang, script-integrity, encoding]
+technologies: [al]
+countries: [w1]
+application-area: [all]
 ---
 
 # Shebang-integritet ved deploy af script-filer
 
-## Regel
+## Description
 
 Når en script-fil med shebang-linje (`.js`, `.sh`, `.ps1`) skrives via Claude Codes
 `Write`-værktøj på Windows, skal linje 1 i den deployede fil verificeres umiddelbart
@@ -16,9 +17,7 @@ efter skrivning.
 
 Den verificerede linje skal matche den forventede shebang præcist, f.eks.:
 
-```
-#!/usr/bin/env node
-```
+    #!/usr/bin/env node
 
 ## Baggrund
 
@@ -39,11 +38,9 @@ Brugeren ser ingen fejlbesked i Claude Code — kaldet afvises blot.
 
 ## Verifikation (påkrævet efter enhver write af script-fil)
 
-```python
-with open(deployed_path, "r", encoding="utf-8") as f:
-    line1 = f.readline().rstrip()
-assert line1 == expected_shebang, f"Shebang fejl: forventet {expected_shebang!r}, fik {line1!r}"
-```
+    with open(deployed_path, "r", encoding="utf-8") as f:
+        line1 = f.readline().rstrip()
+    assert line1 == expected_shebang, f"Shebang fejl: forventet {expected_shebang!r}, fik {line1!r}"
 
 Alternativt med Read-værktøjet: læs linje 1 og sammenlign med forventet shebang.
 Stop setup-processen og genskriv filen hvis de ikke matcher.

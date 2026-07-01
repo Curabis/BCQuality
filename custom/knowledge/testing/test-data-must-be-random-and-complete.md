@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: testing
+keywords: [testing, test-data, random, library, any]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS Test Data Guidelines
 
-## Core Principle
+## Description
 
 "CURABIS tests assume an empty database. All test data must be created programmatically — never assume existing records or hardcode codes, numbers, or names that may or may not exist in a given environment."
 

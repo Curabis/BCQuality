@@ -42,9 +42,7 @@ before the update is considered complete.
 After any Mode B run, compare the list of files in `curabis-standard.agent.md`'s
 Mode B template table against:
 
-```
-Get-ChildItem .github/.agents/*.agent.md | Select-Object -ExpandProperty BaseName
-```
+    Get-ChildItem .github/.agents/*.agent.md | Select-Object -ExpandProperty BaseName
 
 Any template file present in the table but absent from the directory is a gap —
 install it, then surface it per `claude-md-must-reference-all-agents.md` if it
@@ -54,12 +52,10 @@ also needs a CLAUDE.md reference.
 
 When a reconciliation gap is found, output exactly this before continuing:
 
-```
-⚠️ Mode B kørte, men følgende template-fil(er) blev ikke installeret:
+    ⚠️ Mode B kørte, men følgende template-fil(er) blev ikke installeret:
 
-  - <agent-navn>.agent.md
+      - <agent-navn>.agent.md
 
-Vil du have mig til at installere den/dem nu?
-```
+    Vil du have mig til at installere den/dem nu?
 
 Do not continue with other activity until the developer has responded.

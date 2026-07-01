@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: testing
+keywords: [bcpt, performance-test, scenarios, app-specific]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS Testing: BCPT Scenarios Must Be App-Specific
 
-## Core Rule
+## Description
 
 A PerformanceTest app must include BCPT scenario codeunits that exercise the **host app's own business flows** — not only the generic Microsoft scenarios (sales orders, purchase orders, GL entries). Generic scenarios measure BC's baseline performance; app-specific scenarios are the only way to detect performance regressions in the extension's own code.
 
@@ -19,51 +27,49 @@ For every major business flow in the host app, create a corresponding `BCPT*` co
 
 ## Example: Project Management App
 
-```al
-codeunit 80100 "BCPT Create Project" implements "BCPT Test Param. Provider"
-{
-    SingleInstance = true;
+    codeunit 80100 "BCPT Create Project" implements "BCPT Test Param. Provider"
+    {
+        SingleInstance = true;
 
-    trigger OnRun()
-    begin
-        if not IsInitialized then begin
-            InitTest();
-            IsInitialized := true;
+        trigger OnRun()
+        begin
+            if not IsInitialized then begin
+                InitTest();
+                IsInitialized := true;
+            end;
+            CreateProject(GlobalBCPTTestContext);
         end;
-        CreateProject(GlobalBCPTTestContext);
-    end;
 
-    var
-        GlobalBCPTTestContext: Codeunit "BCPT Test Context";
-        IsInitialized: Boolean;
+        var
+            GlobalBCPTTestContext: Codeunit "BCPT Test Context";
+            IsInitialized: Boolean;
 
-    local procedure InitTest()
-    begin
-        // Set up any required BC configuration
-    end;
+        local procedure InitTest()
+        begin
+            // Set up any required BC configuration
+        end;
 
-    local procedure CreateProject(var BCPTTestContext: Codeunit "BCPT Test Context")
-    begin
-        BCPTTestContext.StartScenario('Create Project Header');
-        // ... create project
-        BCPTTestContext.EndScenario('Create Project Header');
-        BCPTTestContext.UserWait();
+        local procedure CreateProject(var BCPTTestContext: Codeunit "BCPT Test Context")
+        begin
+            BCPTTestContext.StartScenario('Create Project Header');
+            // ... create project
+            BCPTTestContext.EndScenario('Create Project Header');
+            BCPTTestContext.UserWait();
 
-        BCPTTestContext.StartScenario('Add Project Task');
-        // ... add task
-        BCPTTestContext.EndScenario('Add Project Task');
-    end;
+            BCPTTestContext.StartScenario('Add Project Task');
+            // ... add task
+            BCPTTestContext.EndScenario('Add Project Task');
+        end;
 
-    procedure GetDefaultParameters(): Text[1000]
-    begin
-        exit('');
-    end;
+        procedure GetDefaultParameters(): Text[1000]
+        begin
+            exit('');
+        end;
 
-    procedure ValidateParameters(Parameters: Text[1000])
-    begin
-    end;
-}
-```
+        procedure ValidateParameters(Parameters: Text[1000])
+        begin
+        end;
+    }
 
 ## Suggested Scenarios for Project Management Apps
 

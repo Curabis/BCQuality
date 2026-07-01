@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: testing
+keywords: [testing, test-setup, library-codeunit, initialization]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS Test Library Standards
 
-## Core Rules
+## Description
 
 The documentation establishes three critical testing practices for CURABIS AL applications:
 

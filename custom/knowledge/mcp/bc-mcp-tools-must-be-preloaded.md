@@ -1,3 +1,11 @@
+---
+bc-version: [all]
+domain: mcp
+keywords: [mcp, tools, preload, session-start, bc]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 ﻿---
 rule: bc-mcp-tools-must-be-preloaded
 title: BC MCP tool schemas must be pre-loaded at session start
@@ -7,14 +15,12 @@ severity: required
 
 # BC MCP tool schemas must be pre-loaded at session start
 
-## Rule
+## Description
 
 When the `bc-mcp.agent.md` agent is invoked, the very first action must be to load
 the BC MCP tool schemas via `ToolSearch` — before producing any user-visible output.
 
-```
-ToolSearch query: select:mcp__businesscentral__bc_actions_search,mcp__businesscentral__bc_actions_invoke,mcp__businesscentral__bc_actions_describe
-```
+    ToolSearch query: select:mcp__businesscentral__bc_actions_search,mcp__businesscentral__bc_actions_invoke,mcp__businesscentral__bc_actions_describe
 
 This call must complete before the agent responds to the user.
 
@@ -35,14 +41,12 @@ and eliminates mid-task delays entirely.
 
 ## Correct pattern
 
-```
-# bc-mcp.agent.md session start
+    # bc-mcp.agent.md session start
 
-1. ToolSearch: select:mcp__businesscentral__bc_actions_search,
-               mcp__businesscentral__bc_actions_invoke,
-               mcp__businesscentral__bc_actions_describe
-2. [proceed with user request]
-```
+    1. ToolSearch: select:mcp__businesscentral__bc_actions_search,
+                   mcp__businesscentral__bc_actions_invoke,
+                   mcp__businesscentral__bc_actions_describe
+    2. [proceed with user request]
 
 ## Scope
 

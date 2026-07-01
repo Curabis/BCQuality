@@ -1,7 +1,7 @@
 ---
 bc-version: [all]
 domain: architecture
-keywords: [xliff, translation, xlf, caption, tooltip, enu, da-dk, de-de, no-nb, sv-se, de-at]
+keywords: [xliff, translation, xlf, caption, tooltip, enu, da-dk, de-de, no-nb, sv-se]
 technologies: [al]
 countries: [w1]
 application-area: [all]
@@ -51,13 +51,11 @@ The following must remain in English in all locales:
 
 ## Trans-unit structure
 
-```xml
-<trans-unit id="..." size-unit="char" translate="yes" xml:space="preserve">
-  <source>Post</source>
-  <target state="translated">Bogfør</target>  ← da-DK example
-  <note from="Developer" annotates="source" priority="2">Button caption</note>
-</trans-unit>
-```
+    <trans-unit id="..." size-unit="char" translate="yes" xml:space="preserve">
+      <source>Post</source>
+      <target state="translated">Bogfør</target>  ← da-DK example
+      <note from="Developer" annotates="source" priority="2">Button caption</note>
+    </trans-unit>
 
 State must always be `translated` — never `needs-translation` or `new`.
 

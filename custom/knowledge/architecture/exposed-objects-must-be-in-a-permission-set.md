@@ -1,4 +1,14 @@
+---
+bc-version: [all]
+domain: architecture
+keywords: [permission-set, api-page, web-service, exposure, security]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # Exposed objects must be in at least one permission set
+
+## Description
 
 **Rule (CURABIS-ARCH-011):** Every *exposed* object in a CURABIS app must be a member of
 at least one permission set shipped by that app. "Exposed" means any object reachable from

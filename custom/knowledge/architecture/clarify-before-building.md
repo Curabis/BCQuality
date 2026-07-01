@@ -39,15 +39,13 @@ Ask before coding if any of the following is true:
 
 State what you understand the task to be, then list the specific questions:
 
-```
-I understand the task as: [one sentence summary]
+    I understand the task as: [one sentence summary]
 
-Before I proceed, I need clarification on:
-1. [specific question]
-2. [specific question]
+    Before I proceed, I need clarification on:
+    1. [specific question]
+    2. [specific question]
 
-I will not write any code until these are answered.
-```
+    I will not write any code until these are answered.
 
 Do not write partial code while waiting. Do not write "placeholder" code.
 Do not write code with TODO comments where a business decision is needed.
@@ -66,29 +64,25 @@ files first and resolve the ambiguity yourself before asking the developer.
 
 ## Anti Pattern
 
-```
-// WRONG: Assuming and building
-// Task: "write a test for the vendor flow"
-// Agent assumes: Vendor, Incoming, Handle+Invoice, no contact
-// Writes 80 lines of code
-// Developer says: "I meant outgoing flow with a customer"
-// Result: wasted work, possible production code changes to revert
-```
+    // WRONG: Assuming and building
+    // Task: "write a test for the vendor flow"
+    // Agent assumes: Vendor, Incoming, Handle+Invoice, no contact
+    // Writes 80 lines of code
+    // Developer says: "I meant outgoing flow with a customer"
+    // Result: wasted work, possible production code changes to revert
 
 ## Best Practice
 
-```
-// CORRECT: Clarify first
-// Task: "write a test for the vendor flow"
+    // CORRECT: Clarify first
+    // Task: "write a test for the vendor flow"
 
-I understand the task as: writing a test codeunit for a Settlement Voucher
-flow where the counterparty is a Vendor.
+    I understand the task as: writing a test codeunit for a Settlement Voucher
+    flow where the counterparty is a Vendor.
 
-Before I proceed, I need clarification on:
-1. Incoming (vendor delivers goods) or Outgoing (vendor picks up goods)?
-2. Handle-only, Invoice-only, or combined Handle+Invoice in one run?
-3. Should the test use an existing vendor from the database or create one
-   via LibraryPurchase.CreateVendor?
+    Before I proceed, I need clarification on:
+    1. Incoming (vendor delivers goods) or Outgoing (vendor picks up goods)?
+    2. Handle-only, Invoice-only, or combined Handle+Invoice in one run?
+    3. Should the test use an existing vendor from the database or create one
+       via LibraryPurchase.CreateVendor?
 
-I will not write any code until these are answered.
-```
+    I will not write any code until these are answered.

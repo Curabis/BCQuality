@@ -1,6 +1,14 @@
+---
+bc-version: [all]
+domain: architecture
+keywords: [pages, business-logic, codeunit, separation-of-concerns]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS Architecture: Page Presentation vs. Business Logic
 
-## Core Rule
+## Description
 
 In CURABIS codebases, pages serve exclusively as presentation layers. All business logic—including calculations, validations, and record modifications—must reside in codeunits, not in page triggers or actions. This standard is more rigorous than general Business Central guidance and applies uniformly across all CURABIS PTE applications.
 

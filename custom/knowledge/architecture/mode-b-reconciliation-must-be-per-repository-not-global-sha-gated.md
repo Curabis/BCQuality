@@ -48,9 +48,7 @@ whether Mode B executes for a given repository.
 
 At session start, compare:
 
-```
-Local per-repo marker: .github/.agents/.bcquality-version (if present)
-```
+    Local per-repo marker: .github/.agents/.bcquality-version (if present)
 
 against the current BCQuality main SHA. If they differ (or the local marker is
 missing), run Mode B reconciliation for this repository regardless of what the
@@ -60,10 +58,8 @@ global `~/.claude/.bcquality-version` file says.
 
 When a per-repo reconciliation gap is found, output exactly this before continuing:
 
-```
-⚠️ Dette repository er ikke reconciled mod seneste BCQuality-SHA, selvom den
-globale versions-fil allerede er opdateret (formentlig af et andet projekt).
-Kører Mode B-reconciliation for dette repo nu.
-```
+    ⚠️ Dette repository er ikke reconciled mod seneste BCQuality-SHA, selvom den
+    globale versions-fil allerede er opdateret (formentlig af et andet projekt).
+    Kører Mode B-reconciliation for dette repo nu.
 
 Do not silently skip Mode B just because the global marker looks current.

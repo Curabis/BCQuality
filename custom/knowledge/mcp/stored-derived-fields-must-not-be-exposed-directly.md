@@ -1,15 +1,21 @@
+---
+bc-version: [all]
+domain: mcp
+keywords: [api-page, derived-fields, exposure, odata]
+technologies: [al]
+countries: [w1]
+application-area: [all]
+---
 # CURABIS MCP: Stored Derived Fields Must Be Recalculated in OnAfterGetRecord
 
-## Core Principle
+## Description
 
 A stored field whose value is derived from other fields via `OnValidate` triggers can be stale. When the source data changes (e.g., new time entries posted), the stored derived field is not updated automatically — it only recalculates when a specific trigger fires. Exposing such a field directly via an API page returns a value that may be hours, days, or weeks out of date.
 
 ## Pattern to Avoid
 
-```al
-// WRONG: Exposes the stored snapshot — may be stale
-field(timeLeft; Rec."Time left") { }
-```
+    // WRONG: Exposes the stored snapshot — may be stale
+    field(timeLeft; Rec."Time left") { }
 
 `"Time left"` is recalculated only when `"Estimated time"` is validated. If new time entries are posted, the stored value does not update.
 
@@ -17,20 +23,18 @@ field(timeLeft; Rec."Time left") { }
 
 Recalculate in `OnAfterGetRecord` using a page variable:
 
-```al
-trigger OnAfterGetRecord()
-begin
-    Rec.CalcFields("Elapsed time (Chargeable)");
-    TimeLeftCalc := Rec."Estimated time" - Rec."Elapsed time (Chargeable)";
-end;
+    trigger OnAfterGetRecord()
+    begin
+        Rec.CalcFields("Elapsed time (Chargeable)");
+        TimeLeftCalc := Rec."Estimated time" - Rec."Elapsed time (Chargeable)";
+    end;
 
-var
-    TimeLeftCalc: Decimal;
+    var
+        TimeLeftCalc: Decimal;
 
-// In layout:
-field(timeLeft; TimeLeftCalc) { }          // live value
-field(elapsedTime; Rec."Elapsed time (Chargeable)") { }  // source FlowField
-```
+    // In layout:
+    field(timeLeft; TimeLeftCalc) { }          // live value
+    field(elapsedTime; Rec."Elapsed time (Chargeable)") { }  // source FlowField
 
 ## Requirements
 
