@@ -64,6 +64,7 @@ AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/
 | munger.agent.md | `{AGENTS_BASE}/munger.agent.md` |
 | edison.agent.md | `{AGENTS_BASE}/edison.agent.md` |
 | ferencz.agent.md | `{AGENTS_BASE}/ferencz.agent.md` |
+| roemer.agent.md | `{AGENTS_BASE}/roemer.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
 | sync-bcquality-knowledge.ps1 | `{BASE}/sync-bcquality-knowledge.ps1` |
 
@@ -229,8 +230,13 @@ These are invoked only when needed - not at session start:
 - `.github/.agents/ferencz.agent.md` - Case builder for the Court. Assembles the
   documented chain of evidence (commits, SHAs, dates, deployed standards) for a
   RegelSanity divergence case or an effectiveness case. Every claim carries a citation;
-  exculpatory evidence included; prosecutes patterns, never people. Invoke when Mode B
-  flags a local agent, or before convening the Court on any question.
+  exculpatory evidence included; prosecutes patterns, never people. Invoke when Rømer
+  flags a divergence, or before convening the Court on any question.
+- `.github/.agents/roemer.agent.md` - Standards inspector. Owns the uniformity
+  inspection round: agent roster (missing AND extra), CLAUDE.md generation, .mcp.json
+  paths, mirror model, version markers, agent visibility. Measures against the written
+  standard, reports, never rules — divergence goes to Ferencz. Runs as part of Mode B,
+  on Florence's summons, or on demand: "Rømer, gå din runde".
 - `.github/.agents/weber.agent.md` - Developer AI coaching. Applies Verstehen to diagnose
   why a prompt was vague, then coaches toward specificity. Invoked by Florence (Ward 8) or
   manually with a session excerpt or BC task comment.
@@ -376,6 +382,7 @@ Fetch and write verbatim:
 - `{AGENTS_BASE}/munger.agent.md`          → `.github/.agents/munger.agent.md`
 - `{AGENTS_BASE}/edison.agent.md`          → `.github/.agents/edison.agent.md`
 - `{AGENTS_BASE}/ferencz.agent.md`         → `.github/.agents/ferencz.agent.md`
+- `{AGENTS_BASE}/roemer.agent.md`          → `.github/.agents/roemer.agent.md`
 - `{AGENTS_BASE}/weber.agent.md`           → `.github/.agents/weber.agent.md`
 - `{AGENTS_BASE}/smiley.agent.md`          → `.github/.agents/smiley.agent.md`
 - `{BASE}/templates/algo-settings.agent.md`→ `.github/.agents/algo-settings.agent.md`
@@ -502,6 +509,7 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `.github/.agents/munger.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/edison.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/ferencz.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
+| `.github/.agents/roemer.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/carlin.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/weber.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/algo-settings.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
@@ -610,10 +618,12 @@ When creating HEARTBEAT.md from template in Mode B:
 
 ### After update — lokal-agent-check (RegelSanity)
 
-Reconciliation runs in BOTH directions. Missing template files are handled
-above — this check finds the opposite: **extra** files in `.github/.agents/`
-that are not in this document's template table (see BCQuality rule
-`repo-local-agents-must-be-universalized-or-removed`).
+The reconciliation and validation steps in this Mode B flow constitute
+**Rømer's inspection round** (`roemer.agent.md` owns the complete station
+list). Reconciliation runs in BOTH directions. Missing template files are
+handled above — this check finds the opposite: **extra** files in
+`.github/.agents/` that are not in this document's template table (see
+BCQuality rule `repo-local-agents-must-be-universalized-or-removed`).
 
 1. List `.github/.agents/*.agent.md` and compare against the template table
 2. For each file NOT in the table, output:
