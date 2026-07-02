@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 12
+version: 13
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -95,6 +95,27 @@ Check whether these paths exist:
 
 If `CLAUDE.md` already exists, ask: "CLAUDE.md eksisterer allerede. Overskrive? (ja/nej)"
 Stop if the developer answers no.
+
+### Step 1b — Structural readiness: raise the flags (Rømer)
+
+Before configuring anything, run Rømer's structural stations (10-11 in
+`roemer.agent.md` — rule `al-go-template-layout-with-test-app-required`):
+
+1. AL-Go template layout: apps folder with per-app project subfolders + `.AL-Go/`
+2. Test app companion for every main app
+
+Report every finding immediately and prominently:
+
+```
+⚠️ Strukturflag ved BCQuality-implementering:
+
+  - <fladt layout: tests kan ikke oprettes før migrering til AL-Go template>
+  - <manglende test-app for <App>: kør CreateTestApp-workflowet>
+```
+
+Setup MAY continue on a non-compliant repo — but the flags go in the setup
+report, and the developer must acknowledge them before Step 2. Never
+restructure silently; migration is a deliberate, planned change.
 
 ### Step 2 — Ask exactly three questions
 
