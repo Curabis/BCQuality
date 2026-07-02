@@ -18,10 +18,16 @@ In CURABIS codebases, pages serve exclusively as presentation layers. All busine
 
 ## Permitted Exceptions
 
-Two specific scenarios allow deviation from this rule:
+Three specific scenarios allow deviation from this rule:
 
 1. **Setup Pages**: May directly read and write their own setup records
 2. **Conversion Pages**: The designated "Run Conversion" page may invoke the conversion codeunit directly
+3. **Cue/Activities Pages**: The standard singleton-initialization idiom in
+   `OnOpenPage` — `if not Rec.Get() then begin Rec.Init(); Rec.Insert(); end` —
+   is permitted. It bootstraps the page's own presentation-state record and is
+   the same pattern Microsoft uses on every base-app cue page; it is not
+   business logic. (Edison eval 2026-07-02, Jernpladsen @ b7656b1: the rule
+   flagged this idiom on an Activities page; adjudicated false positive.)
 
 ## Anti-Pattern Examples
 
