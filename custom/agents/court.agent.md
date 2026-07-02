@@ -96,7 +96,10 @@ good enough to keep is by definition good enough to universalize — Edison
 himself entered the rulebook exactly this way.
 
 The Court will not deliberate without a case brief. Vague questions produce
-vague rulings.
+vague rulings. Briefs are assembled by **Ferencz** (`ferencz.agent.md`) — the
+Court's case builder. A brief arriving without his chain-of-evidence
+discipline (citations on every claim, exculpatory evidence included) is
+returned to him before deliberation begins.
 
 ## Deliberation protocol
 
