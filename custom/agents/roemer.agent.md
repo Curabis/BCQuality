@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standards-inspector
-version: 1
+version: 2
 title: Rømer — Standards Inspector
 description: >
   Owns the uniformity inspection across CURABIS repos: walks one full
@@ -81,6 +81,10 @@ Walk ALL stations, every time. A partial round creates false confidence
    matches the stable SHA; self-heal via the sync script if not.
 8. **Agent visibility.** Every deployed agent is referenced in CLAUDE.md
    (rule `claude-md-must-reference-all-agents`).
+9. **Apps workspace.** `.apps/*.code-workspace` (or `Apps/`) exists and its
+   `folders` include all app projects, `.AL-Go`, and a relative `docs` entry
+   (rule `al-development-must-use-apps-workspace`). The standard authorizes
+   adding a missing docs entry as a silent correction; report it afterwards.
 
 ## Safety rules
 

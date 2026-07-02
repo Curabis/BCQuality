@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 11
+version: 12
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -521,6 +521,7 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `.mcp.json` — `al` entry | Add if `find-altool.ps1` now exists and entry is missing |
 | `.mcp.json` — `businesscentral` path | Validate and correct if wrong (see below) |
 | `.mcp.json` — `al` `-File` path | Validate and correct if wrong (see below) |
+| `.apps/*.code-workspace` — `docs` entry | Validate folders incl. relative `../docs`; add if missing (rule `al-development-must-use-apps-workspace`) |
 | `HEARTBEAT.md` | Create from template if missing (substitute tokens), never overwrite |
 | `docs/specs/`, `docs/decisions/`, `docs/cleanup/` | Create if missing, never overwrite content |
 
