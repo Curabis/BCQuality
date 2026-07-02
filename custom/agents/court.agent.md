@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-bcquality-court
-version: 1
+version: 2
 title: The Court — CURABIS BCQuality Landsret
 description: >
   The three-judge appellate court for BCQuality governance. Convenes Lincoln,
@@ -65,7 +65,11 @@ Each judge reads all prior opinions before writing their own.
 
 ## Convening the Court
 
-The Court is convened by presenting a **case brief** containing:
+The Court hears two kinds of cases, with different brief requirements.
+
+### Effectiveness cases (rulebook health)
+
+Convened by presenting a **case brief** containing:
 
 1. **The question before the Court** — what strategic decision needs a ruling?
    (e.g., "Should rules ARCH-003 and ARCH-007 be consolidated?",
@@ -74,8 +78,28 @@ The Court is convened by presenting a **case brief** containing:
 3. **The relevant rules** — full text from BCQuality
 4. **Incident history** — any documented cases where the rules failed or succeeded
 
+### RegelSanity cases (local divergence)
+
+CURABIS repos must behave identically (BCQuality rule
+`repo-local-agents-must-be-universalized-or-removed`). When Mode B or a session
+finds a repo-local agent or quality rule that exists in no other repo, the
+Court hears the divergence case. **No Edison scorecards are required** — the
+brief is:
+
+1. **The local file** — full text, and which repo carries it
+2. **The gap it fills** — why did a developer feel the need to create it?
+3. **The question** — universalize into BCQuality, or remove from the repo?
+
+The disposition for a RegelSanity case is always one of **UNIVERSALIZE**
+(route to Francis → Immanuel → Michael) or **REMOVE**. A local agent that is
+good enough to keep is by definition good enough to universalize — Edison
+himself entered the rulebook exactly this way.
+
 The Court will not deliberate without a case brief. Vague questions produce
-vague rulings.
+vague rulings. Briefs are assembled by **Ferencz** (`ferencz.agent.md`) — the
+Court's case builder. A brief arriving without his chain-of-evidence
+discipline (citations on every claim, exculpatory evidence included) is
+returned to him before deliberation begins.
 
 ## Deliberation protocol
 

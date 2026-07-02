@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 10
+version: 11
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -63,6 +63,7 @@ AGENTS_BASE = https://raw.githubusercontent.com/Curabis/BCQuality/stable/custom/
 | aurelius.agent.md | `{AGENTS_BASE}/aurelius.agent.md` |
 | munger.agent.md | `{AGENTS_BASE}/munger.agent.md` |
 | edison.agent.md | `{AGENTS_BASE}/edison.agent.md` |
+| ferencz.agent.md | `{AGENTS_BASE}/ferencz.agent.md` |
 | cspell.json | `{BASE}/templates/cspell.json` |
 | sync-bcquality-knowledge.ps1 | `{BASE}/sync-bcquality-knowledge.ps1` |
 
@@ -225,6 +226,11 @@ These are invoked only when needed - not at session start:
   classifies TP/FP/TN/FN, and produces a precision/recall/F1 scorecard. Low scorers route
   to Francis for sharpening. Read-only — never modifies code or rules. Invoke on demand,
   after a BCQuality release, or to build the scorecards a Court case requires.
+- `.github/.agents/ferencz.agent.md` - Case builder for the Court. Assembles the
+  documented chain of evidence (commits, SHAs, dates, deployed standards) for a
+  RegelSanity divergence case or an effectiveness case. Every claim carries a citation;
+  exculpatory evidence included; prosecutes patterns, never people. Invoke when Mode B
+  flags a local agent, or before convening the Court on any question.
 - `.github/.agents/weber.agent.md` - Developer AI coaching. Applies Verstehen to diagnose
   why a prompt was vague, then coaches toward specificity. Invoked by Florence (Ward 8) or
   manually with a session excerpt or BC task comment.
@@ -369,6 +375,7 @@ Fetch and write verbatim:
 - `{AGENTS_BASE}/aurelius.agent.md`        → `.github/.agents/aurelius.agent.md`
 - `{AGENTS_BASE}/munger.agent.md`          → `.github/.agents/munger.agent.md`
 - `{AGENTS_BASE}/edison.agent.md`          → `.github/.agents/edison.agent.md`
+- `{AGENTS_BASE}/ferencz.agent.md`         → `.github/.agents/ferencz.agent.md`
 - `{AGENTS_BASE}/weber.agent.md`           → `.github/.agents/weber.agent.md`
 - `{AGENTS_BASE}/smiley.agent.md`          → `.github/.agents/smiley.agent.md`
 - `{BASE}/templates/algo-settings.agent.md`→ `.github/.agents/algo-settings.agent.md`
@@ -494,6 +501,7 @@ Never touches `CLAUDE.md`, `projectmemory/`, `docs/`, or `~/.bc-mcp.config.json`
 | `.github/.agents/aurelius.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/munger.agent.md` | Fetch fresh from BCQuality, overwrite |
 | `.github/.agents/edison.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
+| `.github/.agents/ferencz.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/carlin.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/weber.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
 | `.github/.agents/algo-settings.agent.md` | Fetch fresh from BCQuality, overwrite (add if missing) |
@@ -599,6 +607,33 @@ When creating HEARTBEAT.md from template in Mode B:
 - `projectmemory/` — team knowledge, never overwritten by tooling
 - `docs/` content — project documentation, never overwritten by tooling
 - `~/.bc-mcp.config.json` — contains developer secrets
+
+### After update — lokal-agent-check (RegelSanity)
+
+Reconciliation runs in BOTH directions. Missing template files are handled
+above — this check finds the opposite: **extra** files in `.github/.agents/`
+that are not in this document's template table (see BCQuality rule
+`repo-local-agents-must-be-universalized-or-removed`).
+
+1. List `.github/.agents/*.agent.md` and compare against the template table
+2. For each file NOT in the table, output:
+
+```
+⚠️ RegelSanity: dette repo har en lokal agent, som ingen andre CURABIS-repos har:
+
+  - <navn>.agent.md
+
+Repoer må ikke opføre sig forskelligt. Agenten skal enten:
+  a) universaliseres — jeg ruter den til Francis/Immanuel som BCQuality-forslag
+     (Retten hører sagen, hvis den rejser et portefølje-spørgsmål)
+  b) fjernes fra repoet
+
+Hvad vælger du? (a/b)
+```
+
+3. Never delete without the developer's answer; never silently keep.
+   If (a): draft the Francis observation immediately — the local file is the
+   evidence. If (b): remove the file and note it in the update report.
 
 ### After update — agent-synligheds-check
 
