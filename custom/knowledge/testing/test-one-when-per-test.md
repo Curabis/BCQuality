@@ -71,6 +71,29 @@ belongs in `[WHEN]`.
         Assert.AreEqual(1, TempBuffer.Count(), 'Exactly one tier line expected');
     end;
 
+## Flow tests — the deliberate exception
+
+A **flow test** verifies the accumulated outcome of a multi-round business
+flow — partial receipt then invoicing, multiple posting rounds against one
+document. Here the sequence IS the scenario: the claim under test is "after
+round 1, 2 and 3, the balances are correct", and it cannot be expressed as
+three independent tests without losing the very interaction being verified.
+
+Flow tests are permitted with multiple `[WHEN]` blocks when ALL of these hold:
+
+1. The name declares the flow: the codeunit or procedure name contains the
+   sequence (`SVPartialFlowTests`, `ReceiveThenInvoice_QuantitiesAreCorrect`).
+2. Each `[WHEN]` is labelled as a round of ONE scenario ("Runde 1: kun
+   modtagelse"), not as an unrelated action.
+3. The `[THEN]` asserts the accumulated end-state — not one unrelated claim
+   per WHEN. If the assertions decompose cleanly per action, it is two tests
+   in disguise: split.
+
+Unit-level tests keep the strict one-WHEN rule without exception. (Edison
+eval 2026-07-02, Jernpladsen @ b7656b1: five multi-WHEN procedures in
+SVPartialFlowTests, all deliberate round-labelled flows — the rule previously
+gave no verdict on them.)
+
 ## Naming implication
 
 The procedure name should make the single WHEN self-evident.
@@ -78,3 +101,5 @@ A name with "And" or "Then" in the middle is a strong signal to split:
 
 - `GetPrice_AndDiscount_ReturnsValues` → split
 - `GetPrice_CustomerPrice_ReturnsUnitPrice` → good
+- `ReceiveThenInvoice_QuantitiesAreCorrect` → legitimate flow test IF the
+  flow-test conditions above are met
