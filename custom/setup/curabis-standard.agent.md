@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standard-setup
-version: 10
+version: 11
 title: CURABIS Standard — Project Setup
 description: >
   Configures a new or existing repository to the CURABIS Standard development
@@ -599,6 +599,33 @@ When creating HEARTBEAT.md from template in Mode B:
 - `projectmemory/` — team knowledge, never overwritten by tooling
 - `docs/` content — project documentation, never overwritten by tooling
 - `~/.bc-mcp.config.json` — contains developer secrets
+
+### After update — lokal-agent-check (RegelSanity)
+
+Reconciliation runs in BOTH directions. Missing template files are handled
+above — this check finds the opposite: **extra** files in `.github/.agents/`
+that are not in this document's template table (see BCQuality rule
+`repo-local-agents-must-be-universalized-or-removed`).
+
+1. List `.github/.agents/*.agent.md` and compare against the template table
+2. For each file NOT in the table, output:
+
+```
+⚠️ RegelSanity: dette repo har en lokal agent, som ingen andre CURABIS-repos har:
+
+  - <navn>.agent.md
+
+Repoer må ikke opføre sig forskelligt. Agenten skal enten:
+  a) universaliseres — jeg ruter den til Francis/Immanuel som BCQuality-forslag
+     (Retten hører sagen, hvis den rejser et portefølje-spørgsmål)
+  b) fjernes fra repoet
+
+Hvad vælger du? (a/b)
+```
+
+3. Never delete without the developer's answer; never silently keep.
+   If (a): draft the Francis observation immediately — the local file is the
+   evidence. If (b): remove the file and note it in the update report.
 
 ### After update — agent-synligheds-check
 
