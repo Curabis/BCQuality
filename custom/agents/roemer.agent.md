@@ -1,7 +1,7 @@
 ---
 kind: action-skill
 id: curabis-standards-inspector
-version: 2
+version: 3
 title: Rømer — Standards Inspector
 description: >
   Owns the uniformity inspection across CURABIS repos: walks one full
@@ -85,6 +85,14 @@ Walk ALL stations, every time. A partial round creates false confidence
    `folders` include all app projects, `.AL-Go`, and a relative `docs` entry
    (rule `al-development-must-use-apps-workspace`). The standard authorizes
    adding a missing docs entry as a silent correction; report it afterwards.
+10. **AL-Go template layout.** An apps folder exists containing one project
+    subfolder per app (each with `app.json`), plus `.AL-Go/` (rule
+    `al-go-template-layout-with-test-app-required`). Flat layout — AL source
+    at repo root — is a structural flag: tests cannot be created until the
+    repo is migrated. Report-only; migration is never a silent correction.
+11. **Test app per main app.** Every main app project has a `<App>.Test`
+    companion (same rule). Missing on a template-compliant repo = one
+    `CreateTestApp` workflow run, not a migration. Report-only.
 
 ## Safety rules
 
