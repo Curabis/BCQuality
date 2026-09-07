@@ -11,7 +11,7 @@ application-area: [all]
 
 ## Description
 
-Codeunit 134926 "Table Relation Test" walks every `TableRelation` field property in the app and fails the moment a related field's type or length doesn't match what the relation requires — the related field must match the largest related field's length, and its type must match (except a field may relate to both `Code` and `Text`, which resolves to `Text`). A field with a legitimate, intentional relation shape has no per-field override in its own object definition; the check runs across the whole app with no built-in escape hatch.
+Codeunit 134926 "Table Relation Test" (shipped in BCApps' test app — only consumers that depend on the BC test libraries can subscribe to it) reads Table Relations Metadata tenant-wide across every installed app, not just the current one, and fails the moment a related field's type or length doesn't match what the relation requires — the related field must match the largest related field's length, and its type must match (except a field may relate to both `Code` and `Text`, which resolves to `Text`). A field with a legitimate, intentional relation shape has no per-field override in its own object definition; the check runs with no built-in escape hatch.
 
 ## Best Practice
 
