@@ -13,11 +13,17 @@ application-area: [all]
 
 ## Description
 
-A document report — an invoice, statement, order confirmation, or any report meant to be printed, emailed, or exported as a single-record document — should default to a `Word` rendering layout rather than `RDLC`. RDLC layouts run in a sandboxed app domain that only lives for the current report invocation, which is slower for UI-related actions such as emailing the resulting document, than a Word layout, which is not subject to that sandbox constraint. This does not apply to every report: tabular/list reports with heavy aggregation or calculated columns are still often a better fit for RDLC or Excel.
+For a document report — an invoice, statement, order confirmation, or any report meant to be printed, emailed, or exported as a single-record document — Microsoft's own guidance recommends a `Word` rendering layout over `RDLC`: "RDL layouts can result in slower performance with document reports, regarding actions that are related to the user interface (for example, like sending emails) compared to Word layouts," and "we recommend that you design Word layouts instead of RDL" for this report shape (see Sources). This is a documented recommendation, not a universal guarantee that Word outperforms RDLC for every workload, and it does not apply to every report: tabular/list reports with heavy aggregation or calculated columns are still often a better fit for RDLC or Excel.
 
 ## Best Practice
 
-Set `DefaultRenderingLayout = Word` and define a `Word` layout for reports that represent one structured document per record. Reserve RDLC (or Excel) for reports that represent a data listing rather than a document.
+For document reports, prefer a `Word` layout (`DefaultRenderingLayout = Word`) over RDLC unless specific layout requirements favor RDLC. Reserve RDLC (or Excel) for reports that represent a data listing rather than a document.
+
+## Sources
+
+- [Report Design Overview](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-report-design-overview)
+- [Creating an RDL layout report](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-report-performance)
+- [Troubleshooting reports / Report performance](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-reports-troubleshooting)
 
 See sample: `document-report-word-layout.good.al`.
 

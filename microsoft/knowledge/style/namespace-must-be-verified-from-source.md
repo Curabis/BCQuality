@@ -7,17 +7,17 @@ countries: [w1]
 application-area: [all]
 ---
 
-# Verify a namespace from the object's own source file, never by inference
+# Resolve a namespace from the referenced object's source or symbols, never by guessing
 
 > Contributions welcome — open a PR to refine or extend this article.
 
 ## Description
 
-Since Business Central 2024 release wave 1, Microsoft's own objects are organized under a deep `Microsoft.*` namespace tree that has been renamed and restructured repeatedly. Guessing a namespace from an object's name, from an older codebase, or from general familiarity produces a `using` statement that can look plausible, compile in isolation, and still resolve to the wrong object or fail in the AL Language Server that VS Code actually uses to report errors. The only reliable source for an object's namespace is line one of that object's own source file.
+Since Business Central 2024 release wave 1, Microsoft's own objects are organized under a deep `Microsoft.*` namespace tree that has been renamed and restructured repeatedly. When adding a `using` directive for an existing AL object (table, codeunit, page, enum, interface, etc.), guessing its namespace from the object's name, from an older codebase, or from general familiarity produces a statement that can look plausible, compile in isolation, and still resolve to the wrong object or fail in the AL Language Server that VS Code actually uses to report errors. The reliable sources are the object's own source file (its `namespace` declaration) or, for a dependency without accessible source, its AL symbol package — not the object's name or a remembered convention.
 
 ## Best Practice
 
-Locate the object's source file, read its `namespace` declaration on line one, and copy that exact value into the consuming file's `using` statement.
+When referencing an existing AL object, resolve its namespace from that object's actual source file or symbol definition — never infer or invent one from its name, functional area, or naming convention.
 
 See sample: `namespace-must-be-verified-from-source.good.al`.
 

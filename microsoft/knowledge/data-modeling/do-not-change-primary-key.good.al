@@ -19,6 +19,6 @@ table 50101 "Period Stats By Flow"
     }
     keys
     {
-        key(PK; "Period Start") { Clustered = true; }
+        key(PK; Flow, "Period Start") { Clustered = true; }
     }
 }

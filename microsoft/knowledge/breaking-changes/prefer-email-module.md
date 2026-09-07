@@ -13,11 +13,11 @@ application-area: [all]
 
 ## Description
 
-Older AL code sends email by calling `Codeunit Mail (397)`. Business Central's current extensibility model is a different, richer object set — `Codeunit Email`, table `Email Message`, `enum "Email Scenario"`, and the `Email Account`/`Email Connector` interface (Microsoft 365, Current User, SMTP, or a custom connector). New code built on `Codeunit Mail` inherits its SMTP-era, single-connector assumptions and leaves no Sent/Outbox trail behind.
+Older AL code sends email by calling `Codeunit Mail (397)`. Business Central's current extensibility model is a different, richer object set — `Codeunit Email`, `Codeunit "Email Message"`, `enum "Email Scenario"`, and the `Email Account`/`Email Connector` interface (Microsoft 365, Current User, SMTP, or a custom connector). `Codeunit "Email Message"` is the in-memory object you build the message on; it is not itself the persisted Sent/Outbox/Draft record — that storage is managed separately once the message is queued or sent. New code built on `Codeunit Mail` inherits its SMTP-era, single-connector assumptions and leaves no Sent/Outbox trail behind.
 
 ## Best Practice
 
-Build on `Codeunit Email` and table `Email Message`. Route the message through an `Email Scenario` so different document types can use different accounts without the calling code needing to know which account that is, and get a tracked Sent/Outbox/Draft record for free.
+Build on `Codeunit Email` and `Codeunit "Email Message"`. Route the message through an `Email Scenario` so different document types can use different accounts without the calling code needing to know which account that is, and get a tracked Sent/Outbox/Draft record for free.
 
 See sample: `prefer-email-module.good.al`.
 

@@ -13,11 +13,11 @@ application-area: [all]
 
 ## Description
 
-When a field or variable represents exactly two states — yes/no, on/off, active/inactive, blocked/not blocked — it should be typed `Boolean`. Modeling that same two-state choice as an `Option`/`Enum` with two members, or as an `Integer` with two magic-number values, adds a layer of indirection a reader has to resolve before understanding the code, and it invites a multi-branch check where a simple `if X then` would do. This is distinct from a genuine multi-value choice with more than two named states, which legitimately calls for `Enum` — the line is the state count.
+When a field or variable represents a genuine true/false state — yes/no, on/off, active/inactive, blocked/not blocked — it should be typed `Boolean`. Modeling that same predicate as an `Option`/`Enum` with two members, or as an `Integer` with two magic-number values, adds a layer of indirection a reader has to resolve before understanding the code. This is about semantics, not member count: a domain concept that currently has exactly two named alternatives — Inbound/Outbound, Debit/Credit, Buy/Sell — is not automatically a Boolean in disguise. An `Enum` can be the clearer model there, including when it needs to implement an interface, preserve an existing contract, or leave room for a future third value. The distinction is whether the domain is genuinely a stable predicate, not how many states it currently has.
 
 ## Best Practice
 
-Type a true two-state field or variable as `Boolean` and branch on it directly.
+Type a field or variable as `Boolean` when the domain concept is inherently a true/false state. Do not replace a meaningful two-option domain model with a Boolean solely because it currently has two values.
 
 See sample: `binary-choice-must-be-boolean.good.al`.
 

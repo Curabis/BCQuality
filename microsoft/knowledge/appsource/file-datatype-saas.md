@@ -13,7 +13,7 @@ application-area: [all]
 
 ## Description
 
-The classic `File` variable type — `Open`/`Create`/`Read`/`Write`/`Close` against a path on the local or server filesystem — only works on-premises, because there is no accessible filesystem in the SaaS/cloud sandbox. Any extension meant to run in Business Central Online must not rely on `File.Open`, `File.Create`, `File.Read`, or `File.Write` for its core functionality: code built this way compiles but fails, or is silently skipped, in the cloud.
+The classic `File` variable type — `Open`/`Create`/`Read`/`Write`/`Close` against a path on the local or server filesystem — is scoped OnPrem-only. Code targeting Business Central Online that calls `File.Open`, `File.Create`, `File.Read`, or `File.Write` fails to compile against a Cloud-scoped project; it does not compile successfully and fail or get silently skipped at runtime. Separately, and regardless of the compile-time scoping, no server/local filesystem path is available to an extension actually running in Business Central Online.
 
 ## Best Practice
 
