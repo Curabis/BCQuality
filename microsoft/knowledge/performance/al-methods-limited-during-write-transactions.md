@@ -1,13 +1,13 @@
 ---
 bc-version: [all]
 domain: performance
-keywords: [runmodal, page-runmodal, report-runmodal, xmlport-runmodal, write-transaction, commit, requestpage, runtime-error]
+keywords: [limited-during-write-transactions, write-transaction, runmodal, form-runmodal, page-runmodal, report-runmodal, xmlport-runmodal, codeunit-run, commit, requestpage, runtime-error]
 technologies: [al]
 countries: [w1]
 application-area: [all]
 ---
 
-# RunModal is not allowed inside a write transaction
+# AL methods limited during write transactions: commit before RunModal and Codeunit.Run
 
 ## Description
 
@@ -28,13 +28,13 @@ The reason is the same one behind `avoid-user-prompts-inside-transactions.md`: a
 
 Sequence the work so the modal interaction happens before the write phase: run the lookup or dialog page first, then perform the writes the user's choice requires, and let the transaction end. When a modal object genuinely must follow a write, `Commit()` first — but only when the state written so far is complete and safe to persist on its own, because that Commit is a real transaction boundary, not a formality. Microsoft's own Base Application follows exactly this pattern where the preceding state is final (`ActivityLog.Table.al` commits the log entry before `Page.RunModal(Page::"Activity Log", Rec)`; `DocumentSendingProfile.Table.al` commits before `Page.RunModal(Page::"Select Sending Options", …)`). For a report or XMLport, suppressing the request page (`UseRequestPage(false)`) is a legitimate way to run it inside a write transaction when no user input is needed. `Database.IsInWriteTransaction()` (runtime 11.0+) lets library code that cannot control its caller detect the state, with the same caveat as the Codeunit.Run article: branching production flow on it usually signals unclear transaction ownership.
 
-See sample: `runmodal-is-not-allowed-inside-write-transactions.good.al`.
+See sample: `al-methods-limited-during-write-transactions.good.al`.
 
 ## Anti Pattern
 
 Writing to the database and then calling `Page.RunModal` (or a report/XMLport with its request page) in the same trigger — the first production run hits the runtime error. The reflexive fixes are worse than the error: dropping in `Commit()` to silence it persists a half-finished state that can no longer roll back with the rest of the operation, and swapping the page for a `Confirm` or `StrMenu` to "avoid the error" trades a loud failure for the silent lock-holding that `avoid-user-prompts-inside-transactions.md` warns about.
 
-See sample: `runmodal-is-not-allowed-inside-write-transactions.bad.al`.
+See sample: `al-methods-limited-during-write-transactions.bad.al`.
 
 ## Source
 
