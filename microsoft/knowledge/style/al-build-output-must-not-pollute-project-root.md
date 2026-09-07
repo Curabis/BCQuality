@@ -1,24 +1,24 @@
 ---
 bc-version: [all]
 domain: style
-keywords: [build, output, alpackages, duplicate, language-server, app-package, project-root, al0197]
+keywords: [build, output, alpackages, artifact-hygiene, outfolder, project-root]
 technologies: [al]
 countries: [w1]
 application-area: [all]
 ---
 
-# Keep AL Build Output Out of the Project Root
+# Write AL Build Artifacts to an Intentional Output Location
 
 > Contributions welcome — open a PR to refine or extend this article.
 
 ## Description
 
-When an AL project is built, the compiled `.app` file is placed in the project root by default. Over successive builds, multiple `.app` files accumulate there (e.g. one per version). The AL language server, both in the editor and in build tooling, scans the project folder for symbol packages and can load these compiled artefacts alongside the live source files, which produces `AL0197` duplicate-object errors for every object in the project — with messages that point at source lines rather than at the packaged artefact that is the actual duplicate. The errors are not real; they disappear as soon as the stale `.app` files are removed from the root.
+An AL project's compiled `.app` file can be written to the project root by default, and current tooling explicitly supports choosing a different destination instead — `ALTool`'s `--outfolder` option and the `al_build` agent tool's `outputPath` parameter both exist for this. The problem this rule addresses is not that root-level output is technically invalid; it is agents leaving generated `.app` files scattered through arbitrary source locations, or treating a compiled artefact as if it were part of the source tree (committing it, editing around it, referencing it as a dependency by hand).
 
 ## Best Practice
 
-Configure the build output path to a dedicated subfolder that is excluded from language server scanning — for example by setting `al.outputPath` to a folder such as `.output` in `.vscode/settings.json`, or by passing an explicit output path to the build tool being used — and add that folder to `.gitignore`. Before treating an `AL0197` "already declared" error as a source code problem, check the project root for stale `.app` files first; adding root `.app` files to `.gitignore` instead of relocating the output path only hides the accumulation rather than fixing it.
+Write build artifacts to a deliberate, dedicated output location — configured via the build tool actually in use (e.g. `ALTool --outfolder`, or an explicit `outputPath` on the agent build tool) — and add that folder to `.gitignore`. Treat a compiled `.app` as a build artifact, never as a source file to commit or hand-edit around.
 
 ## Anti Pattern
 
-Letting `.app` files accumulate in the project root across builds, then debugging the resulting `AL0197` duplicate-object errors as if they were a source code defect instead of first checking for stale build artefacts in the root folder.
+Letting `.app` files accumulate in arbitrary or unversioned locations without a deliberate output path, or committing compiled artefacts into source control alongside the AL files that produced them.

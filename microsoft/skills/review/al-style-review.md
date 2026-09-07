@@ -41,7 +41,7 @@ Narrow the relevant files to the subset that applies to the changes under review
 
 - Changed AL objects — especially API pages (`PageType = API`), tables and pages declaring Labels/TextConsts, codeunits issuing `Error`/`Message`/`Confirm`, and any file whose name violates the `<ObjectName>.<ObjectType>.al` convention.
 - Changed declarations, weighted toward `: Label '...'`, `: TextConst '...'`, temporary record variables, option fields, error-handling call sites, and codeunit-internal method calls.
-- Tokens extracted from the diff (`Label`, `TextConst`, `Locked`, `Comment`, `MaxLength`, `temporary`, `OptionMembers`, `OptionCaption`, `APIPublisher`, `APIGroup`, `APIVersion`, `EntityName`, `EntitySetName`, `DelayedInsert`, `FieldCaption`, `TableCaption`, `FieldName`, `TableName`, `Page.RunModal`, `Report.Run`, `this.`, `StrSubstNo`).
+- Tokens extracted from the diff (`Label`, `TextConst`, `Locked`, `Comment`, `MaxLength`, `temporary`, `OptionMembers`, `OptionCaption`, `APIPublisher`, `APIGroup`, `APIVersion`, `EntityName`, `EntitySetName`, `DelayedInsert`, `FieldCaption`, `TableCaption`, `FieldName`, `TableName`, `Page.RunModal`, `Report.Run`, `this.`, `StrSubstNo`, `namespace`, `using`, `var `).
 
 A file enters the candidate worklist when its `keywords` intersect the extracted tokens or its topic (derived from the index entry's `path`, `title`, and `description`) matches a changed object or declaration. Read an article's full file — its `## Best Practice` / `## Anti Pattern` bodies — only after it makes the worklist; candidate selection uses the index alone.
 
