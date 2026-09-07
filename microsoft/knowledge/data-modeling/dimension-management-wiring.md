@@ -1,7 +1,7 @@
 ---
 bc-version: [all]
 domain: data-modeling
-keywords: [dimensions, dimensionmanagement, global-dimension, shortcut-dimension, default-dimension, validateshortcutdimcode, createdim]
+keywords: [dimensions, dimensionmanagement, global-dimension, shortcut-dimension, default-dimension, validatedimvaluecode, getdefaultdimid]
 technologies: [al]
 countries: [w1]
 application-area: [all]
@@ -17,7 +17,7 @@ Adding dimension support to a custom master or document table is not just a matt
 
 ## Best Practice
 
-A master table should validate its dimension fields through `ValidateShortcutDimCode` and `SaveDefaultDim`, and create/delete the matching Default Dimension records in `OnInsert`/`OnDelete`. A document table should add Shortcut Dimension fields validated the same way, and call `CreateDim` to pull dimension values from the related master record whenever the field that attaches the document to that master changes.
+A master table should validate its dimension fields through `ValidateDimValueCode` (or `ValidateShortcutDimValues` when a `DimSetID` is also needed) and `SaveDefaultDim`, and create/delete the matching Default Dimension records in `OnInsert`/`OnDelete`. A document table should add Shortcut Dimension fields validated the same way, and call `GetDefaultDimID` to pull inherited dimension values from the related master record whenever the field that attaches the document to that master changes.
 
 See sample: `dimension-management-wiring.good.al`.
 

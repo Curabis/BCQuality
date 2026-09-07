@@ -13,7 +13,7 @@ table 50100 "Course"
             var
                 DimMgt: Codeunit DimensionManagement;
             begin
-                DimMgt.ValidateShortcutDimCode(1, "Global Dimension 1 Code");
+                DimMgt.ValidateDimValueCode(1, "Global Dimension 1 Code");
                 DimMgt.SaveDefaultDim(Database::Course, "No.", FieldNo("Global Dimension 1 Code"), "Global Dimension 1 Code");
             end;
         }
