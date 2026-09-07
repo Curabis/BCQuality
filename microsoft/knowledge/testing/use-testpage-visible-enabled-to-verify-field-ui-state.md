@@ -7,15 +7,15 @@ countries: [w1]
 application-area: [all]
 ---
 
-# Verify field visibility and editability with TestPage.Visible()/.Enabled()
+# Verify field visibility and enabled state with TestPage.Visible()/.Enabled()
 
 ## Description
 
-A UI test codeunit does not need to inspect table or page properties indirectly to confirm a field is shown or editable under given conditions. The `TestPage` object exposes a `Visible()` and an `Enabled()` function on each field, reflecting the page's actual rendered state, callable directly from a `[Test]` procedure after `OpenView()`.
+A UI test codeunit does not need to inspect table or page properties indirectly to confirm a field is shown or enabled under given conditions. The `TestPage` object exposes a `Visible()` and an `Enabled()` function on each field, reflecting the page's actual rendered state, callable directly from a `[Test]` procedure. `Enabled()` and `Editable()` are distinct states — this article covers visibility/enabled state specifically; see `use-testpage-editable-to-verify-field-editability.md` for verifying whether a field can actually be changed.
 
 ## Best Practice
 
-Open the `TestPage`, navigate to the relevant record if needed, then assert against `TestPageField.Visible()` and `TestPageField.Enabled()` to verify the field's UI state, rather than checking an unrelated table/page property or skipping the check.
+Open the `TestPage`, navigate to the relevant record if needed, then assert against `TestPageField.Visible()` and `TestPageField.Enabled()` to verify the field's shown/enabled state, rather than checking an unrelated table/page property or skipping the check.
 
 See sample: `use-testpage-visible-enabled-to-verify-field-ui-state.good.al`.
 

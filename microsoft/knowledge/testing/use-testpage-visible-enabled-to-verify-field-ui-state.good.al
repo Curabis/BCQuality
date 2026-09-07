@@ -9,7 +9,7 @@ codeunit 50131 "Sample Customer Type UI Test"
         CustomerCard: TestPage "Customer Card";
     begin
         CustomerCard.OpenView();
-        Assert.IsTrue(CustomerCard."Customer Type".Enabled(), 'Customer Type should be editable on the Customer Card.');
+        Assert.IsTrue(CustomerCard."Customer Type".Enabled(), 'Customer Type should be enabled on the Customer Card.');
         Assert.IsTrue(CustomerCard."Customer Type".Visible(), 'Customer Type should be visible on the Customer Card.');
     end;
 }
