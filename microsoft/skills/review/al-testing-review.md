@@ -46,6 +46,9 @@ A file enters the candidate worklist when its `keywords` intersect the extracted
 The following targeted checks cover every current `testing` article. Treat each as a candidate-selection cue: when the signal appears in changed code, add the named article to the worklist and evaluate it in Action.
 
 - A method in a `Subtype = Test` codeunit adds or changes `[TransactionModel(...)]`, exercises code that calls `Commit` under `AutoRollback`, defaults broadly to `AutoCommit`, or chooses `None` for a writing test — `transactionmodel-attribute-governs-test-transactions`.
+- A test procedure or comment adds `[FEATURE]`/`[SCENARIO]`/`[GIVEN]`/`[WHEN]`/`[THEN]` tags — `test-feature-scenario-tags`.
+- A test codeunit calls `TestPage` methods (`OpenNew`, `OpenView`, `OpenEdit`) — `ui-test-codeunit-naming`.
+- A `[GIVEN]`-tagged setup precedes a posting call or report execution — `given-blocks-must-cover-full-precondition-chain`.
 - An `AutoCommit` test runs under a `Subtype = TestRunner` codeunit that omits `TestIsolation` or sets it to `Disabled`, leaving committed data between tests — `testisolation-belongs-on-the-test-runner`. Require runner/repository context; a standalone test file cannot prove which runner executes it.
 - A permission-sensitive test uses `TestPermissions = Disabled`, claims to test a restricted user without `"Permissions Mock"`/`"Library - Lower Permissions"`, or declares `[TestPermissions(...)]` without applying that context — `permission-tests-must-lower-the-execution-context`.
 - Test fixture code manually calls `Init`/`Insert`, invents keys or prerequisite records, or bypasses available `LibrarySales`, `LibraryPurchase`, `LibraryERM`, `LibraryInventory`, `LibraryRandom`, or equivalent library codeunits — `use-library-codeunits-for-test-fixtures`.

@@ -26,3 +26,7 @@ See sample: `upgrade-tag-logic-must-not-nest-deeply.good.al`.
 Nesting the tag check, a record loop, and a multi-branch business condition inside one procedure. Split the buried business condition into its own, separately tagged upgrade step instead.
 
 See sample: `upgrade-tag-logic-must-not-nest-deeply.bad.al`.
+
+## Source
+
+Microsoft's own "Upgrading Extensions" guidance, Design considerations: "Keep tags simple by limiting nesting tags to two levels. Complicated if statements can lead to problems." — https://learn.microsoft.com/dynamics365/business-central/dev-itpro/developer/devenv-upgrading-extensions#using-upgrade-tags-to-control-upgrade-code

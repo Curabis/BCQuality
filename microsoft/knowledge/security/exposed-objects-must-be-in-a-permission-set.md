@@ -11,7 +11,7 @@ application-area: [all]
 
 ## Description
 
-An object that is reachable from outside the app's own UI — an API page (`PageType = API`), a web-service-enabled page or query (`ServiceEnabled = true`), or a published API query — is only usable if it is also granted execute access through a permission set. When such an object is left out of every permission set, it becomes both unusable (no caller, human or service, can reach it) and invisible in review: nobody deliberately decided who may call it. Exposure without a matching grant is not a safe default; it is an endpoint nobody is governing.
+An object that is reachable from outside the app's own UI is only usable if it is also granted execute access through a permission set. Three distinct mechanisms make an object reachable this way, and each needs to be checked on its own terms: a page or query published through the **Web Services** configuration page; a custom REST endpoint declared with `PageType = API` / `QueryType = API`; or an individual codeunit method exposed with the `[ServiceEnabled]` attribute (a method-level attribute — it does not apply to pages or queries as a property). When such an object is left out of every permission set, it becomes both unusable (no caller, human or service, can reach it) and invisible in review: nobody deliberately decided who may call it. Exposure without a matching grant is not a safe default; it is an endpoint nobody is governing.
 
 ## Best Practice
 
