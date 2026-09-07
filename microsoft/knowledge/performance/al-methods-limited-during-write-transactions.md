@@ -1,7 +1,7 @@
 ---
 bc-version: [all]
 domain: performance
-keywords: [limited-during-write-transactions, write-transaction, runmodal, form-runmodal, page-runmodal, report-runmodal, xmlport-runmodal, codeunit-run, commit, requestpage, runtime-error]
+keywords: [limited-during-write-transactions, write-transaction, runmodal, form-runmodal, page-runmodal, report-runmodal, xmlport-runmodal, codeunit-run, commit, requestpage]
 technologies: [al]
 countries: [w1]
 application-area: [all]
