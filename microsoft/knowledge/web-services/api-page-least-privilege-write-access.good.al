@@ -6,6 +6,8 @@ page 50102 "Vendor Contact Info API"
     APIVersion = 'v1.0';
     SourceTable = Vendor;
     DelayedInsert = true;
+    InsertAllowed = false;
+    DeleteAllowed = false;
 
     layout
     {

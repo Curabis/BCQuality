@@ -11,7 +11,7 @@ application-area: [all]
 
 ## Description
 
-Each test procedure should contain exactly one `[WHEN]` block: one action that triggers the behaviour under test. A test with multiple WHENs — "do A, then do B, then check C" — is two or more tests in disguise. Splitting them gives failure isolation (a failing test points at one action, not an ambiguous sequence) and keeps each test readable as a single, falsifiable claim. A precondition action, such as posting a document so a ledger entry exists to assert against, belongs in `[GIVEN]`; only the action actually being asserted belongs in `[WHEN]`.
+This is a testing-design practice, not a BC platform requirement — no AL API enforces it, and it should not gate a change the way a platform-contradicted claim would. Each test procedure should contain exactly one `[WHEN]` block: one action that triggers the behaviour under test. A test with multiple WHENs — "do A, then do B, then check C" — is two or more tests in disguise. Splitting them gives failure isolation (a failing test points at one action, not an ambiguous sequence) and keeps each test readable as a single, falsifiable claim. A precondition action, such as posting a document so a ledger entry exists to assert against, belongs in `[GIVEN]`; only the action actually being asserted belongs in `[WHEN]`.
 
 ## Best Practice
 

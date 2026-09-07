@@ -8,7 +8,6 @@ codeunit 50103 "Item Price Testing"
         ItemPriceMgt: Codeunit "Item Price Mgt.";
         Assert: Codeunit "Library Assert";
 
-    // [SCENARIO] Customer with a specific price list line gets that unit price
     [Test]
     procedure GetPrice_CustomerPrice_ReturnsUnitPrice()
     var
@@ -16,6 +15,7 @@ codeunit 50103 "Item Price Testing"
         Item: Record Item;
         UnitPrice, LineDiscPct: Decimal;
     begin
+        // [SCENARIO] Customer with a specific price list line gets that unit price
         // [GIVEN] a customer with a price list line at 100 LCY
         LibrarySales.CreateCustomerWithPrice(Customer, Item, '', 100);
         // [WHEN]

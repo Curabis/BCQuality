@@ -32,8 +32,14 @@ Match the page's design to its type:
 - **RoleCenter** — tailored home page for a role; named role + `Role
   Center`; links to List pages, shows Cues/Activities.
 - **Card** — view/edit one record; named table + `Card`; FastTabs only,
-  first FastTab named `General`. Requires a single-field primary key — a
-  multi-field key needs a List/Worksheet/Tabular page instead.
+  first FastTab named `General`. A single-field primary key is typical,
+  but not a hard requirement: a subsidiary table that supplements a
+  master record with its own identity (parent key + own code — Ship-to
+  Address, Customer/Vendor Bank Account) commonly gets its own Card page
+  over a composite key too. Treat the key shape as a contextual signal,
+  not a mandatory constraint — a composite-key table with no such
+  supplementing relationship to a master record is the actual signal a
+  List/Worksheet/Tabular page fits better.
 - **List** — view multiple records, also the lookup/drilldown surface;
   named table + `List` if read-only, or the plural table name if
   editable; primary-key fields shown left-most; `CardPageID` must point
@@ -64,10 +70,11 @@ See sample: `page-design-must-match-bc-page-type-conventions.good.al`.
 
 ## Anti Pattern
 
-A page that mixes conventions from two types — for example, a "Card"
-page built on a table with a two-field primary key, or a "List" page
-with no `CardPageID` even though a Card page exists for the same table —
-signals a design step was skipped, not a stylistic choice. Also watch
+A page that mixes conventions from two types — for example, a "List"
+page with no `CardPageID` even though a Card page exists for the same
+table — signals a design step was skipped, not a stylistic choice. A
+Card page over a composite-key table is not automatically this anti
+pattern; check whether the table supplements a master record first. Also watch
 for: a Worksheet or List page showing primary-key fields it shouldn't (or
 hiding them when it should show them), and a page with no
 `UsageCategory` set, which makes it invisible to Tell Me search even

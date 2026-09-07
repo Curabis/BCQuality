@@ -11,7 +11,7 @@ application-area: [all]
 
 ## Description
 
-Source folders inside an AL app should group files by the business feature or module they belong to (`src/Sales/Invoice/`, `src/NoSeries/`), not by which kind of AL object they are (`src/Tables/`, `src/Pages/`, `src/Codeunits/`). Object-type folders scatter everything belonging to one feature across half a dozen directories, so a developer picking up a feature has to jump between folders that share nothing but object type to see the whole picture. Feature folders keep a table, its pages, its codeunits, and its test setup physically together.
+Folder structure inside an AL app has no effect on compilation or runtime behavior — this is a repository-organization convention, not a platform requirement, and different projects reasonably choose differently. Grouping files by business feature or module (`src/Sales/Invoice/`, `src/NoSeries/`) rather than by AL object type (`src/Tables/`, `src/Pages/`, `src/Codeunits/`) keeps everything belonging to one feature physically together, which many teams find easier to navigate than jumping between object-type folders that share nothing but their AL object kind. Adopt this consistently on a project rather than mixing both schemes, but treat it as a team convention to apply deliberately, not a Microsoft-mandated structure.
 
 Code genuinely shared across multiple features (utility codeunits, common interfaces, shared enums) belongs in a `Common` or `Shared` folder, not duplicated per feature and not left in a catch-all root.
 

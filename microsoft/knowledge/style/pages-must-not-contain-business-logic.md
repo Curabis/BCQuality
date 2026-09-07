@@ -11,7 +11,7 @@ application-area: [all]
 
 ## Description
 
-A page procedure that calculates a value and assigns it to a field, calls `Rec.Modify()` directly, or implements a business rule is an architecture violation even when it compiles. Pages are a presentation layer: they bind data to the UI and invoke actions. Calculations, validations, and record mutations belong in codeunits, where they can be tested, reused, and called consistently regardless of which page (or API, or batch job) triggers them. When logic lives on a page, it only applies when a user opens that specific page — the same business rule silently doesn't run through any other entry point.
+A page procedure that persists a business mutation directly (`Rec.Modify()` outside the standard record-bound save, or a cross-entry-point business rule implemented only in a page trigger) is an architecture violation even when it compiles: the rule only applies when a user opens that specific page, and silently doesn't run through any other entry point (API, batch job, another page). This is narrower than "no calculation may live on a page" — a presentation-specific calculation (formatting, a derived display value) is fine on the page that shows it, and a reusable data invariant commonly belongs on the table itself (a field's own validation/trigger), not forced into a codeunit merely to keep it off the page. The actual line is entry-point independence: a business operation or invariant that must hold regardless of which entry point touches the record belongs in a codeunit or the table, not solely in one page's trigger.
 
 A narrow set of patterns are conventional rather than violations:
 - A setup page reading and writing its own singleton setup record.
@@ -26,6 +26,6 @@ See sample: `pages-must-not-contain-business-logic.good.al`.
 
 ## Anti Pattern
 
-Direct calculations in a page trigger (e.g. `Rec."Total Amount" := Rec.Quantity * Rec."Unit Price"`), calls to `Rec.Modify()` from a page trigger, or business-rule validation embedded in `OnValidate`/`OnAction` instead of routed through a codeunit.
+A cross-entry-point business rule or persisted mutation implemented only in a page trigger — calling `Rec.Modify()` to save a computed business value from `OnValidate`/`OnAction`, or a validation that must hold regardless of caller, instead of routed through a codeunit or the table's own field validation. A presentation-only calculation or a table-owned field invariant is not an instance of this anti-pattern.
 
 See sample: `pages-must-not-contain-business-logic.bad.al`.
