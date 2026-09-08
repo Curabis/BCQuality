@@ -13,7 +13,7 @@ application-area: [all]
 
 ## Description
 
-Every journal-based posting routine in Business Central is split across three companion codeunits with distinct, non-overlapping responsibilities: `Check Line` validates one line, `Post Line` writes exactly one line to the ledger, and `Post Batch` loops both across the journal. A document posting routine (posting one document at a time) calls `Post Line` directly and skips `Post Batch`. A new posting routine that blurs this split either misses functionality other code expects to call directly, or exposes an interaction surface it shouldn't.
+Business Central's own journal-based posting routines consistently follow a three-codeunit split with distinct, non-overlapping responsibilities — `Codeunit "Gen. Jnl.-Check Line"` / `"Gen. Jnl.-Post Line"` / `"Gen. Jnl.-Post Batch"` for the general journal, and the same `<Journal>-Check Line` / `<Journal>-Post Line` / `<Journal>-Post Batch` shape repeated for Item, Resource, Job, Fixed Asset, Insurance, and Cost Accounting journals: `Check Line` validates one line, `Post Line` writes exactly one line to the ledger, and `Post Batch` loops both across the journal. A document posting routine (posting one document at a time) calls `Post Line` directly and skips `Post Batch`. This is the standard shape to evaluate a new journal-based posting routine against, not a platform-enforced constraint — a routine with a genuinely different transaction/reuse shape may legitimately organize itself differently. But a new routine that blurs this split without a specific reason either misses functionality other code expects to call directly, or exposes an interaction surface it shouldn't.
 
 ## Best Practice
 

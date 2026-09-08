@@ -23,6 +23,6 @@ See sample: `prefer-email-module.good.al`.
 
 ## Anti Pattern
 
-Calling `Codeunit Mail`'s `CreateMessage`/`Send`/`GetErrorDesc`. It still runs, but it is hard-coupled to whatever SMTP setup exists, and leaves no queryable record of what was sent.
+Calling `Codeunit Mail`'s `CreateMessage`. It still compiles and runs, but current `Codeunit Mail`'s own implementation of `CreateMessage` no longer sends anything by itself — it only raises integration events for a legacy subscriber to act on — so building new code on it means depending on whatever compatibility shim happens to still be wired up, with no first-class connector selection and no queryable Sent/Outbox/Draft record. `Send` and `GetErrorDesc` are not current members of `Codeunit Mail` at all; do not reference them.
 
 See sample: `prefer-email-module.bad.al`.
