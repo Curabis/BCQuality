@@ -15,7 +15,7 @@ codeunit 50100 "Sample Error Log Writer"
     // session — there is no shared memory with the caller's instance.
     TableNo = "Sample Error Log Buffer";
 
-    trigger OnRun(var Rec: Record "Sample Error Log Buffer")
+    trigger OnRun()
     var
         ErrorLogEntry: Record "Sample Error Log";
     begin

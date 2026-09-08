@@ -30,8 +30,8 @@ file attachment blob unrelated to picture rendering).
 
 ## Best Practice
 
-Use `Media` (or `MediaSet` for multiple image variants) for any field that
-holds a picture.
+Use `Media` for a single image, or `MediaSet` for multiple independent
+images, for any field that holds a picture.
 
 See sample: `pictures-must-use-media-not-blob.good.al`.
 

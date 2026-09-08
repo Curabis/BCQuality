@@ -3,22 +3,25 @@ codeunit 50104 "Item Price Testing"
     Subtype = Test;
 
     [Test]
-    procedure GetPrice_LogicTest()
+    procedure ApplyDiscount_LogicTest()
     var
-        Customer: Record Customer;
-        Item: Record Item;
-        UnitPrice, LineDiscPct: Decimal;
+        Assert: Codeunit "Library Assert";
     begin
         // logic test — fine on its own, but not paired with a UI test below
-        ItemPriceMgt.GetSalesPrice(Customer."No.", Item."No.", '', UnitPrice, LineDiscPct);
+        Assert.AreEqual(90, ApplyDiscount(100, 10), 'A 10% discount on 100 must yield 90');
+    end;
+
+    local procedure ApplyDiscount(UnitPrice: Decimal; DiscountPct: Decimal): Decimal
+    begin
+        exit(UnitPrice - (UnitPrice * DiscountPct / 100));
     end;
 
     [Test]
-    procedure Page_ShowsPrice_UT()
+    procedure CustomerCard_Opens_UT()
     var
-        ItemPricePage: TestPage "Item Price";
+        CustomerCard: TestPage "Customer Card";
     begin
         // UI test mixed into a logic-test codeunit, and the codeunit lacks the _UT suffix
-        ItemPricePage.OpenNew();
+        CustomerCard.OpenNew();
     end;
 }

@@ -28,9 +28,21 @@ Each feature folder holds every object type it needs; shared code has one dedica
 
 ## Anti Pattern
 
+A repository that documents or has established feature-based organization
+as its convention, but then mixes in object-type folders for new work
+anyway:
+
     src/
-    ├── Tables/
-    ├── Pages/
+    ├── Sales/
+    │   └── Invoice/
+    ├── Tables/          <- new objects land here instead of a feature folder
     └── Codeunits/
 
-Finding everything related to one feature now requires searching multiple folders and mentally reassembling it from scattered pieces.
+The anti-pattern is inconsistency with the project's own chosen convention,
+not the object-type scheme itself — a repository that deliberately and
+consistently organizes by object type throughout is exercising the other
+reasonable choice described above, not violating this rule. What actually
+costs a reader time is a codebase where some features live under their own
+folder and others are scattered across type folders, so finding everything
+related to one feature means checking both schemes and reassembling it from
+wherever each object happened to land.

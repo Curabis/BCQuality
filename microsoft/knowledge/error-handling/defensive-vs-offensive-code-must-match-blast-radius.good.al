@@ -1,8 +1,8 @@
 // Low blast radius: guard, with an explicit chosen fallback.
-if SalesHeader.Get(SalesHeader."Document Type"::Order, DocumentNo) then
-    VATRegNo := SalesHeader."VAT Registration No.";
+if Customer.Get(SalesHeader."Sell-to Customer No.") then
+    CustomerHomePage := Customer."Home Page";
 // Blank is an acceptable, deliberately-considered default here - the field
-// is informational and a reviewer sees it before the document ships.
+// is purely a display convenience and a reviewer sees it before the document ships.
 
 // High blast radius: let it fail loud, because this feeds posted VAT.
 SalesHeader.Get(SalesHeader."Document Type"::Order, DocumentNo);
