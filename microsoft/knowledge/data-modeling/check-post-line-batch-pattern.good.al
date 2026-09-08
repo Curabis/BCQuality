@@ -1,3 +1,13 @@
+codeunit 50100 "Meter Jnl.-Check Line"
+{
+    procedure CheckLine(var MeterJnlLine: Record "Meter Journal Line")
+    begin
+        // Reads setup/dimension data only, shows no UI beyond errors.
+        if MeterJnlLine.Quantity = 0 then
+            Error('Quantity must not be zero.');
+    end;
+}
+
 codeunit 50101 "Meter Jnl.-Post Line"
 {
     procedure PostLine(var MeterJnlLine: Record "Meter Journal Line")
