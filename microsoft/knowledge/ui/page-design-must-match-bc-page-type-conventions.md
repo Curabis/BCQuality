@@ -75,9 +75,11 @@ page with no `CardPageID` even though a Card page exists for the same
 table — signals a design step was skipped, not a stylistic choice. A
 Card page over a composite-key table is not automatically this anti
 pattern; check whether the table supplements a master record first. Also watch
-for: a Worksheet or List page showing primary-key fields it shouldn't (or
-hiding them when it should show them), and a page with no
-`UsageCategory` set, which makes it invisible to Tell Me search even
-though it otherwise works.
+for a Worksheet or List page showing primary-key fields it shouldn't (or
+hiding them when it should show them). A page with no `UsageCategory` set
+is not automatically a defect either: supporting pages, subpages, dialogs,
+and pages intended only to be reached through another workflow correctly
+have no `UsageCategory` — flag its absence only on a page intended as a
+searchable entry point in its own right.
 
 See sample: `page-design-must-match-bc-page-type-conventions.bad.al`.

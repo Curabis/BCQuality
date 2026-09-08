@@ -1,6 +1,6 @@
 // Both fields guarded the same way, out of habit rather than analysis.
-if SalesHeader.Get(SalesHeader."Document Type"::Order, DocumentNo) then
-    VATRegNo := SalesHeader."VAT Registration No.";  // low blast radius - fine
+if Customer.Get(SalesHeader."Sell-to Customer No.") then
+    CustomerHomePage := Customer."Home Page";  // low blast radius - fine
 
 // but the same pattern, unexamined, was also applied here:
 if SalesHeader.Get(SalesHeader."Document Type"::Order, DocumentNo) then

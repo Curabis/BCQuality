@@ -21,6 +21,6 @@ See sample: `defensive-vs-offensive-code-must-match-blast-radius.good.al`.
 
 ## Anti Pattern
 
-Guarding two fields the same way purely out of habit, without analyzing what each one feeds. A low-blast-radius field, such as a VAT registration number shown only on a printed document, and a high-blast-radius field, such as the VAT posting group that determines VAT actually applied to a posted transaction, are both wrapped in the same `if Header.Get(...) then ... else` pattern with a blank/zero fallback — leaving the posting-critical field free to post with a silently wrong value.
+Guarding two fields the same way purely out of habit, without analyzing what each one feeds. A low-blast-radius field, such as a customer's home page URL shown only for convenience on a printed document, and a high-blast-radius field, such as the VAT posting group that determines VAT actually applied to a posted transaction, are both wrapped in the same `if Header.Get(...) then ... else` pattern with a blank/zero fallback — leaving the posting-critical field free to post with a silently wrong value. A VAT registration number is not a safe stand-in for the low-risk side of this example: it is legally relevant, often validated, and can feed external VAT services or mandated document output, so it belongs on the offensive/fail-fast side alongside the posting group, not next to it as the "safe" contrast.
 
 See sample: `defensive-vs-offensive-code-must-match-blast-radius.bad.al`.

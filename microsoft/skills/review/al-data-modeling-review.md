@@ -47,6 +47,7 @@ The following targeted checks cover every current `data-modeling` article. Treat
 
 - A `* Setup` table or its page changes singleton structure, uses a nonblank or generated key, permits insert/delete, uses a List page, or does not ensure the blank-keyed row exists — `setup-table-is-a-singleton`.
 - A new field is typed `Media`, `MediaSet`, or `BLOB` and the field's caption/name suggests a picture or image — `pictures-must-use-media-not-blob`.
+- Code outside a test codeunit or a demo-data generator calls `WorkDate(NewDate)` (the assignment form, not a bare `WorkDate()` read) as part of logic whose purpose is unrelated to the work date itself — `code-must-not-change-workdate`. A test deliberately setting a date context, or a demo-data routine that saves, sets, and restores the work date to backdate the data it creates, is not this anti-pattern.
 - A new or extended table declares its `keys` block, primary-key field list, or naming suffix (`Ledger Entry`, `Journal Line`, `Header`/`Line`, `Setup`) — `table-design-must-match-bc-table-type-conventions`.
 - A custom master table changes its primary key, `No.`/`No. Series` fields, or `OnInsert` without assigning a blank `No.` from setup through a number series — `master-table-no-from-number-series-in-oninsert`.
 - BC v22 or later code introduces or retains `NoSeriesManagement`, `InitSeries`, `SelectSeries`, or `SetSeries`, or number assignment/manual-entry checks do not use codeunit `"No. Series"` methods such as `GetNextNo`, `IsManual`, or `TestManual` — `use-no-series-codeunit-not-noseriesmanagement`.
