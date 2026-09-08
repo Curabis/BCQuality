@@ -15,7 +15,14 @@ A fixture helper that assigns a hardcoded literal to a primary-key or descriptiv
 
 ## Best Practice
 
-For a field that holds the full 10 characters, assign `LibraryUtility.GenerateGUID()` directly. For a shorter or arbitrary-length field, use `LibraryUtility.GenerateRandomCode(FieldNo, TableNo)` (or `GenerateRandomCodeWithLength`/`GenerateRandomXMLText(Length)` for a specific length) instead of truncating a GUID yourself — these generate the value and verify it is actually unique against the target table, rather than relying on the number series alone.
+For a field that holds the full 10 characters, assign `LibraryUtility.GenerateGUID()` directly. For a shorter field, do not truncate a GUID yourself — but also do not assume every `LibraryUtility` helper verifies uniqueness against the real table, because they don't all behave the same way:
+
+- `GenerateRandomCode(FieldNo, TableNo)` opens the target table as a **temporary** `RecordRef`, so its own emptiness check never inspects real rows — despite taking `TableNo`, it does not verify against the actual table. It's safe to use for its non-colliding-*within-a-single-test-run* value (derived from `GenerateGUID()`'s own number series), not for a guarantee against pre-existing or leftover data.
+- `GenerateRandomCodeWithLength(FieldNo, TableNo, CodeLength)` opens the real (non-temporary) table and loops until the generated value doesn't collide — a genuine verified-unique guarantee — but it returns `Code[10]` regardless of the requested `CodeLength`, so it's only useful for a field of 10 characters or fewer.
+- `GenerateRandomCode20(FieldNo, TableNo)` is the same real, verified-against-the-table pattern as `GenerateRandomCodeWithLength`, sized for a `Code[20]` field.
+- `GenerateRandomXMLText(Length)` performs no table lookup at all — it's a plain random-text generator, appropriate for a descriptive/incidental field where uniqueness doesn't matter, not for a value that needs to be collision-checked.
+
+Pick `GenerateRandomCodeWithLength`/`GenerateRandomCode20` when the test genuinely needs a code verified unique against the table; use `GenerateRandomCode`/`GenerateGUID`/`GenerateRandomXMLText` for incidental values where a low collision *chance* is enough.
 
 See sample: `use-generateguid-for-unique-test-fixture-values.good.al`.
 
