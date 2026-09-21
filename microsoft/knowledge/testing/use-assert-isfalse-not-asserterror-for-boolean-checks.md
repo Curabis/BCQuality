@@ -17,13 +17,13 @@ application-area: [all]
 
 When the code under test returns a `Boolean` rather than raising an error, assert the value directly with `Assert.IsFalse(SomeFunc(), Msg)` (or `Assert.IsTrue` for the positive case). Reserve `asserterror` for statements expected to actually raise an error.
 
-See sample: `use-assert-isfalse-not-asserterror-for-boolean-checks.good.al`.
+See sample: [`use-assert-isfalse-not-asserterror-for-boolean-checks.good.al`](use-assert-isfalse-not-asserterror-for-boolean-checks.good.al).
 
 ## Anti Pattern
 
 `asserterror Assert.IsTrue(SomeFunc(), Msg);` to verify `SomeFunc()` is `false`. It passes today because `Assert.IsTrue` happens to raise an error on failure, but it verifies the assertion helper's error-raising behavior, not the value under test.
 
-See sample: `use-assert-isfalse-not-asserterror-for-boolean-checks.bad.al`.
+See sample: [`use-assert-isfalse-not-asserterror-for-boolean-checks.bad.al`](use-assert-isfalse-not-asserterror-for-boolean-checks.bad.al).
 
 ## Source
 
