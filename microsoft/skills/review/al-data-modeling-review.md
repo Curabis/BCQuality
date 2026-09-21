@@ -16,7 +16,7 @@ application-area: [all]
 
 Reviews AL source changes against the `data-modeling` knowledge domain in BCQuality and emits a findings report. This is a leaf action skill: it invokes no sub-skills. It is one of the skills composed by `al-code-review`.
 
-An orchestrator invokes this skill with a `pr-diff`, `file-path`, or `folder-path`. Data-modeling findings are narrow by design — they apply when the review scope contains setup or master tables, their card pages, primary keys, number-series assignment, block enforcement, or audit fields. The skill returns `not-applicable` when none of those apply.
+An orchestrator invokes this skill with a `pr-diff`, `file-path`, or `folder-path`. Data-modeling findings are narrow by design — they apply when the review scope contains setup or master tables, their card pages, primary keys, number-series assignment, block enforcement, audit fields, dimension wiring, journal-based posting-routine structure, or Item Ledger Entry document-number lookups after a combined sales post. The skill returns `not-applicable` when none of those apply.
 
 ## Source
 
@@ -84,7 +84,7 @@ Outcome selection:
 
 - `completed` — the skill evaluated every worklist item.
 - `no-knowledge` — no applicable data-modeling knowledge survived filtering.
-- `not-applicable` — the diff touches no setup/master table, page, key, numbering, block-check, or audit-field surface.
+- `not-applicable` — the diff touches no setup/master table, page, key, numbering, block-check, audit-field, dimension-wiring, posting-routine-structure, or Item-Ledger-Entry-document-number surface.
 - `partial` — a budget was hit before the worklist was exhausted.
 - `failed` — an unrecoverable error occurred.
 

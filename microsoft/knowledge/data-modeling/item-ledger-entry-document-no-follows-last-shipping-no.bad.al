@@ -7,6 +7,6 @@ codeunit 50130 "Sample Item Ledger Lookup"
     begin
         InvoiceNo := LibrarySales.PostSalesDocument(SalesHeader, true, true);
         ItemLedgerEntry.SetRange("Document No.", InvoiceNo);
-        ItemLedgerEntry.FindSet();
+        if ItemLedgerEntry.FindSet() then;
     end;
 }

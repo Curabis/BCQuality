@@ -17,10 +17,10 @@ Posting a sales order with both Ship and Invoice in one call creates the Item Le
 
 After posting a sales order with Ship and Invoice together, read `SalesHeader."Last Shipping No."` (populated during the post) and filter Item Ledger Entry by that value, not by the invoice number the posting routine returns.
 
-See sample: `item-ledger-entry-document-no-follows-last-shipping-no.good.al`.
+See sample: [`item-ledger-entry-document-no-follows-last-shipping-no.good.al`](item-ledger-entry-document-no-follows-last-shipping-no.good.al).
 
 ## Anti Pattern
 
 Filtering Item Ledger Entry by the posted sales invoice number after a combined Ship-and-Invoice post. The filter compiles and runs without error but matches zero rows, because the entry belongs to the shipment leg of the posting, not the invoice leg.
 
-See sample: `item-ledger-entry-document-no-follows-last-shipping-no.bad.al`.
+See sample: [`item-ledger-entry-document-no-follows-last-shipping-no.bad.al`](item-ledger-entry-document-no-follows-last-shipping-no.bad.al).

@@ -17,10 +17,10 @@ Whether a field can actually be changed is a distinct state from whether it is s
 
 Open the `TestPage` with `OpenEdit()`, navigate to the relevant record, then assert against `TestPageField.Editable()` to verify whether the field can be changed under the given precondition.
 
-See sample: `use-testpage-editable-to-verify-field-editability.good.al`.
+See sample: [`use-testpage-editable-to-verify-field-editability.good.al`](use-testpage-editable-to-verify-field-editability.good.al).
 
 ## Anti Pattern
 
 Asserting `Enabled()` (or checking nothing at all) when the actual claim is about editability, or opening the page with `OpenView()` when the field's editability depends on business logic that only applies in edit mode.
 
-See sample: `use-testpage-editable-to-verify-field-editability.bad.al`.
+See sample: [`use-testpage-editable-to-verify-field-editability.bad.al`](use-testpage-editable-to-verify-field-editability.bad.al).

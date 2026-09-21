@@ -8,6 +8,6 @@ codeunit 50130 "Sample Item Ledger Lookup"
         LibrarySales.PostSalesDocument(SalesHeader, true, true);
         ShippingNo := SalesHeader."Last Shipping No.";
         ItemLedgerEntry.SetRange("Document No.", ShippingNo);
-        ItemLedgerEntry.FindSet();
+        if ItemLedgerEntry.FindSet() then;
     end;
 }
