@@ -14,7 +14,7 @@ codeunit 50101 "Meter Jnl.-Post Line"
     var
         MeterLedgEntry: Record "Meter Ledger Entry";
     begin
-        // Writes exactly one ledger entry; never touches the Journal table.
+        // Posts exactly one journal line; never touches the Journal table.
         MeterLedgEntry.Init();
         MeterLedgEntry.TransferFields(MeterJnlLine);
         MeterLedgEntry.Insert();

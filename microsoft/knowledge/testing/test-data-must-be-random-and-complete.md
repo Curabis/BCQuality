@@ -13,7 +13,7 @@ application-area: [all]
 
 ## Description
 
-A BC test company normally contains initialized system/setup data — an AL test suite should not assume an empty database, but it must be independent of unrelated business records: create the records and setup it owns rather than looking up a specific code, number, or name assumed to already exist, since that makes the test fail for reasons unrelated to the code under test. Every mandatory field on a created record also needs a value that respects its declared length; a partial setup that merely passes validation is not sufficient.
+A BC test company normally contains initialized system/setup data — an AL test suite should not assume an empty database, but it must be independent of unrelated business records: create the records and setup it owns rather than looking up a specific code, number, or name assumed to already exist, since that makes the test fail for reasons unrelated to the code under test. Every mandatory field on a created record also needs an actual value — leaving one blank because setup-time validation happens to allow it produces a record that doesn't reflect a real one and can fail later, elsewhere in the flow (posting, a report, a later assertion), for a reason unrelated to what the test claims to check. A short-but-valid value is not itself a defect: AL field lengths are maxima, not minimums, so a two-character value in a `Text[100]` field is fine unless the scenario specifically depends on the field's length or shape — for example, a test that verifies truncation or a format check needs a value chosen to exercise that boundary, not an arbitrary short one.
 
 Not every value should be generated, though. Incidental fixture data — identifiers, names, descriptions — should generally come from the standard library codeunits rather than be tied to specific existing data. But values that materially define the scenario under test — amounts, quantities, percentages, dates, thresholds, rounding precision — should stay explicit and deliberately chosen, not randomized: a rounding test needs values placed deliberately around the rounding boundary, not a random one that might miss it entirely.
 
@@ -25,6 +25,6 @@ See sample: `test-data-must-be-random-and-complete.good.al`.
 
 ## Anti Pattern
 
-Looking up a record assumed to already exist (a hardcoded payment method or customer number) instead of creating it, or leaving mandatory fields empty or underfilled because validation happens to allow it.
+Looking up a record assumed to already exist (a hardcoded payment method or customer number) instead of creating it, or leaving a mandatory field empty because setup-time validation happens to allow it. Also an anti-pattern, narrower: using a value that doesn't satisfy a scenario's explicit length or format requirement — for example a truncation test that never actually exceeds the field it's meant to overflow.
 
 See sample: `test-data-must-be-random-and-complete.bad.al`.

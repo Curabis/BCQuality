@@ -17,7 +17,7 @@ A stored field whose value is derived from other fields inside an `OnValidate` t
 
 ## Best Practice
 
-Recalculate the derived value in `OnAfterGetRecord` from its authoritative source — typically a FlowField — using a page-level variable, and expose both the recalculated value and the source field so the consumer can verify it.
+Recalculate the derived value in `OnAfterGetRecord` from its authoritative source — typically a FlowField — using a page-level variable, and expose that recalculated value instead of the stale stored field. Whether to also expose the source fields is a separate design decision, not a requirement of this pattern; keep the API contract scoped to what consumers actually need. If letting the consumer verify the recalculation is itself a requirement, expose every field the calculation reads, not just one of them — a derived value with two inputs needs both exposed, or the "verification" is incomplete.
 
 See sample: `stored-derived-fields-must-not-be-exposed-directly.good.al`.
 

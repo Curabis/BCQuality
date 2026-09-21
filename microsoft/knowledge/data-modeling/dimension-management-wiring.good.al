@@ -15,7 +15,7 @@ table 50100 "Course"
                 DimMgt: Codeunit DimensionManagement;
             begin
                 DimMgt.ValidateDimValueCode(1, "Global Dimension 1 Code");
-                DimMgt.SaveDefaultDim(Database::Course, "No.", FieldNo("Global Dimension 1 Code"), "Global Dimension 1 Code");
+                DimMgt.SaveDefaultDim(Database::Course, "No.", 1, "Global Dimension 1 Code");
             end;
         }
     }
@@ -74,9 +74,14 @@ table 50101 "Course Registration Header"
         if not Customer.Get("Customer No.") then
             exit;
 
+        // Recompute from scratch (InheritFromDimSetID = 0): passing the existing
+        // "Dimension Set ID" here would inherit dimensions from whichever record
+        // the document was previously linked to, retaining them even after the
+        // new customer's defaults have nothing for that dimension.
+        "Shortcut Dimension 1 Code" := '';
         DimMgt.AddDimSource(DefaultDimSource, Database::Customer, "Customer No.");
         "Dimension Set ID" :=
             DimMgt.GetDefaultDimID(
-                DefaultDimSource, '', "Shortcut Dimension 1 Code", GlobalDim2Code, "Dimension Set ID", 0);
+                DefaultDimSource, '', "Shortcut Dimension 1 Code", GlobalDim2Code, 0, 0);
     end;
 }

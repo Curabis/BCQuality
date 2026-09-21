@@ -15,6 +15,7 @@ page 50102 "Project Task API"
             repeater(General)
             {
                 field(remainingHours; RemainingHoursCalc) { }
+                field(budgetedHours; Rec."Budgeted Hours") { }
                 field(hoursUsed; Rec."Hours Used") { }
             }
         }
