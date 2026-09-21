@@ -17,13 +17,13 @@ This is a testing-design practice, not a BC platform requirement — no AL API e
 
 Give each test one `[WHEN]` and one focused claim. A procedure name containing "And" or "Then" in the middle (`GetPrice_AndDiscount_ReturnsValues`) is a strong signal the test should be split.
 
-See sample: `test-one-when-per-test.good.al`.
+See sample: [`test-one-when-per-test.good.al`](test-one-when-per-test.good.al).
 
 ## Anti Pattern
 
 A test that performs a first action, then a second unrelated action, then asserts on both — mixing two falsifiable claims into one procedure so a failure can't tell you which action broke.
 
-See sample: `test-one-when-per-test.bad.al`.
+See sample: [`test-one-when-per-test.bad.al`](test-one-when-per-test.bad.al).
 
 ## Flow tests — a deliberate exception
 

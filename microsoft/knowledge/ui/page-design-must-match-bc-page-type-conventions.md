@@ -12,8 +12,13 @@ application-area: [all]
 ## Description
 
 Business Central's page types — RoleCenter, Card, List, CardPart,
-ListPart, Worksheet, Document, ListPlus, plus the system dialog types
-(Navigate, ConfirmationDialog, StandardDialog, HeadlinePart, API) — each
+ListPart, Worksheet, Document, ListPlus, plus system dialog/special
+types such as `NavigatePage`, `ConfirmationDialog`, `StandardDialog`,
+`HeadlinePart`, and `API` (a selected list of conventional types this
+article covers design conventions for — not an exhaustive catalogue of
+every current `PageType` value; `PromptDialog`, `ConfigurationDialog`,
+`UserControlHost`, and `XmlPort` also exist but follow their own
+design rules, out of scope here) — each
 fix a naming pattern and a structural constraint, not just a visual
 layout. A page whose name, primary-key handling, or linkage
 (`CardPageID`, `SubPageLink`, `AutoSplitKey`) doesn't match its own type's
@@ -56,7 +61,7 @@ Match the page's design to its type:
   header; named for the document (`Sales Invoice`).
 - **ListPlus** — like Document but with multiple lists instead of one;
   named like the record/report it summarizes.
-- System dialog types (`Navigate`, `ConfirmationDialog`,
+- System dialog types (`NavigatePage`, `ConfirmationDialog`,
   `StandardDialog`, `HeadlinePart`) are fixed shapes with no page-name
   suffix convention. `API` pages follow their own property rules and are
   extended by adding a new API page, never a page extension.
@@ -66,7 +71,7 @@ tasks the page serves, the concrete fields/commands/links those tasks
 need, the page type that matches the content (chosen before the source
 table), and the source table that actually holds the page's primary data.
 
-See sample: `page-design-must-match-bc-page-type-conventions.good.al`.
+See sample: [`page-design-must-match-bc-page-type-conventions.good.al`](page-design-must-match-bc-page-type-conventions.good.al).
 
 ## Anti Pattern
 
@@ -82,4 +87,4 @@ and pages intended only to be reached through another workflow correctly
 have no `UsageCategory` — flag its absence only on a page intended as a
 searchable entry point in its own right.
 
-See sample: `page-design-must-match-bc-page-type-conventions.bad.al`.
+See sample: [`page-design-must-match-bc-page-type-conventions.bad.al`](page-design-must-match-bc-page-type-conventions.bad.al).

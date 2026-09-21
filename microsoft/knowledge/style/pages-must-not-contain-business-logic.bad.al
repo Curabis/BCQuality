@@ -11,7 +11,7 @@ page 50100 "Sales Line Card"
             {
                 trigger OnAction()
                 begin
-                    Rec."Total Amount" := Rec.Quantity * Rec."Unit Price";
+                    Rec."Line Amount" := Rec.Quantity * Rec."Unit Price";
                     Rec.Modify();
                 end;
             }

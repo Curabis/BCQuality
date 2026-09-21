@@ -16,6 +16,9 @@ begin
     LibraryPriceCalculation.CreateSalesPriceLine(
         PriceListLine, PriceListHeader.Code, "Price Source Type"::Customer, Customer."No.",
         "Price Asset Type"::Item, Item."No.");
+    // CreatePriceHeader leaves the list in Draft status, which price calculation ignores.
+    PriceListHeader.Validate(Status, PriceListHeader.Status::Active);
+    PriceListHeader.Modify(true);
     // [WHEN]
     LibrarySales.CreateSalesDocumentWithItem(
         SalesHeader, SalesLine, SalesHeader."Document Type"::Order, Customer."No.", Item."No.", 1, '', 0D);

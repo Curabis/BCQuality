@@ -19,13 +19,13 @@ Upgrade code runs unattended, once, against production data with no chance to in
 
 One tag check, one exit, one upgrade action — two levels deep at most.
 
-See sample: `upgrade-tag-logic-must-not-nest-deeply.good.al`.
+See sample: [`upgrade-tag-logic-must-not-nest-deeply.good.al`](upgrade-tag-logic-must-not-nest-deeply.good.al).
 
 ## Anti Pattern
 
 Nesting the tag check, a record loop, and a multi-branch business condition inside one procedure. Split the buried business condition into its own, separately tagged upgrade step instead.
 
-See sample: `upgrade-tag-logic-must-not-nest-deeply.bad.al`.
+See sample: [`upgrade-tag-logic-must-not-nest-deeply.bad.al`](upgrade-tag-logic-must-not-nest-deeply.bad.al).
 
 ## Source
 

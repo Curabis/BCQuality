@@ -17,10 +17,10 @@ Whether code should guard gracefully (defensive) or fail loudly (offensive/fail-
 
 Trace what a silently-defaulted or skipped value actually reaches before deciding how to guard it. If it reaches a posted ledger amount, a tax/VAT calculation, a quantity or price actually used in a transaction, or a legally/compliance-facing output, code offensively: let the lookup fail loud (`TestField`, an unguarded `Get()` expected to always succeed, or an explicit `Error`) so a human sees the problem before anything posts. If it is cosmetic, informational, or easily corrected after the fact (a display field, an optional UI enhancement, a report not yet run), code defensively — but the fallback must be an explicit, deliberately-chosen, named business value, never a blank or zero that is merely the datatype default. When genuinely unsure which category a field falls into, that is a question to resolve explicitly with whoever owns the requirement, not a coin flip.
 
-See sample: `defensive-vs-offensive-code-must-match-blast-radius.good.al`.
+See sample: [`defensive-vs-offensive-code-must-match-blast-radius.good.al`](defensive-vs-offensive-code-must-match-blast-radius.good.al).
 
 ## Anti Pattern
 
 Guarding two fields the same way purely out of habit, without analyzing what each one feeds. A low-blast-radius field, such as a customer's home page URL shown only for convenience on a printed document, and a high-blast-radius field, such as the VAT posting group that determines VAT actually applied to a posted transaction, are both wrapped in the same `if Header.Get(...) then ... else` pattern with a blank/zero fallback — leaving the posting-critical field free to post with a silently wrong value. A VAT registration number is not a safe stand-in for the low-risk side of this example: it is legally relevant, often validated, and can feed external VAT services or mandated document output, so it belongs on the offensive/fail-fast side alongside the posting group, not next to it as the "safe" contrast.
 
-See sample: `defensive-vs-offensive-code-must-match-blast-radius.bad.al`.
+See sample: [`defensive-vs-offensive-code-must-match-blast-radius.bad.al`](defensive-vs-offensive-code-must-match-blast-radius.bad.al).

@@ -22,10 +22,10 @@ A narrow set of patterns are conventional rather than violations:
 
 Delegate all business operations to a codeunit: the page owns presentation, the codeunit owns logic. A calculation or validation triggered from a page action should call a codeunit procedure rather than compute the result inline.
 
-See sample: `pages-must-not-contain-business-logic.good.al`.
+See sample: [`pages-must-not-contain-business-logic.good.al`](pages-must-not-contain-business-logic.good.al).
 
 ## Anti Pattern
 
 A cross-entry-point business rule or persisted mutation implemented only in a page trigger — calling `Rec.Modify()` to save a computed business value from `OnValidate`/`OnAction`, or a validation that must hold regardless of caller, instead of routed through a codeunit or the table's own field validation. A presentation-only calculation or a table-owned field invariant is not an instance of this anti-pattern.
 
-See sample: `pages-must-not-contain-business-logic.bad.al`.
+See sample: [`pages-must-not-contain-business-logic.bad.al`](pages-must-not-contain-business-logic.bad.al).

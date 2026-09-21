@@ -4,6 +4,8 @@ page 50102 "Vendor Contact Info API"
     APIPublisher = 'contoso';
     APIGroup = 'integration';
     APIVersion = 'v1.0';
+    EntityName = 'vendorContact';
+    EntitySetName = 'vendorContacts';
     SourceTable = Vendor;
     DelayedInsert = true;
     InsertAllowed = false;

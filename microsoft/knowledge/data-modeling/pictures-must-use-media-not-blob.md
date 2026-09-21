@@ -33,7 +33,7 @@ file attachment blob unrelated to picture rendering).
 Use `Media` for a single image, or `MediaSet` for multiple independent
 images, for any field that holds a picture.
 
-See sample: `pictures-must-use-media-not-blob.good.al`.
+See sample: [`pictures-must-use-media-not-blob.good.al`](pictures-must-use-media-not-blob.good.al).
 
 ## Anti Pattern
 
@@ -46,4 +46,4 @@ pattern: assuming `MediaSet` gives automatic image variants or thumbnails
 because it sounds like a collection with derived versions — it is only a
 collection of independently-imported media objects.
 
-See sample: `pictures-must-use-media-not-blob.bad.al`.
+See sample: [`pictures-must-use-media-not-blob.bad.al`](pictures-must-use-media-not-blob.bad.al).

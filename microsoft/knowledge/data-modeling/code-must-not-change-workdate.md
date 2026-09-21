@@ -42,7 +42,7 @@ to do something else must never write `WorkDate` as an incidental side
 effect; if a calculation needs a specific date, pass or compute that date
 as a local variable instead.
 
-See sample: `code-must-not-change-workdate.good.al`.
+See sample: [`code-must-not-change-workdate.good.al`](code-must-not-change-workdate.good.al).
 
 ## Anti Pattern
 
@@ -55,4 +55,4 @@ it. This is a different case from a test or demo-data routine explicitly
 declaring a date context: the anti-pattern is unrelated logic silently
 mutating state it does not own, not the setter form itself.
 
-See sample: `code-must-not-change-workdate.bad.al`.
+See sample: [`code-must-not-change-workdate.bad.al`](code-must-not-change-workdate.bad.al).

@@ -17,10 +17,10 @@ A general-purpose API page that exposes many fields should not be widened to all
 
 Create a separate, minimal API page that exposes only the key and the specific field the consumer needs to write, with everything else `Editable = false` or simply absent from the page — and set `InsertAllowed`/`DeleteAllowed` to `false` unless the consumer's use case genuinely needs to create or delete records through that page.
 
-See sample: `api-page-least-privilege-write-access.good.al`.
+See sample: [`api-page-least-privilege-write-access.good.al`](api-page-least-privilege-write-access.good.al).
 
 ## Anti Pattern
 
 Widening an existing general-purpose API page with write access to one field, leaving every other field on the page (including identity and posting fields) writable by default because no one added `Editable = false`.
 
-See sample: `api-page-least-privilege-write-access.bad.al`.
+See sample: [`api-page-least-privilege-write-access.bad.al`](api-page-least-privilege-write-access.bad.al).

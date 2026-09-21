@@ -17,10 +17,10 @@ A test codeunit that drives pages through `TestPage` — opening pages, reading 
 
 Keep UI-layer (`TestPage`-driven) and logic-layer tests in separate codeunits regardless of naming. Projects that adopt a `_UT`-style suffix convention should apply it consistently to every UI-layer test codeunit, keep the corresponding logic-only codeunit unsuffixed, and document the convention where the team's other naming rules live.
 
-See sample: `ui-test-codeunit-naming.good.al`.
+See sample: [`ui-test-codeunit-naming.good.al`](ui-test-codeunit-naming.good.al).
 
 ## Anti Pattern
 
 One codeunit that mixes a direct logic-call test and a `TestPage`-driven test side by side — a failing test no longer tells a reader which layer actually broke. On a project that has adopted the `_UT` convention, a UI-layer codeunit missing the suffix is also an instance of this anti-pattern; on a project that has not adopted it, the suffix itself is not required.
 
-See sample: `ui-test-codeunit-naming.bad.al`.
+See sample: [`ui-test-codeunit-naming.bad.al`](ui-test-codeunit-naming.bad.al).

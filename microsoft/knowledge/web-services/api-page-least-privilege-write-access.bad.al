@@ -4,6 +4,8 @@ page 50100 "Vendor Document API"
     APIPublisher = 'contoso';
     APIGroup = 'documents';
     APIVersion = 'v1.0';
+    EntityName = 'vendorDocument';
+    EntitySetName = 'vendorDocuments';
     SourceTable = Vendor;
     // no InsertAllowed/ModifyAllowed override, no Editable = false anywhere
 

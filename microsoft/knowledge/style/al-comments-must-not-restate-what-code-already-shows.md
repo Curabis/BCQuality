@@ -21,10 +21,10 @@ This does not override required structural documentation — feature/scenario te
 
 Let the code speak for itself; reserve comments for the reason a reader could not otherwise infer.
 
-See sample: `al-comments-must-not-restate-what-code-already-shows.good.al`.
+See sample: [`al-comments-must-not-restate-what-code-already-shows.good.al`](al-comments-must-not-restate-what-code-already-shows.good.al).
 
 ## Anti Pattern
 
 A comment line before every statement, repeating in English what the statement's own identifiers already say.
 
-See sample: `al-comments-must-not-restate-what-code-already-shows.bad.al`.
+See sample: [`al-comments-must-not-restate-what-code-already-shows.bad.al`](al-comments-must-not-restate-what-code-already-shows.bad.al).

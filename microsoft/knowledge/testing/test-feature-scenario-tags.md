@@ -17,10 +17,10 @@ Test codeunits are easier to trust and to review when they carry a four-level co
 
 Put `[FEATURE]` as a comment before the codeunit's opening brace, naming the domain rather than the object — Microsoft's own guidance allows setting it once for the whole codeunit, inherited by every test in it. Put `[SCENARIO]`, matching the current BCApps corpus, as the first comment inside each test procedure's body (after `begin`), describing the scenario in business language that complements — not duplicates — the procedure name, followed by `[GIVEN]` marking the precondition setup, `[WHEN]` marking the single action under test, and `[THEN]` marking the assertions. The procedure name stays the machine-readable identity shown in test-runner output; the `[SCENARIO]` comment stays the human-readable one. Neither replaces the other.
 
-See sample: `test-feature-scenario-tags.good.al`.
+See sample: [`test-feature-scenario-tags.good.al`](test-feature-scenario-tags.good.al).
 
 ## Anti Pattern
 
 A test procedure with no `[FEATURE]`/`[SCENARIO]`/`[GIVEN]`/`[WHEN]`/`[THEN]` structure, setup mixed freely with assertions, and a procedure name like `Test1` that says nothing about what is being verified. Nothing in the codeunit tells a reader what business rule it exists to protect.
 
-See sample: `test-feature-scenario-tags.bad.al`.
+See sample: [`test-feature-scenario-tags.bad.al`](test-feature-scenario-tags.bad.al).

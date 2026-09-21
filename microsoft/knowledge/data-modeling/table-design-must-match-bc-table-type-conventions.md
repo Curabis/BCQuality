@@ -72,7 +72,7 @@ table with a real business-field key and no page), say so explicitly
 rather than forcing a classification; settling it requires checking actual
 row cardinality or call sites, not just the object definition.
 
-See sample: `table-design-must-match-bc-table-type-conventions.good.al`.
+See sample: [`table-design-must-match-bc-table-type-conventions.good.al`](table-design-must-match-bc-table-type-conventions.good.al).
 
 ## Anti Pattern
 
@@ -83,4 +83,4 @@ a design step. A Ledger table's `Entry No.` must come only from the
 posting routine; exposing it as an editable field breaks the type's core
 guarantee that entries are an immutable, sequential audit trail.
 
-See sample: `table-design-must-match-bc-table-type-conventions.bad.al`.
+See sample: [`table-design-must-match-bc-table-type-conventions.bad.al`](table-design-must-match-bc-table-type-conventions.bad.al).

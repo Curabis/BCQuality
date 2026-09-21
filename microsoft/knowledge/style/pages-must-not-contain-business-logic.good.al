@@ -2,7 +2,7 @@ codeunit 50100 "Sales Line Management"
 {
     procedure RecalculateLine(var SalesLine: Record "Sales Line")
     begin
-        SalesLine."Total Amount" := SalesLine.Quantity * SalesLine."Unit Price";
+        SalesLine."Line Amount" := SalesLine.Quantity * SalesLine."Unit Price";
         SalesLine.Modify();
     end;
 }
