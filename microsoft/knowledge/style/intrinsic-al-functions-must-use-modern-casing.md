@@ -19,10 +19,10 @@ AL is case-insensitive, so `MESSAGE(...)`, `ERROR(...)`, `CONFIRM(...)`, and `ST
 
 Call intrinsic functions in their modern, PascalCase form.
 
-See sample: `intrinsic-al-functions-must-use-modern-casing.good.al`.
+See sample: [`intrinsic-al-functions-must-use-modern-casing.good.al`](intrinsic-al-functions-must-use-modern-casing.good.al).
 
 ## Anti Pattern
 
 ALL-CAPS intrinsic function calls trip no compiler error, but they are a reliable signal that a code block was copied from old C/AL material or outdated training content rather than written against current AL conventions.
 
-See sample: `intrinsic-al-functions-must-use-modern-casing.bad.al`.
+See sample: [`intrinsic-al-functions-must-use-modern-casing.bad.al`](intrinsic-al-functions-must-use-modern-casing.bad.al).

@@ -21,10 +21,10 @@ Not every value should be generated, though. Incidental fixture data — identif
 
 Use the standard library codeunits (`Library - ERM`, `Library - Inventory`, `Library - Sales`, `Library - Utility`) to generate incidental fixture values — they produce valid, unique-enough data via number series and controlled randomness, not a mathematical collision-free guarantee — and fill every mandatory field with correctly-sized data. Keep values that define the scenario's expected outcome explicit and fixed. Reserve hardcoded values for tests that validate an external contract itself — a fixed JSON schema, an EDIFACT message, a counterparty code — where the hardcoded value documents the specification rather than arbitrary test logic.
 
-See sample: `test-data-must-be-random-and-complete.good.al`.
+See sample: [`test-data-must-be-random-and-complete.good.al`](test-data-must-be-random-and-complete.good.al).
 
 ## Anti Pattern
 
 Looking up a record assumed to already exist (a hardcoded payment method or customer number) instead of creating it, or leaving a mandatory field empty because setup-time validation happens to allow it. Also an anti-pattern, narrower: using a value that doesn't satisfy a scenario's explicit length or format requirement — for example a truncation test that never actually exceeds the field it's meant to overflow.
 
-See sample: `test-data-must-be-random-and-complete.bad.al`.
+See sample: [`test-data-must-be-random-and-complete.bad.al`](test-data-must-be-random-and-complete.bad.al).

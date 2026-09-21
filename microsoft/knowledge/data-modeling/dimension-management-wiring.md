@@ -26,10 +26,10 @@ For a master table, validate each shortcut dimension field through `ValidateDimV
 
 For a document table, when the field that attaches the document to a master record changes (e.g. `Customer No.`), call `AddDimSource` naming that master table and key, then `GetDefaultDimID` to compute the document's new `Dimension Set ID`, inheriting the master's Default Dimension records. Pass `0` for `GetDefaultDimID`'s `InheritFromDimSetID` argument in this case — passing the document's *existing* `Dimension Set ID` instead inherits whatever dimensions were already in it, so a value the previous linked record supplied can survive into the new one even where the new record has no default for that dimension. Validate the document's own Shortcut Dimension fields through `ValidateShortcutDimValues`, which updates that same `Dimension Set ID` in place rather than persisting a separate Default Dimension record.
 
-See sample: `dimension-management-wiring.good.al`.
+See sample: [`dimension-management-wiring.good.al`](dimension-management-wiring.good.al).
 
 ## Anti Pattern
 
 Adding a dimension-looking field with only a `TableRelation` to Dimension Value, and no call into `DimensionManagement` at all. The field accepts input but never becomes a real Default Dimension record, so it does not validate against blocked values and does not flow into postings.
 
-See sample: `dimension-management-wiring.bad.al`.
+See sample: [`dimension-management-wiring.bad.al`](dimension-management-wiring.bad.al).

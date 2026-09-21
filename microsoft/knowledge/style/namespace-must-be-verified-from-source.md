@@ -19,10 +19,10 @@ Since Business Central 2024 release wave 1, Microsoft's own objects are organize
 
 When referencing an existing AL object, resolve its namespace from that object's actual source file or symbol definition — never infer or invent one from its name, functional area, or naming convention.
 
-See sample: `namespace-must-be-verified-from-source.good.al`.
+See sample: [`namespace-must-be-verified-from-source.good.al`](namespace-must-be-verified-from-source.good.al).
 
 ## Anti Pattern
 
 Writing a `using` statement from memory, from an incomplete path, or from a plausible-looking guess. It can appear correct while actually resolving to the wrong object, or fail to resolve, once checked against stale or mismatched symbols, a different build configuration, or the object's actual current source — not because the compiler and the AL Language Server apply different namespace-resolution rules; they don't.
 
-See sample: `namespace-must-be-verified-from-source.bad.al`.
+See sample: [`namespace-must-be-verified-from-source.bad.al`](namespace-must-be-verified-from-source.bad.al).

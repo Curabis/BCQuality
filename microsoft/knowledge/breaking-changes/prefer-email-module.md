@@ -19,10 +19,10 @@ Older AL code sends email by calling `Codeunit Mail (397)`. Business Central's c
 
 Build on `Codeunit Email` and `Codeunit "Email Message"`. Route the message through an `Email Scenario` so different document types can use different accounts without the calling code needing to know which account that is, and get a tracked Sent/Outbox/Draft record for free.
 
-See sample: `prefer-email-module.good.al`.
+See sample: [`prefer-email-module.good.al`](prefer-email-module.good.al).
 
 ## Anti Pattern
 
 Calling `Codeunit Mail`'s `CreateMessage`. It still compiles and runs, but current `Codeunit Mail`'s own implementation of `CreateMessage` no longer sends anything by itself — it only raises integration events for a legacy subscriber to act on — so building new code on it means depending on whatever compatibility shim happens to still be wired up, with no first-class connector selection and no queryable Sent/Outbox/Draft record. `Send` and `GetErrorDesc` are not current members of `Codeunit Mail` at all; do not reference them.
 
-See sample: `prefer-email-module.bad.al`.
+See sample: [`prefer-email-module.bad.al`](prefer-email-module.bad.al).

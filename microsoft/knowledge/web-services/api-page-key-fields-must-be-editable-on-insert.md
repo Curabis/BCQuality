@@ -19,10 +19,10 @@ A field listed in `ODataKeyFields` cannot have `Editable = false` when the API p
 
 Leave every consumer-supplied key field referenced in `ODataKeyFields` without `Editable = false` on pages where `InsertAllowed = true`, so the OData layer accepts it as a writable property on POST.
 
-See sample: `api-page-key-fields-must-be-editable-on-insert.good.al`.
+See sample: [`api-page-key-fields-must-be-editable-on-insert.good.al`](api-page-key-fields-must-be-editable-on-insert.good.al).
 
 ## Anti Pattern
 
 Marking a consumer-provided key field `Editable = false`, out of habit or for perceived safety. This silently breaks create operations with a generic `BadRequest` instead of a clear validation error.
 
-See sample: `api-page-key-fields-must-be-editable-on-insert.bad.al`.
+See sample: [`api-page-key-fields-must-be-editable-on-insert.bad.al`](api-page-key-fields-must-be-editable-on-insert.bad.al).

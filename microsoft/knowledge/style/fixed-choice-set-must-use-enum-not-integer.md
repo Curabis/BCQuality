@@ -19,10 +19,10 @@ When a variable or field represents a fixed set of named, mutually exclusive sta
 
 Declare an `Enum` with named values and branch on the enum value, not a raw number.
 
-See sample: `fixed-choice-set-must-use-enum-not-integer.good.al`.
+See sample: [`fixed-choice-set-must-use-enum-not-integer.good.al`](fixed-choice-set-must-use-enum-not-integer.good.al).
 
 ## Anti Pattern
 
 Using a plain `Integer` field with the meaning of each value tracked only in a comment pushes the documentation of the states into something the compiler cannot check and a future maintainer cannot rely on.
 
-See sample: `fixed-choice-set-must-use-enum-not-integer.bad.al`.
+See sample: [`fixed-choice-set-must-use-enum-not-integer.bad.al`](fixed-choice-set-must-use-enum-not-integer.bad.al).

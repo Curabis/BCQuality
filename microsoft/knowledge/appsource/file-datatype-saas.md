@@ -19,10 +19,10 @@ The classic `File` variable type — `Open`/`Create`/`Read`/`Write`/`Close` agai
 
 Use the stream-based equivalents: `UploadIntoStream` to read user-selected file content into an `InStream`, and `DownloadFromStream` to write an `OutStream`'s content to a file the user saves. Stage the content in a `TempBlob` between the stream and the rest of the parsing/formatting code.
 
-See sample: `file-datatype-saas.good.al`.
+See sample: [`file-datatype-saas.good.al`](file-datatype-saas.good.al).
 
 ## Anti Pattern
 
 Opening a hardcoded or user-supplied filesystem path with the `File` variable type. This is a strong signal the code was written for on-premises only, or copied from material that predates the cloud-first streaming APIs.
 
-See sample: `file-datatype-saas.bad.al`.
+See sample: [`file-datatype-saas.bad.al`](file-datatype-saas.bad.al).

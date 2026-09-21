@@ -19,10 +19,10 @@ A procedure that reads a field from a setup or configuration table inside a bran
 
 Once a business rule has decided that a setup-table field's value is required for a branch to behave correctly, call `TestField` on it before use, even though a plain read would "work" by returning a blank or zero without erroring. Write a test that blanks the setup field and asserts the resulting error, so the guard itself is verified rather than merely present.
 
-See sample: `testfield-required-setup-field.good.al`.
+See sample: [`testfield-required-setup-field.good.al`](testfield-required-setup-field.good.al).
 
 ## Anti Pattern
 
 Reading a required setup-table field behind a presence check that falls through to a default value instead of erroring. This looks defensive because it never crashes, but it converts "administrator forgot to configure this" into "system silently did something else" — worse than a hard failure, because nobody is told anything went wrong.
 
-See sample: `testfield-required-setup-field.bad.al`.
+See sample: [`testfield-required-setup-field.bad.al`](testfield-required-setup-field.bad.al).

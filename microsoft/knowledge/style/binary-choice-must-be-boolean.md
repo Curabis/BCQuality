@@ -19,10 +19,10 @@ When a field or variable represents a genuine true/false state — yes/no, on/of
 
 Type a field or variable as `Boolean` when the domain concept is inherently a true/false state. Do not replace a meaningful two-option domain model with a Boolean solely because it currently has two values.
 
-See sample: `binary-choice-must-be-boolean.good.al`.
+See sample: [`binary-choice-must-be-boolean.good.al`](binary-choice-must-be-boolean.good.al).
 
 ## Anti Pattern
 
 Modeling a yes/no choice as an `Option` with two members, or as an `Integer` with magic-number values, forces every caller to remember which value means what and leaves room for a meaningless third value.
 
-See sample: `binary-choice-must-be-boolean.bad.al`.
+See sample: [`binary-choice-must-be-boolean.bad.al`](binary-choice-must-be-boolean.bad.al).

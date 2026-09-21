@@ -25,10 +25,10 @@ For document reports, prefer a `Word` layout (`DefaultRenderingLayout = Word`) o
 - [Creating an RDL layout report](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-report-performance)
 - [Troubleshooting reports / Report performance](https://learn.microsoft.com/en-us/dynamics365/business-central/dev-itpro/developer/devenv-reports-troubleshooting)
 
-See sample: `document-report-word-layout.good.al`.
+See sample: [`document-report-word-layout.good.al`](document-report-word-layout.good.al).
 
 ## Anti Pattern
 
 Defaulting a document report's layout to RDLC out of habit or because a template happened to use it. This inherits RDLC's sandboxed-app-domain performance cost with no benefit tied to the report's actual content or calculation needs.
 
-See sample: `document-report-word-layout.bad.al`.
+See sample: [`document-report-word-layout.bad.al`](document-report-word-layout.bad.al).

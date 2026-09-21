@@ -19,10 +19,10 @@ All AL identifiers — variables, procedures, parameters, fields, object names, 
 
 Write every identifier in English, and translate developer intent rather than transliterating it — when a requirement is described in another language, the resulting variable, procedure, and field names should still read as English. Captions and tooltips may carry target-language text in the source file, with locale translations managed through XLIFF.
 
-See sample: `al-identifiers-english.good.al`.
+See sample: [`al-identifiers-english.good.al`](al-identifiers-english.good.al).
 
 ## Anti Pattern
 
 Using native-language identifiers such as a Danish variable or procedure name in AL source code, relying on the fact that the code still compiles and runs correctly. This makes the code unreadable to non-native-language contributors and mixes localization concerns into source that should stay language-neutral.
 
-See sample: `al-identifiers-english.bad.al`.
+See sample: [`al-identifiers-english.bad.al`](al-identifiers-english.bad.al).

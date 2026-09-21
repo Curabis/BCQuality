@@ -19,10 +19,10 @@ When a procedure declares a parameter with `var`, that parameter is passed by re
 
 Declare a variable in the caller's scope and pass it to the `var` parameter.
 
-See sample: `var-parameters-require-an-addressable-variable.good.al`.
+See sample: [`var-parameters-require-an-addressable-variable.good.al`](var-parameters-require-an-addressable-variable.good.al).
 
 ## Anti Pattern
 
 Passing a literal or a computed expression to a `var` parameter position fails to compile, because neither has an address the callee can write back to.
 
-See sample: `var-parameters-require-an-addressable-variable.bad.al`.
+See sample: [`var-parameters-require-an-addressable-variable.bad.al`](var-parameters-require-an-addressable-variable.bad.al).
