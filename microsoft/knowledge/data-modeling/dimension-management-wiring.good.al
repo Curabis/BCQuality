@@ -71,15 +71,17 @@ table 50101 "Course Registration Header"
         DefaultDimSource: List of [Dictionary of [Integer, Code[20]]];
         GlobalDim2Code: Code[20];
     begin
-        if not Customer.Get("Customer No.") then
-            exit;
-
-        // Recompute from scratch (InheritFromDimSetID = 0): passing the existing
-        // "Dimension Set ID" here would inherit dimensions from whichever record
-        // the document was previously linked to, retaining them even after the
-        // new customer's defaults have nothing for that dimension.
+        // Recompute from scratch (InheritFromDimSetID = 0) whether or not the
+        // customer lookup succeeds. Passing the existing "Dimension Set ID"
+        // here would inherit dimensions from whichever record the document
+        // was previously linked to, and exiting early on a failed Get would
+        // leave that same stale data in place — both defeat the point of
+        // this procedure. Clearing the shortcut field and recomputing with
+        // an empty source list (when the customer doesn't exist) correctly
+        // clears the document's dimensions instead of leaving old ones.
         "Shortcut Dimension 1 Code" := '';
-        DimMgt.AddDimSource(DefaultDimSource, Database::Customer, "Customer No.");
+        if Customer.Get("Customer No.") then
+            DimMgt.AddDimSource(DefaultDimSource, Database::Customer, "Customer No.");
         "Dimension Set ID" :=
             DimMgt.GetDefaultDimID(
                 DefaultDimSource, '', "Shortcut Dimension 1 Code", GlobalDim2Code, 0, 0);

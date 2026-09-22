@@ -9,6 +9,7 @@ page 50101 "Customer Info API"
     SourceTable = Customer;
     ODataKeyFields = "No.";
     InsertAllowed = true;
+    DelayedInsert = true;
 
     layout
     {

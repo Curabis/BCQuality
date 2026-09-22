@@ -7,6 +7,7 @@ page 50102 "Project Task API"
     EntityName = 'projectTask';
     EntitySetName = 'projectTasks';
     SourceTable = "Project Task";
+    DelayedInsert = true;
 
     layout
     {
