@@ -3,6 +3,7 @@ codeunit 50142 "Sample Test Library"
     Subtype = Test;
 
     var
+        LibraryInventory: Codeunit "Library - Inventory";
         Initialized: Boolean;
         SharedItemNo: Code[20];
         RollBackMsg: Label 'Revert back the tables to their original state.';
@@ -21,9 +22,7 @@ codeunit 50142 "Sample Test Library"
     var
         Item: Record Item;
     begin
-        Item.Init();
-        Item."No." := 'SAMPLE-SHARED';
-        Item.Insert(true);
+        LibraryInventory.CreateItem(Item);
         SharedItemNo := Item."No.";
     end;
 
