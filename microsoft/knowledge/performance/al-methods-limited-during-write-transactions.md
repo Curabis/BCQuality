@@ -1,7 +1,7 @@
 ---
 bc-version: [all]
 domain: performance
-keywords: [limited-during-write-transactions, write-transaction, runmodal, form-runmodal, page-runmodal, report-runmodal, xmlport-run, codeunit-run, commit, requestpage]
+keywords: [limited-during-write-transactions, write-transaction, runmodal, report-run, page-runmodal, report-runmodal, xmlport-run, codeunit-run, commit, requestpage]
 technologies: [al]
 countries: [w1]
 application-area: [all]
@@ -14,7 +14,7 @@ application-area: [all]
 Once AL code has written to the database in the current transaction — an `Insert`, `Modify`, or `Delete` with no `Commit` since — the platform restricts four methods until that transaction is committed. The exact conditions, as enforced:
 
 - `Page.RunModal` — not allowed in a write transaction, under any circumstances.
-- `Report.RunModal` — allowed only if the request page is suppressed: `Report.RunModal(ReportId, false)` (the second argument is `RequestWindow`), or `UseRequestPage(false)` on a report instance. With a request page it fails.
+- `Report.RunModal` and `Report.Run` — both allowed only if the request page is suppressed: `Report.RunModal(ReportId, false)` / `Report.Run(ReportId, false)` (the second argument is `RequestWindow` in both), or `UseRequestPage(false)` on a report instance. With a request page shown, either fails identically — `Run` and `RunModal` differ only in whether the report instance is cleared afterward, not in this guard.
 - `Xmlport.Run` — same rule when it would show a request page: allowed only if the request page is suppressed, `Xmlport.Run(XmlPortId, false)` (the second argument is `RequestWindow`) or the `UseRequestPage = false;` object property. With a request page shown it fails. There is no `XmlPort.RunModal` method — see the note on the platform's error text below.
 - `Codeunit.Run` — allowed only if its Boolean return value is not used. `OK := Codeunit.Run()` and `if Codeunit.Run() then` fail, because that form commits — see `codeunit-run-requires-prior-commit-inside-transaction.md`.
 
