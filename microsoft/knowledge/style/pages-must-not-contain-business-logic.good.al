@@ -1,16 +1,45 @@
-codeunit 50100 "Sales Line Management"
+table 50101 "Sample Order Line"
 {
-    procedure RecalculateLine(var SalesLine: Record "Sales Line")
+    fields
+    {
+        field(1; "Document No."; Code[20]) { }
+        field(2; "Line No."; Integer) { }
+        field(10; Quantity; Decimal) { }
+        field(11; "Unit Price"; Decimal) { }
+        field(12; "Line Amount"; Decimal) { }
+    }
+    keys
+    {
+        key(PK; "Document No.", "Line No.") { Clustered = true; }
+    }
+}
+
+codeunit 50100 "Sample Order Line Management"
+{
+    procedure RecalculateLine(var OrderLine: Record "Sample Order Line")
     begin
-        SalesLine."Line Amount" := SalesLine.Quantity * SalesLine."Unit Price";
-        SalesLine.Modify();
+        OrderLine.Validate("Line Amount", OrderLine.Quantity * OrderLine."Unit Price");
+        OrderLine.Modify(true);
     end;
 }
 
-page 50100 "Sales Line Card"
+page 50100 "Sample Order Line Card"
 {
     PageType = Card;
-    SourceTable = "Sales Line";
+    SourceTable = "Sample Order Line";
+
+    layout
+    {
+        area(content)
+        {
+            repeater(General)
+            {
+                field(quantity; Rec.Quantity) { }
+                field(unitPrice; Rec."Unit Price") { }
+                field(lineAmount; Rec."Line Amount") { }
+            }
+        }
+    }
 
     actions
     {
@@ -20,12 +49,12 @@ page 50100 "Sales Line Card"
             {
                 trigger OnAction()
                 begin
-                    SalesLineMgt.RecalculateLine(Rec);
+                    OrderLineMgt.RecalculateLine(Rec);
                 end;
             }
         }
     }
 
     var
-        SalesLineMgt: Codeunit "Sales Line Management";
+        OrderLineMgt: Codeunit "Sample Order Line Management";
 }

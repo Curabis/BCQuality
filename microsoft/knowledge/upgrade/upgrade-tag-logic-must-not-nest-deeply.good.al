@@ -6,23 +6,35 @@ begin
     Customer.SetLoadFields("Discount %", "Customer Posting Group");
     if Customer.FindSet() then
         repeat
-            SetDefaultDiscountIfEligible(Customer);
+            // A business-data safety condition inside this one migration's
+            // loop is not a second migration hiding inside the first -
+            // Microsoft's own upgrade-tag example nests exactly this shape
+            // (a corruption guard, then a redundant-write guard) inside a
+            // single tagged procedure.
+            if (Customer."Discount %" = 0) and (Customer."Customer Posting Group" <> '') then begin
+                Customer."Discount %" := 5;
+                Customer.Modify();
+            end;
         until Customer.Next() = 0;
 
     UpgradeTag.SetUpgradeTag(GetCustomerDiscountFieldTag());
 end;
 
-local procedure SetDefaultDiscountIfEligible(var Customer: Record Customer)
+// A second, genuinely unrelated migration gets its own tag and its own
+// top-level procedure - not nested inside the first one's guarded body.
+local procedure UpgradeCustomerShippingAgentField()
 begin
-    // Both safety conditions from the original logic are preserved, just
-    // flattened into early exits instead of nested ifs: don't overwrite an
-    // already-set discount, and don't touch a customer with no posting
-    // group configured yet.
-    if Customer."Discount %" <> 0 then
-        exit;
-    if Customer."Customer Posting Group" = '' then
+    if UpgradeTag.HasUpgradeTag(GetCustomerShippingAgentFieldTag()) then
         exit;
 
-    Customer."Discount %" := 5;
-    Customer.Modify();
+    Customer.SetLoadFields("Shipping Agent Code");
+    if Customer.FindSet() then
+        repeat
+            if Customer."Shipping Agent Code" = '' then begin
+                Customer."Shipping Agent Code" := DefaultShippingAgentCode();
+                Customer.Modify();
+            end;
+        until Customer.Next() = 0;
+
+    UpgradeTag.SetUpgradeTag(GetCustomerShippingAgentFieldTag());
 end;

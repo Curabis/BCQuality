@@ -72,6 +72,19 @@ table with a real business-field key and no page), say so explicitly
 rather than forcing a classification; settling it requires checking actual
 row cardinality or call sites, not just the object definition.
 
+These nine types cover Business Central's *business-record* tables — they
+are not an exhaustive catalogue of every legitimate table shape. A
+temporary/buffer table, a work queue, a log or telemetry table, a
+cross-reference/mapping table with no business meaning of its own, or a
+staging/working table used only inside one process is not required to fit
+any of the nine, and forcing one into the nearest-looking type (usually
+Ledger, because it has an `Integer` key, or Subsidiary, because it has a
+composite key) produces a harmful redesign recommendation for a table that
+was never meant to carry that type's guarantees. Apply this rule only when
+the table's name, fields, or usage genuinely establish it as one of the
+nine business-record types; when nothing points that way, this rule simply
+does not apply — that is not the same as an unresolved classification.
+
 See sample: [`table-design-must-match-bc-table-type-conventions.good.al`](table-design-must-match-bc-table-type-conventions.good.al).
 
 ## Anti Pattern

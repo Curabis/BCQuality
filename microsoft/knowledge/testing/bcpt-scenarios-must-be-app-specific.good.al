@@ -14,15 +14,30 @@ codeunit 50100 "BCPT Create Service Request" implements "BCPT Test Param. Provid
     var
         GlobalBCPTTestContext: Codeunit "BCPT Test Context";
         CustomerNo: Code[20];
-        NextNo: Integer;
         IsInitialized: Boolean;
 
     local procedure InitTest()
     var
         Customer: Record Customer;
     begin
-        Customer.FindFirst();
+        // Do not assume a customer already exists: a BCPT run may target an
+        // otherwise-empty environment. Create one if none is found instead
+        // of failing on FindFirst().
+        if not Customer.FindFirst() then begin
+            Customer.Init();
+            Customer."No." := GenerateUniqueCode(MaxStrLen(Customer."No."));
+            Customer.Insert(true);
+        end;
         CustomerNo := Customer."No.";
+    end;
+
+    local procedure GenerateUniqueCode(Length: Integer): Code[20]
+    begin
+        // A GUID-derived code, not a session-local counter: it stays unique
+        // across concurrent BCPT sessions and repeated runs against the
+        // same environment, which an in-memory counter reset per session
+        // cannot guarantee.
+        exit(CopyStr(DelChr(Format(CreateGuid()), '=', '{}-'), 1, Length));
     end;
 
     local procedure CreateServiceRequest(var BCPTTestContext: Codeunit "BCPT Test Context")
@@ -31,9 +46,8 @@ codeunit 50100 "BCPT Create Service Request" implements "BCPT Test Param. Provid
         ServiceRequestLine: Record "Service Request Line";
     begin
         BCPTTestContext.StartScenario('Create Service Request Header');
-        NextNo += 1;
         ServiceRequestHeader.Init();
-        ServiceRequestHeader."No." := CopyStr(Format(NextNo), 1, MaxStrLen(ServiceRequestHeader."No."));
+        ServiceRequestHeader."No." := GenerateUniqueCode(MaxStrLen(ServiceRequestHeader."No."));
         ServiceRequestHeader.Validate("Customer No.", CustomerNo);
         ServiceRequestHeader.Insert(true);
         BCPTTestContext.EndScenario('Create Service Request Header');
