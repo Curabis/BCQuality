@@ -53,7 +53,7 @@ consistency requirement between definitions that are already meant to be
 linked, not a mandate to check every field against every table on the
 cascade.
 
-See sample: `transferfields-mirrored-fields-must-match-type-and-length.good.al`.
+See sample: [`transferfields-mirrored-fields-must-match-type-and-length.good.al`](transferfields-mirrored-fields-must-match-type-and-length.good.al).
 
 ## Anti Pattern
 
@@ -64,7 +64,7 @@ incompatible data type — on one side. Both definitions compile without
 error; nothing fails until an actual value exceeds the shorter one, which
 typical test data never does.
 
-See sample: `transferfields-mirrored-fields-must-match-type-and-length.bad.al`.
+See sample: [`transferfields-mirrored-fields-must-match-type-and-length.bad.al`](transferfields-mirrored-fields-must-match-type-and-length.bad.al).
 
 ## Source
 

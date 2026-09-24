@@ -57,7 +57,7 @@ font name to specify is literally `IDAutomation2D` (Maxicode itself uses
 purchased version name for that specific font (e.g. `IDAutomationHC39M`
 for Code 39), never a name containing `Demo`.
 
-See sample: `report-barcodes-must-use-barcode-module-and-production-font-name.good.al`.
+See sample: [`report-barcodes-must-use-barcode-module-and-production-font-name.good.al`](report-barcodes-must-use-barcode-module-and-production-font-name.good.al).
 
 ## Anti Pattern
 
@@ -75,7 +75,7 @@ in review and testing and fails silently — the first because the encoded
 data was never a real barcode, the second because Business Central
 online refuses to render it at all.
 
-See sample: `report-barcodes-must-use-barcode-module-and-production-font-name.bad.al`.
+See sample: [`report-barcodes-must-use-barcode-module-and-production-font-name.bad.al`](report-barcodes-must-use-barcode-module-and-production-font-name.bad.al).
 
 ## Source
 

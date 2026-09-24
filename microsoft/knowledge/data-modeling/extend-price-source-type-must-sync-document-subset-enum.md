@@ -39,7 +39,7 @@ price list, extend `Price Source Type` and the matching document subset
 enum (`Sales Price Source Type`, `Purchase Price Source Type`, `Job Price
 Source Type`) together, using the identical numeric ID in both.
 
-See sample: `extend-price-source-type-must-sync-document-subset-enum.good.al`.
+See sample: [`extend-price-source-type-must-sync-document-subset-enum.good.al`](extend-price-source-type-must-sync-document-subset-enum.good.al).
 
 ## Anti Pattern
 
@@ -50,7 +50,7 @@ absent from the "Applies-to Type" options on an actual sales price list,
 with no error anywhere: the base enum extension compiles and installs
 cleanly on its own.
 
-See sample: `extend-price-source-type-must-sync-document-subset-enum.bad.al`.
+See sample: [`extend-price-source-type-must-sync-document-subset-enum.bad.al`](extend-price-source-type-must-sync-document-subset-enum.bad.al).
 
 ## Source
 

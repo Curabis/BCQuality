@@ -51,7 +51,7 @@ legitimately, since that document posts to both ledgers, not by default.
    triad and the value is unreachable in Document Layouts; wire both sides
    needlessly and the picker is cluttered with a value that never applies.
 
-See sample: `extend-report-selection-usage-for-new-document-types.good.al`
+See sample: [`extend-report-selection-usage-for-new-document-types.good.al`](extend-report-selection-usage-for-new-document-types.good.al)
 (customer-only document — only the customer-side enum and triad added).
 
 ## Anti Pattern
@@ -60,7 +60,7 @@ See sample: `extend-report-selection-usage-for-new-document-types.good.al`
    subscribers. Works via the tenant-wide default, so it's invisible in
    testing — but Document Layouts shows the value's rows blank, can't offer
    it in the Usage dropdown, and "Copy from Report Selection" never lists
-   it. See sample: `extend-report-selection-usage-for-new-document-types.bad.al`.
+   it. See sample: [`extend-report-selection-usage-for-new-document-types.bad.al`](extend-report-selection-usage-for-new-document-types.bad.al).
 2. Subscribe both counterparties' triads for a one-sided document. This is
    the overbroad default Jesper Schulz-Wedde's review caught: it
    contradicts how `ReportSelectionHandlerCZZ` actually partitions its

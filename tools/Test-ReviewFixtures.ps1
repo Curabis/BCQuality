@@ -195,12 +195,42 @@ foreach ($domain in $leafDomains) {
     }
 
     $override = if ($overrides.ContainsKey($domain)) { $overrides[$domain] } else { $null }
-    $selectedArticle = $null
-    if ($override -and ($override.PSObject.Properties.Name -contains 'article')) {
-        $articleName = [string]$override.article
+    $hasArticleOverride = $override -and ($override.PSObject.Properties.Name -contains 'article')
+    $hasArticlesOverride = $override -and ($override.PSObject.Properties.Name -contains 'articles')
+    if ($hasArticleOverride -and $hasArticlesOverride) {
+        $problems.Add("${domain}: override must specify either 'article' or 'articles', not both.") | Out-Null
+        continue
+    }
+
+    $articleNames = @()
+    if ($hasArticlesOverride) {
+        $articleNames = @($override.articles)
+        if (-not $articleNames.Count) {
+            $problems.Add("${domain}: override 'articles' must contain at least one article.") | Out-Null
+            continue
+        }
+    } elseif ($hasArticleOverride) {
+        $articleNames = @($override.article)
+    } else {
+        $articleNames = @($articles | Select-Object -First 1 | ForEach-Object BaseName)
+    }
+
+    $selectedArticles = [System.Collections.Generic.List[object]]::new()
+    $seenArticleNames = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($articleNameValue in $articleNames) {
+        if ($articleNameValue -isnot [string] -or [string]::IsNullOrWhiteSpace([string]$articleNameValue)) {
+            $problems.Add("${domain}: override article names must be non-empty strings.") | Out-Null
+            continue
+        }
+        $articleName = [string]$articleNameValue
         if ($articleName.EndsWith('.md')) {
             $articleName = [System.IO.Path]::GetFileNameWithoutExtension($articleName)
         }
+        if (-not $seenArticleNames.Add($articleName)) {
+            $problems.Add("${domain}: override contains duplicate article: $articleName.md") | Out-Null
+            continue
+        }
+
         $selectedArticle = $articles | Where-Object BaseName -eq $articleName | Select-Object -First 1
         if (-not $selectedArticle) {
             $articleExists = @(
@@ -218,74 +248,43 @@ foreach ($domain in $leafDomains) {
             }
             continue
         }
-    } else {
-        $selectedArticle = $articles | Select-Object -First 1
+        $selectedArticles.Add($selectedArticle) | Out-Null
     }
-    if (-not $selectedArticle) {
-        $problems.Add("${domain}: no article has both .good.al and .bad.al companion samples.") | Out-Null
+    if (-not $selectedArticles.Count) {
+        if (-not $articleNames.Count) {
+            $problems.Add("${domain}: no article has both .good.al and .bad.al companion samples.") | Out-Null
+        }
         continue
     }
 
-    $articlePath = [string]$selectedArticle.ArticlePath
-    $sampleDirectory = (Split-Path -Parent $articlePath).Replace('\', '/')
     $context = if ($override -and ($override.PSObject.Properties.Name -contains 'context')) {
         [string]$override.context
     } else {
         $null
     }
-    foreach ($kind in 'bad', 'good') {
-        $case = [pscustomobject]@{
-            id = "$domain-$kind"
-            domain = $domain
-            input = "$sampleDirectory/$($selectedArticle.BaseName).$kind.al"
-            expected = if ($kind -eq 'bad') { @($articlePath) } else { @() }
+    for ($articleIndex = 0; $articleIndex -lt $selectedArticles.Count; $articleIndex++) {
+        $selectedArticle = $selectedArticles[$articleIndex]
+        $articlePath = [string]$selectedArticle.ArticlePath
+        $sampleDirectory = (Split-Path -Parent $articlePath).Replace('\', '/')
+        foreach ($kind in 'bad', 'good') {
+            $caseId = if ($articleIndex -eq 0) {
+                "$domain-$kind"
+            } else {
+                "$domain-$($selectedArticle.BaseName)-$kind"
+            }
+            $case = [pscustomobject]@{
+                id = $caseId
+                domain = $domain
+                input = "$sampleDirectory/$($selectedArticle.BaseName).$kind.al"
+                expected = if ($kind -eq 'bad') { @($articlePath) } else { @() }
+            }
+            if ($context) {
+                $case | Add-Member -NotePropertyName context -NotePropertyValue $context
+            }
+            $caseList.Add($case) | Out-Null
         }
-        if ($context) {
-            $case | Add-Member -NotePropertyName context -NotePropertyValue $context
-        }
-        $caseList.Add($case) | Out-Null
     }
 
-    if ($override -and ($override.PSObject.Properties.Name -contains 'additionalArticles')) {
-        foreach ($additionalArticleName in @($override.additionalArticles)) {
-            $additionalName = [string]$additionalArticleName
-            if ($additionalName.EndsWith('.md')) {
-                $additionalName = [System.IO.Path]::GetFileNameWithoutExtension($additionalName)
-            }
-            $additionalArticle = $articles | Where-Object BaseName -eq $additionalName | Select-Object -First 1
-            if (-not $additionalArticle) {
-                $articleExists = @(
-                    foreach ($layer in $layers) {
-                        $articleFile = Join-Path $Root "$($layer.Name)/knowledge/$domain/$additionalName.md"
-                        if (Test-Path -LiteralPath $articleFile -PathType Leaf) {
-                            $articleFile
-                        }
-                    }
-                ).Count -gt 0
-                if ($articleExists) {
-                    $problems.Add("${domain}: additionalArticles entry does not have both .good.al and .bad.al companion samples: $additionalName.md") | Out-Null
-                } else {
-                    $problems.Add("${domain}: additionalArticles entry does not exist: $additionalName.md") | Out-Null
-                }
-                continue
-            }
-            if ($additionalArticle.BaseName -eq $selectedArticle.BaseName) {
-                $problems.Add("${domain}: additionalArticles entry duplicates the selected article: $additionalName") | Out-Null
-                continue
-            }
-            $additionalArticlePath = [string]$additionalArticle.ArticlePath
-            $additionalSampleDirectory = (Split-Path -Parent $additionalArticlePath).Replace('\', '/')
-            foreach ($kind in 'bad', 'good') {
-                $additionalCase = [pscustomobject]@{
-                    id = "$domain-$kind-$($additionalArticle.BaseName)"
-                    domain = $domain
-                    input = "$additionalSampleDirectory/$($additionalArticle.BaseName).$kind.al"
-                    expected = if ($kind -eq 'bad') { @($additionalArticlePath) } else { @() }
-                }
-                $caseList.Add($additionalCase) | Out-Null
-            }
-        }
-    }
 }
 $cases = @($caseList)
 
@@ -475,6 +474,7 @@ if ($PrepareDirectory) {
 }
 
 if (-not $ResultsPath -and -not $ResultsDirectory) {
+    & (Join-Path $PSScriptRoot 'Test-ReviewContract.ps1') -Root $Root
     Write-Host "Review fixture validation PASSED: $($cases.Count) cases cover $($leafDomains.Count) leaf domains." -ForegroundColor Green
     exit 0
 }

@@ -40,7 +40,7 @@ what validation must pass before sending — is genuinely specific to the
 document. Custom logic belongs around the call to `Report Selections`,
 not instead of it.
 
-See sample: `custom-document-dispatch-must-not-bypass-report-selections.good.al`.
+See sample: [`custom-document-dispatch-must-not-bypass-report-selections.good.al`](custom-document-dispatch-must-not-bypass-report-selections.good.al).
 
 ## Anti Pattern
 
@@ -51,7 +51,7 @@ without a code change and a new release, and the document is invisible to
 "Document Layouts" — the standard place every other document's
 distribution is configured.
 
-See sample: `custom-document-dispatch-must-not-bypass-report-selections.bad.al`.
+See sample: [`custom-document-dispatch-must-not-bypass-report-selections.bad.al`](custom-document-dispatch-must-not-bypass-report-selections.bad.al).
 
 ## Source
 

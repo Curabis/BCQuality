@@ -7,15 +7,12 @@
     "agents": {
       "article": "wire-all-three-agent-interfaces"
     },
-    "appsource": {
-      "context": "AppSourceCop mandatoryAffixes is configured to ABC."
-    },
     "breaking-changes": {
       "article": "do-not-expose-sensitive-data-through-public-api"
     },
     "data-modeling": {
-      "article": "check-blocked-in-referencing-code-not-in-master",
-      "additionalArticles": [
+      "articles": [
+        "check-blocked-in-referencing-code-not-in-master",
         "extend-report-selection-usage-for-new-document-types",
         "document-print-and-email-actions-call-report-selections-directly",
         "custom-document-dispatch-must-not-bypass-report-selections",
@@ -30,17 +27,76 @@
     "events": {
       "article": "reset-ishandled-only-when-the-value-can-carry-over"
     },
+    "finance": {
+      "articles": [
+        "apply-ledger-entries-through-application-codeunits",
+        "change-ledger-due-dates-through-entry-edit",
+        "do-not-edit-shared-dimension-sets",
+        "do-not-modify-or-delete-posted-ledger-entries",
+        "normal-vat-journal-amount-includes-vat",
+        "post-ledger-entries-through-posting-codeunits",
+        "preserve-journal-batch-document-balance",
+        "reverse-transactions-by-transaction-number",
+        "write-dimensions-as-dimension-set-entries"
+      ],
+      "context": "Target Business Central 28, worldwide standard application (w1). Review each file as an independent source input."
+    },
     "interfaces": {
       "article": "set-defaultimplementation-on-enum"
     },
     "performance": {
-      "article": "use-isempty-for-existence-check"
+      "articles": [
+        "use-isempty-for-existence-check",
+        "job-queue-category-code-serializes-conflicting-jobs",
+        "job-queue-external-effects-must-be-idempotent",
+        "job-queue-handlers-must-not-require-ui",
+        "job-queue-handlers-must-propagate-failures",
+        "job-queue-on-hold-does-not-stop-running-work",
+        "store-scheduled-task-id-to-avoid-duplicate-tasks"
+      ]
     },
     "privacy": {
       "article": "no-pii-in-telemetry-message-string"
     },
+    "query": {
+      "articles": [
+        "dataitemtablefilter-cannot-be-overwritten-at-runtime",
+        "reopening-query-resets-cursor-but-keeps-filters",
+        "set-query-filters-before-open",
+        "setfilter-overwrites-query-columnfilter"
+      ]
+    },
+    "reporting": {
+      "articles": [
+        "clear-report-variable-before-independent-runmodal",
+        "currreport-break-ends-the-current-trigger",
+        "currreport-quit-rolls-back-and-skips-onpostreport",
+        "currreport-skip-does-not-stop-trigger-code",
+        "report-output-in-a-loop-needs-one-client-download",
+        "reportextension-dataitem-trigger-order-is-explicit",
+        "reportextension-report-triggers-run-after-base-triggers",
+        "settableview-cannot-broaden-dataitemtableview",
+        "stop-when-runrequestpage-returns-empty-parameters"
+      ]
+    },
+    "scm": {
+      "articles": [
+        "post-item-ledger-changes-through-item-journals",
+        "post-revaluation-through-the-item-journal-batch",
+        "change-item-applications-through-posting-routines",
+        "cancel-reservations-through-reservation-management",
+        "transfer-item-tracking-through-source-reservation-codeunits",
+        "reconcile-warehouse-adjustments-with-the-item-ledger",
+        "post-transfers-through-shipment-and-receipt-codeunits",
+        "use-date-aware-availability-for-promising",
+        "carry-out-requisition-actions-through-the-standard-workflow"
+      ]
+    },
     "style": {
-      "article": "label-comment-explains-placeholders"
+      "articles": [
+        "label-comment-explains-placeholders",
+        "dateformula-evaluate-needs-language-independent-literals"
+      ]
     },
     "telemetry": {
       "article": "telemetry-event-id-stable-unique"

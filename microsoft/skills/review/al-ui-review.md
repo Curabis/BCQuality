@@ -4,7 +4,7 @@ id: al-ui-review
 version: 1
 title: AL UI and accessibility review
 description: Reviews AL page and control add-in UI files against UI text, caption, tooltip, and accessibility guidance from BCQuality.
-inputs: [pr-diff, file-path]
+inputs: [pr-diff, file-path, folder-path]
 outputs: [findings-report]
 bc-version: [all]
 technologies: [al, javascript]
@@ -18,11 +18,11 @@ Reviews AL page source and control add-in UI files against the `ui` knowledge do
 
 UI findings apply to page files — files that declare `PageType = ...`, including `*.Page.al` under the standard file-naming convention — and to JavaScript/CSS/HTML files that implement Business Central control add-ins, including their client-service communication. The skill returns `not-applicable` when the diff contains no page or control add-in changes.
 
-An orchestrator invokes this skill with either a `pr-diff` or a `file-path`. The skill produces a single JSON document conforming to the DO output contract.
+An orchestrator invokes this skill with a `pr-diff`, `file-path`, or `folder-path`. The skill produces a single JSON document conforming to the DO output contract.
 
 ## Source
 
-Read the BCQuality knowledge index once — the `knowledge-index.json` BCQuality builds at the root of the knowledge checkout (Entry's preparation step regenerates it over the live, already-filtered clone — see `skills/entry.md`). It lists every article that survived layer and allow/deny filtering and carries, per article, its `path`, `layer`, `domain`, frontmatter dimensions, `keywords`, `title`, and a one-line `description` hint — exactly the fields Relevance and Worklist consume. Take the index entries whose `domain` is `ui` as this skill's candidate set across every enabled layer; do not open the individual article files at this step. Open an article's full body only once it enters the Worklist below, so a review reads the index plus the handful of worklisted articles instead of every file under `*/knowledge/ui/**`.
+Use READ's **Bounded retrieval for review skills** workflow with `-Domain ui`. Consume every catalog page across enabled layers before applying this leaf's Relevance and Worklist; preserve each exact catalog path and open complete bodies only for exact paths selected by the Worklist. If the helper or prepared index is unavailable or invalid, use READ's explicit path-discovery and bounded native-read fallback.
 
 ## Relevance
 
@@ -41,9 +41,14 @@ Narrow the relevant files to the subset that applies to the changes under review
 
 - **UI-file filter.** UI review applies to files declaring `page`, `pageextension`, or `pagecustomization`, and to JavaScript/CSS/HTML that implements a control add-in's rendering or Business Central communication. When the diff contains no such files, return `outcome: "not-applicable"` without evaluating knowledge files.
 - For each relevant knowledge file, compute overlap against changed page declarations and control add-in files, weighted toward `Caption`, `ToolTip`, `AboutTitle`, `AboutText`, `OptionCaption`, `ShowCaption`, `InstructionalText`, `GridLayout`, `Style`, `StyleExpr`, promoted action definitions, field importance, page background tasks, DOM creation, ARIA attributes, keyboard/focus handlers, packaged-resource AJAX, and calls from JavaScript into AL.
-- Tokens extracted from the diff (`Caption`, `ToolTip`, `AboutTitle`, `AboutText`, `PageType`, `ShowCaption`, `InstructionalText`, `grid`, `fixed`, `GridLayout`, `Style`, `StyleExpr`, `Importance`, `Promoted`, `Additional`, `area(Promoted)`, `actionref`, `PromotedCategory`, `PromotedOnly`, `PromotedIsBig`, `ShowAs`, `SplitButton`, `EnqueueBackgroundTask`, `OnAfterGetCurrRecord`, `OnAfterGetRecord`, `OnPageBackgroundTaskCompleted`, `OnPageBackgroundTaskError`, `RunPageBackgroundTask`, `Favorable`, `Unfavorable`, `Ambiguous`, `cuegroup`, `controladdin`, `control-add-in`, `usercontrol`, `aria-`, `tabindex`, `keydown`, `focus`, `innerHTML`, `createElement`, `packaged-resource`, `ajax`, `$.get`, `$.ajax`, `XMLHttpRequest`, `xhrFields`, `withCredentials`, `withcredentials`, `InvokeExtensibilityMethod`, `invokeextensibilitymethod`, `skipIfBusy`, `successCallback`, `success-callback`, `errorCallback`, `setInterval`, `JSON.stringify`, `payload`, `throttling`, `reduced-functionality`, `ClientServicesMaxUploadSize`, `&`, `Specifies`, `Message(`, `Confirm(`, `Error(` in a page context, `Disabled`, `Invalid`, `Whitelist`, `Blacklist`, trailing punctuation patterns on captions).
+- Tokens extracted from the diff (`Caption`, `ToolTip`, `AboutTitle`, `AboutText`, `PageType`, `ShowCaption`, `InstructionalText`, `grid`, `fixed`, `GridLayout`, `Style`, `StyleExpr`, `Importance`, `Promoted`, `Additional`, `area(Promoted)`, `actionref`, `PromotedCategory`, `PromotedOnly`, `PromotedIsBig`, `ShowAs`, `SplitButton`, `fieldgroups`, `DropDown`, `UpdatePropagation`, `EnqueueBackgroundTask`, `OnAfterGetCurrRecord`, `OnAfterGetRecord`, `OnPageBackgroundTaskCompleted`, `OnPageBackgroundTaskError`, `RunPageBackgroundTask`, `Favorable`, `Unfavorable`, `Ambiguous`, `cuegroup`, `controladdin`, `control-add-in`, `usercontrol`, `aria-`, `tabindex`, `keydown`, `focus`, `innerHTML`, `createElement`, `packaged-resource`, `ajax`, `$.get`, `$.ajax`, `XMLHttpRequest`, `xhrFields`, `withCredentials`, `withcredentials`, `InvokeExtensibilityMethod`, `invokeextensibilitymethod`, `skipIfBusy`, `successCallback`, `success-callback`, `errorCallback`, `setInterval`, `JSON.stringify`, `payload`, `throttling`, `reduced-functionality`, `ClientServicesMaxUploadSize`, `&`, `Specifies`, `Message(`, `Confirm(`, `Error(` in a page context, `Disabled`, `Invalid`, `Whitelist`, `Blacklist`, trailing punctuation patterns on captions).
 
 A file enters the candidate worklist when its `keywords` intersect the extracted tokens or its topic (derived from the index entry's `path`, `title`, and `description`) matches a changed page element. Read an article's full file — its `## Best Practice` / `## Anti Pattern` bodies — only after it makes the worklist; candidate selection uses the index alone.
+
+Apply these high-signal mappings before fuzzy topic ranking:
+
+- A tableextension adds a field to `DropDown` while the corresponding lookup-page control remains `Visible = false` — `dropdown-fieldgroup-respects-lookup-page-visibility`.
+- An editable page part affects a total, FlowField, or FactBox on the parent but does not set `UpdatePropagation = Both` — `updatepropagation-both-refreshes-main-page`.
 
 Once the candidate worklist is known, resolve layer-precedence conflicts per READ and record suppressions.
 

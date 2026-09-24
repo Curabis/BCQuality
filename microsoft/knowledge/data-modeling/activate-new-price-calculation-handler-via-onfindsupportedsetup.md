@@ -40,7 +40,7 @@ relevant `Method` (e.g. `"Lowest Price"`), `Type` (`Sale`/`Purchase`), and
 `Asset Type` — with `Default := true`, since `FindSetup` only considers
 rows where `Default` is set when resolving a handler for a line.
 
-See sample: `activate-new-price-calculation-handler-via-onfindsupportedsetup.good.al`.
+See sample: [`activate-new-price-calculation-handler-via-onfindsupportedsetup.good.al`](activate-new-price-calculation-handler-via-onfindsupportedsetup.good.al).
 
 ## Anti Pattern
 
@@ -51,7 +51,7 @@ selected manually if a user creates their own `Price Calculation Setup`
 row through the UI — but ships with no default row, so it's never active
 for anyone until someone notices it's missing and configures it by hand.
 
-See sample: `activate-new-price-calculation-handler-via-onfindsupportedsetup.bad.al`.
+See sample: [`activate-new-price-calculation-handler-via-onfindsupportedsetup.bad.al`](activate-new-price-calculation-handler-via-onfindsupportedsetup.bad.al).
 
 ## Source
 

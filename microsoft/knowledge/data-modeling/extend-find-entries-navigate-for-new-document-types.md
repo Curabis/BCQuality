@@ -59,7 +59,7 @@ custom table that should be searchable by document number:
   uncombined keys, with no compound key between them, because `"No."`
   alone is already sufficient.
 
-See sample: `extend-find-entries-navigate-for-new-document-types.good.al`.
+See sample: [`extend-find-entries-navigate-for-new-document-types.good.al`](extend-find-entries-navigate-for-new-document-types.good.al).
 
 ## Anti Pattern
 
@@ -70,7 +70,7 @@ and a correct record count both show up — but leads nowhere when
 selected, with no error and no indication to the user that anything is
 wrong.
 
-See sample: `extend-find-entries-navigate-for-new-document-types.bad.al`.
+See sample: [`extend-find-entries-navigate-for-new-document-types.bad.al`](extend-find-entries-navigate-for-new-document-types.bad.al).
 
 ## Source
 

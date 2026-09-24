@@ -61,7 +61,7 @@ equally correct; neither reads the counterparty's assigned profile.
 Reserve a genuine `Get`/`GetDefaultForCustomer`/`GetDefaultForVendor`
 lookup and `Send`/`SendVendor` for Post-and-Send.
 
-See sample: `document-print-and-email-actions-call-report-selections-directly.good.al`.
+See sample: [`document-print-and-email-actions-call-report-selections-directly.good.al`](document-print-and-email-actions-call-report-selections-directly.good.al).
 
 ## Anti Pattern
 
@@ -76,7 +76,7 @@ clicking "Email" does nothing observable. A second version of the same
 mistake: an email action on a document that only receives from its
 counterparty and was never meant to send anything back.
 
-See sample: `document-print-and-email-actions-call-report-selections-directly.bad.al`.
+See sample: [`document-print-and-email-actions-call-report-selections-directly.bad.al`](document-print-and-email-actions-call-report-selections-directly.bad.al).
 
 ## Source
 

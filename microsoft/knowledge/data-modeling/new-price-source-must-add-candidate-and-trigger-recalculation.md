@@ -42,7 +42,7 @@ a trigger on the field itself (its own `OnValidate`, or a matching
 `OnAfterValidate` integration event) that calls
 `SalesLine.UpdateUnitPriceByField(SalesLine.FieldNo(<TheField>))`.
 
-See sample: `new-price-source-must-add-candidate-and-trigger-recalculation.good.al`.
+See sample: [`new-price-source-must-add-candidate-and-trigger-recalculation.good.al`](new-price-source-must-add-candidate-and-trigger-recalculation.good.al).
 
 ## Anti Pattern
 
@@ -52,7 +52,7 @@ validation. The field is a genuine, working calculation candidate — new
 lines price correctly — but editing the field on an existing line leaves
 the unit price stale, with nothing to indicate why.
 
-See sample: `new-price-source-must-add-candidate-and-trigger-recalculation.bad.al`.
+See sample: [`new-price-source-must-add-candidate-and-trigger-recalculation.bad.al`](new-price-source-must-add-candidate-and-trigger-recalculation.bad.al).
 
 ## Source
 
