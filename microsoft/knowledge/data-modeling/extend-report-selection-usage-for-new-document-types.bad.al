@@ -28,11 +28,20 @@ codeunit 50100 "Sample Report Selection Install"
     begin
         ReportSelections.InsertRecord(
             "Report Selection Usage"::"Sample.SettlementDoc", '1', Report::"Sample Settlement Document");
-        // Registration ends here. No subscriber added to
-        // OnAfterFilterCustomerUsageReportSelections / OnAfterFilterVendorUsageReportSelections
-        // - the tenant-wide default works, but "Copy from Report Selection"
-        // on the Document Layouts page never lists this usage value, so a
-        // per-account override can only be entered by hand, if a user even
-        // knows to look for it.
+        // Registration ends here. No enumextension was added to
+        // "Custom Report Selection Sales" (or "Report Selection Usage
+        // Vendor"), and no subscriber was added to
+        // OnAfterOnMapTableUsageValueToPageValue, OnValidateUsage2OnCaseElse,
+        // or OnAfterFilterCustomerUsageReportSelections /
+        // OnAfterFilterVendorUsageReportSelections.
+        //
+        // The tenant-wide default works, so the gap isn't visible in
+        // testing - but on the Document Layouts page for a specific
+        // customer or vendor: an existing row for this usage shows blank in
+        // the Usage column (no map event), a user cannot pick this usage
+        // from the Usage dropdown at all (no validate event and no
+        // page-facing enum value to pick), and "Copy from Report Selection"
+        // never lists it either (no filter event). No error, no visible
+        // sign that anything is missing.
     end;
 }

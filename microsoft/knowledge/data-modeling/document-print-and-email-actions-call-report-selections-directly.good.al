@@ -20,7 +20,10 @@ page 50101 "Sample Settlement Document Card"
                 begin
                     // Calls Report Selections directly - the button's outcome
                     // depends only on this customer's registered report/layout,
-                    // not on any Document Sending Profile setting.
+                    // not on any Document Sending Profile setting. Calling
+                    // DocumentSendingProfile.TrySendToEMail(...) instead would
+                    // be equally correct: it never Get's the customer's
+                    // actually assigned profile, only a local, hardcoded one.
                     ReportSelections.SendEmailToCust(
                         "Report Selection Usage"::"S.Invoice".AsInteger(), Rec, Rec."No.",
                         Rec.Name, true, Rec."No.");

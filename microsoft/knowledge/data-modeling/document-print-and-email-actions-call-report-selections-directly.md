@@ -11,89 +11,90 @@ application-area: [all]
 
 ## Description
 
-`table 60 "Document Sending Profile"` is not a general gateway that every
-print/email path should route through — it exists specifically for the
-combined **Post and Send** action: "You can set each customer up with a
-preferred method of sending sales documents, so that you do not have to
-select a sending option every time you choose the Post and Send action"
-(Microsoft Learn, "Set Up Document Sending Profiles"). A document's own, ordinary
-Print/Email ribbon actions call `table 77 "Report Selections"` directly
-and are not affected by any Document Sending Profile at all. This is the
-pattern BC's own base application uses for a document's plain print/email
-actions: the Sales Order's "Print Confirmation"/"Email Confirmation"
-actions (`codeunit "Document-Print"`, `PrintSalesOrder`/`EmailSalesHeader`)
-call `ReportSelections.PrintWithDialogForCust`/`SendEmailToCust` directly,
-and the posted `Purch. Inv. Header`'s own `PrintRecords` does the same
-through `ReportSelection.PrintWithDialogForVend` — no customer's or
-vendor's actually assigned Document Sending Profile is consulted by
-either.
+`table 60 "Document Sending Profile"` is not a general gateway for every
+print/email path — it exists specifically for the combined **Post and
+Send** action: "You can set each customer up with a preferred method of
+sending sales documents, so that you do not have to select a sending
+option every time you choose the Post and Send action" (Microsoft Learn,
+"Set Up Document Sending Profiles"). A document's own, ordinary
+Print/Email actions are unaffected by any *configured* profile either
+way: the unposted Sales Order's "Print Confirmation"/"Email
+Confirmation" (`codeunit "Document-Print"`,
+`PrintSalesOrder`/`EmailSalesHeader`) and the posted `Purch. Inv.
+Header`'s `PrintRecords` call `Report Selections` literally directly
+(`PrintWithDialogForCust`/`SendEmailToCust`/`PrintWithDialogForVend`),
+while the posted `Sales Invoice Header`'s `PrintRecords`/`EmailRecords`
+and the unposted `Purchase Header`'s `PrintRecords` go through
+`DocumentSendingProfile.TrySendToPrinter`/`TrySendToEMail`/
+`TrySendToPrinterVendor` instead. Those three helpers each declare a
+fresh, local, never-`Get`'d profile record, hardcode its
+`Printer`/`"E-Mail"` field to a "Yes" option themselves, and feed it into
+`SendToPrinter`/`SendToEMailGroupedMultipleSelection` — which resolve
+into Report Selections just like the direct route. The table is a
+throwaway options carrier here, not the counterparty's configuration.
 
-The unposted `Purchase Header`'s own `PrintRecords` is a partial exception
-worth naming precisely: it calls `DocumentSendingProfile.TrySendToPrinterVendor(...)`,
-but only as a stateless, never-`Get`'d local record carrying print-dialog
-options, never a vendor's actually configured profile — that helper still
-resolves the report through `ReportSelections.PrintWithDialogForVend(...)`,
-the same as everywhere else.
+Only a genuinely configured profile changes the outcome, and that only
+happens for the combined Post-and-Send flow: `Sales-Post and Send` loads
+the customer's assigned profile (`Get(Customer."Document Sending
+Profile")`, or the tenant default) before `Sales Invoice
+Header.SendProfile` → `DocumentSendingProfile.Send`, which gates
+`SendToPrinter`/`SendToEMail`/`SendToDisk` on whatever that record holds.
 
-Only the combined Post-and-Send flow resolves through Document Sending
-Profile: `Sales-Post and Send` calls `Sales Invoice Header.SendProfile`,
-which calls `DocumentSendingProfile.Send(...)`, which then decides
-Print/Email/Disk/Electronic based on the customer's assigned profile and
-only *then* calls back into `Report Selections` (for the PDF cases) or
-`Electronic Document Format` (for machine-readable cases).
-
-Whether a document needs outbound distribution at all isn't determined by
-Customer-vs-Vendor, but by whether the document is genuinely *outbound* to
-its counterparty. A posted Purchase Invoice records what a vendor already
-billed you — nothing to send back — and its posted `Purch. Inv. Header`
-exposes only a bare `PrintRecords`, no `SendProfile`/`SendRecords`/email at
-all. A Purchase *Order* is genuinely outbound before posting, which is why
-the full `SendProfile`/`SendRecords`/`PrintRecords` triplet lives on the
-unposted `Purchase Header` instead.
+Whether a document needs outbound distribution isn't determined by
+Customer vs. Vendor, but by whether it's genuinely *outbound* to that
+party: a posted Purchase Invoice records what a vendor already billed,
+so the posted `Purch. Inv. Header` has only a bare `PrintRecords`; a
+Purchase *Order* is still outbound before posting, so the rich
+`SendProfile`/`SendRecords`/`PrintRecords` triplet lives there instead.
 
 ## Best Practice
 
-For a document's own interactive Print/Email actions, call the relevant
-`Report Selections` procedure directly —
+For a document's own interactive Print/Email actions, either call the
+relevant `Report Selections` procedure directly —
 `PrintForCust`/`PrintWithDialogForCust`/`SendEmailToCust` for a
-customer-facing document, `PrintWithDialogForVend`/`SendEmailToVendor` for
-a vendor-facing one — using the usage value registered per
-`extend-report-selection-usage-for-new-document-types.md`. Wire into
-`Document Sending Profile` only when specifically building a combined
-Post-and-Send action for that document. Before adding any send capability
-at all, confirm the document is genuinely outbound to the counterparty
-it's attached to; a document that only records something already received
-needs print-for-reference at most, not a send path.
+customer-facing document, `PrintWithDialogForVend`/`SendEmailToVendor`
+for a vendor-facing one — or call one of `Document Sending Profile`'s
+stateless `TrySendToPrinter`/`TrySendToEMail`/`TrySendToPrinterVendor`
+helpers, using the usage value registered per
+`extend-report-selection-usage-for-new-document-types.md`. Both are
+equally correct; neither reads the counterparty's assigned profile.
+Reserve a genuine `Get`/`GetDefaultForCustomer`/`GetDefaultForVendor`
+lookup and `Send`/`SendVendor` for Post-and-Send.
 
 See sample: `document-print-and-email-actions-call-report-selections-directly.good.al`.
 
 ## Anti Pattern
 
-Routing a document's plain, on-demand "Email" button through
-`DocumentSendingProfile.Send`/`SendVendor` instead of calling
-`ReportSelections.SendEmailToCust`/`SendEmailToVendor` directly. The
-button's outcome now silently depends on that customer's or vendor's
-assigned Document Sending Profile — if its `"E-Mail"` option happens to be
-`No`, clicking "Email" does nothing observable, with no indication to the
-user that a profile setting (meant for the Post-and-Send flow) is the
-reason. A second version of the same mistake: adding an email action to a
-document that only receives from its counterparty and was never meant to
-send anything back.
+Loading the counterparty's *actually assigned* `Document Sending
+Profile` (or the tenant default, via `Get`/`GetDefaultForCustomer`/
+`GetDefaultForVendor` — the same lookup `Sales-Post and Send` performs)
+and calling `Send`/`SendVendor` on it from a plain, on-demand "Email"
+button, instead of `ReportSelections.SendEmailToCust`/`SendEmailToVendor`
+directly. The button's outcome now silently depends on a profile
+configured for Post-and-Send — if its `"E-Mail"` option is `No`,
+clicking "Email" does nothing observable. A second version of the same
+mistake: an email action on a document that only receives from its
+counterparty and was never meant to send anything back.
 
 See sample: `document-print-and-email-actions-call-report-selections-directly.bad.al`.
 
 ## Source
 
-BCApps `DocumentPrint.Codeunit.al` (`EmailSalesHeader`/`DoPrintSalesHeader`/`PrintSalesOrder`,
-calling `ReportSelections.SendEmailToCust`/`PrintForCust`/`PrintWithDialogForCust`
-directly), `PurchaseHeader.Table.al` (`SendProfile` at line ~6387, calling
-`DocumentSendingProfile.SendVendor`), `PurchInvHeader.Table.al` (`PrintRecords`
-calling `ReportSelection.PrintWithDialogForVend` directly, no send capability),
-`SalesPost.Codeunit.al`
-(`SendPostedDocumentRecord` at line 7660 → `SalesInvHeader.SendProfile` at
-lines 7680/7699 → `DocumentSendingProfile.Send`),
-`DocumentSendingProfile.Table.al` (table 60; `TrySendToPrinterVendor` at
-line 552 and `SendToPrinterVendor` at line 716, called from
-`PurchaseHeader.PrintRecords` at line 6357) — all under
-`src/Layers/W1/BaseApp/`. Microsoft Learn, "Set Up Document Sending Profiles":
-https://learn.microsoft.com/dynamics365/business-central/sales-how-setup-document-send-profiles
+BCApps `DocumentPrint.Codeunit.al` (`EmailSalesHeader`/`DoPrintSalesHeader`/
+`PrintSalesOrder` → `ReportSelections.SendEmailToCust`/`PrintForCust`/
+`PrintWithDialogForCust` directly), `SalesInvoiceHeader.Table.al`
+(`PrintRecords`/`EmailRecords`, lines 1453/1528 → `TrySendToPrinter`/
+`TrySendToEMail`, lines 1462/1541, on a local never-`Get`'d record),
+`PurchaseHeader.Table.al` (`PrintRecords` line 6357 →
+`TrySendToPrinterVendor` line 6374; `SendProfile` line 6387 →
+`SendVendor` line 6403), `PurchInvHeader.Table.al` (`PrintRecords` →
+`ReportSelection.PrintWithDialogForVend` directly, no send capability),
+`SalesPostandSend.Codeunit.al`/`SalesPost.Codeunit.al`
+(`ConfirmPostAndSend` loads `Get(Customer."Document Sending
+Profile")`/`GetDefault`; `SendPostedDocumentRecord` line 7660 →
+`SalesInvHeader.SendProfile` lines 7680/7699 →
+`DocumentSendingProfile.Send`), `DocumentSendingProfile.Table.al` (table
+60; `TrySendToPrinter`/`TrySendToEMail` lines 536/562,
+`TrySendToPrinterVendor` line 552, `GetDefaultForCustomer` line 195,
+`Send`/`SendVendor` lines 482/506) — all under `src/Layers/W1/BaseApp/`.
+Microsoft Learn, "Set Up Document Sending Profiles": https://learn.microsoft.com/dynamics365/business-central/sales-how-setup-document-send-profiles

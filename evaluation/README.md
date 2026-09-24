@@ -2,7 +2,7 @@
 
 The evaluation is convention-driven. The harness discovers every `<layer>/skills/review/al-<domain>-review.md` leaf across the enabled `microsoft`, `community`, and `custom` layers. Duplicate domains resolve with `custom > community > microsoft` precedence. For each selected leaf, the harness finds paired knowledge across the same layers, applies the same precedence to duplicate article slugs, selects the first article (by filename) with both `.bad.al` and `.good.al` companions, and derives the expected positive and clean control automatically. Adding a conforming leaf requires no scoring-contract edit.
 
-`review-fixtures.json` contains only global thresholds and optional exceptional overrides. An override may select a different article or add context when the generic convention cannot express a scenario. It should remain empty in the normal case.
+`review-fixtures.json` contains only global thresholds and optional exceptional overrides. An override may select a different article or add context when the generic convention cannot express a scenario. It should remain empty in the normal case. An override may also list `additionalArticles` — other same-domain slugs (each with a `.good.al`/`.bad.al` pair) that get their own deterministic positive/clean case pair alongside the convention-selected one. Use this when a single leaf's worklist covers several distinct, newly-added rules and each one needs its own proof of reachability rather than riding on whichever article the generic convention happens to select.
 
 Model-facing preparation hashes case IDs, neutralizes `Good`/`Bad` object-name tokens, and removes full-line sample comments so neither the article slug, domain, nor expected outcome reveals the answer.
 

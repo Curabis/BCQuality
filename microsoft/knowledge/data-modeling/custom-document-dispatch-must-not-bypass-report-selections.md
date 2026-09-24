@@ -18,7 +18,8 @@ Print/Email procedures, works for the one case it was written for — and
 loses everything the platform's registry provides for free. `Report
 Selections` carries its own attachment/email-body configuration per usage
 (`"Use for Email Attachment"`, `"Use for Email Body"`, `"Email Body Layout
-Code"`, `"Email Body Layout Type"`, `"Custom Report Layout Code"`), and
+Code"`, `"Email Body Layout Type"`), plus a separate per-usage layout
+override, `"Custom Report Layout Code"`, and
 `table 9657 "Custom Report Selection"` (the "Document Layouts" page on the
 Customer/Vendor card) lets one specific account override the report or
 layout without touching code at all. None of that exists for a document
@@ -54,9 +55,10 @@ See sample: `custom-document-dispatch-must-not-bypass-report-selections.bad.al`.
 
 ## Source
 
-BCApps `ReportSelections.Table.al` (table 77 — fields 19–26 for email
-attachment/body configuration; `SendEmailToCust`/`PrintWithDialogForCust`
-as the registry-backed dispatch entry points) and
+BCApps `ReportSelections.Table.al` (table 77 — field 7,
+`"Custom Report Layout Code"`; fields 19–26 for email attachment/body
+configuration; `SendEmailToCust`/`PrintWithDialogForCust` as the
+registry-backed dispatch entry points) and
 `CustomReportSelection.Table.al` (table 9657, the per-account override
 backing the "Document Layouts" page) — both under
 `src/Layers/W1/BaseApp/Foundation/Reporting/`.

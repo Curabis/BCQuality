@@ -19,12 +19,16 @@ page 50101 "Sample Settlement Document Card"
                     DocumentSendingProfile: Record "Document Sending Profile";
                 begin
                     // WRONG: this is a plain, on-demand "Email" button, not
-                    // part of a combined Post-and-Send action - but routing
-                    // it through Document Sending Profile means the outcome
-                    // now silently depends on this customer's assigned
-                    // profile. If that profile's "E-Mail" option is No, the
-                    // user sees nothing happen after clicking Email, with no
-                    // indication that an unrelated setup field is why.
+                    // part of a combined Post-and-Send action - but this
+                    // loads the customer's ACTUAL assigned profile (or the
+                    // tenant default, if none is assigned - the same lookup
+                    // Sales-Post and Send performs) and calls Send on it, so
+                    // the outcome now silently depends on that profile. A
+                    // profile set up for Post-and-Send printing only (say,
+                    // Printer = Yes, "E-Mail" = No) turns this button into a
+                    // silent no-op, with no indication an unrelated setup
+                    // field is why.
+                    DocumentSendingProfile.GetDefaultForCustomer(Rec."No.", DocumentSendingProfile);
                     DocumentSendingProfile.Send(
                         "Report Selection Usage"::"S.Invoice".AsInteger(), Rec, Rec."No.", Rec."No.",
                         Rec.Name, Rec.FieldNo("No."), Rec.FieldNo("No."));

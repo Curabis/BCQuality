@@ -6,6 +6,19 @@ enumextension 50100 "Sample Report Selection Usage Ext" extends "Report Selectio
     }
 }
 
+// This document is only ever issued to a customer, so only the customer-side
+// page-facing enum is extended - not the vendor-side one too. This mirrors
+// BCApps' ReportSelectionHandlerCZZ, which extends "Custom Report Selection
+// Sales" for its customer-only usages and "Report Selection Usage Vendor"
+// for its vendor-only usages, never both for the same one-sided value.
+enumextension 50101 "Sample Cust. Rep. Sel. Sales Ext" extends "Custom Report Selection Sales"
+{
+    value(50100; "Sample.SettlementDoc")
+    {
+        Caption = 'Sample Settlement Document';
+    }
+}
+
 report 50100 "Sample Settlement Document"
 {
     UsageCategory = ReportsAndAnalysis;
@@ -33,16 +46,34 @@ codeunit 50100 "Sample Report Selection Install"
 
 codeunit 50101 "Sample Report Selection Subscribers"
 {
-    // Appends to whatever the standard filter already contains, following
-    // the real BCApps pattern in ReportSelectionHandlerCZC.Codeunit.al.
-    [EventSubscriber(ObjectType::Page, Page::"Customer Report Selections", 'OnAfterFilterCustomerUsageReportSelections', '', false, false)]
-    local procedure AddSampleUsageOnAfterFilterCustomerUsageReportSelections(var ReportSelections: Record "Report Selections")
+    // Customer-only document: all three subscribers below are on
+    // "Customer Report Selections" only. There are no matching subscribers
+    // on "Vendor Report Selections" - subscribing there too would be the
+    // overbroad mistake this sample avoids (see the .bad.al companion and
+    // the article's Anti Pattern #2).
+
+    // 1) Map: lets an existing row display in the Usage column instead of
+    // showing blank.
+    [EventSubscriber(ObjectType::Page, Page::"Customer Report Selections", 'OnAfterOnMapTableUsageValueToPageValue', '', false, false)]
+    local procedure AddSampleUsageOnAfterOnMapTableUsageValueToPageValue(var Usage2: Enum "Custom Report Selection Sales"; CustomReportSelection: Record "Custom Report Selection")
     begin
-        ReportSelections.SetFilter(Usage, GetUsageFilter(ReportSelections));
+        if CustomReportSelection.Usage = "Report Selection Usage"::"Sample.SettlementDoc" then
+            Usage2 := "Custom Report Selection Sales"::"Sample.SettlementDoc";
     end;
 
-    [EventSubscriber(ObjectType::Page, Page::"Vendor Report Selections", 'OnAfterFilterVendorUsageReportSelections', '', false, false)]
-    local procedure AddSampleUsageOnAfterFilterVendorUsageReportSelections(var ReportSelections: Record "Report Selections")
+    // 2) Validate: lets a user pick the new value from the Usage dropdown.
+    [EventSubscriber(ObjectType::Page, Page::"Customer Report Selections", 'OnValidateUsage2OnCaseElse', '', false, false)]
+    local procedure AddSampleUsageOnValidateUsage2OnCaseElse(var CustomReportSelection: Record "Custom Report Selection"; ReportUsage: Option)
+    begin
+        if ReportUsage = "Custom Report Selection Sales"::"Sample.SettlementDoc".AsInteger() then
+            CustomReportSelection.Usage := "Report Selection Usage"::"Sample.SettlementDoc";
+    end;
+
+    // 3) Filter: wires "Copy from Report Selection" - the piece most
+    // guidance stops at, appending to whatever filter already exists rather
+    // than replacing it.
+    [EventSubscriber(ObjectType::Page, Page::"Customer Report Selections", 'OnAfterFilterCustomerUsageReportSelections', '', false, false)]
+    local procedure AddSampleUsageOnAfterFilterCustomerUsageReportSelections(var ReportSelections: Record "Report Selections")
     begin
         ReportSelections.SetFilter(Usage, GetUsageFilter(ReportSelections));
     end;

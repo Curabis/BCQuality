@@ -245,6 +245,47 @@ foreach ($domain in $leafDomains) {
         }
         $caseList.Add($case) | Out-Null
     }
+
+    if ($override -and ($override.PSObject.Properties.Name -contains 'additionalArticles')) {
+        foreach ($additionalArticleName in @($override.additionalArticles)) {
+            $additionalName = [string]$additionalArticleName
+            if ($additionalName.EndsWith('.md')) {
+                $additionalName = [System.IO.Path]::GetFileNameWithoutExtension($additionalName)
+            }
+            $additionalArticle = $articles | Where-Object BaseName -eq $additionalName | Select-Object -First 1
+            if (-not $additionalArticle) {
+                $articleExists = @(
+                    foreach ($layer in $layers) {
+                        $articleFile = Join-Path $Root "$($layer.Name)/knowledge/$domain/$additionalName.md"
+                        if (Test-Path -LiteralPath $articleFile -PathType Leaf) {
+                            $articleFile
+                        }
+                    }
+                ).Count -gt 0
+                if ($articleExists) {
+                    $problems.Add("${domain}: additionalArticles entry does not have both .good.al and .bad.al companion samples: $additionalName.md") | Out-Null
+                } else {
+                    $problems.Add("${domain}: additionalArticles entry does not exist: $additionalName.md") | Out-Null
+                }
+                continue
+            }
+            if ($additionalArticle.BaseName -eq $selectedArticle.BaseName) {
+                $problems.Add("${domain}: additionalArticles entry duplicates the selected article: $additionalName") | Out-Null
+                continue
+            }
+            $additionalArticlePath = [string]$additionalArticle.ArticlePath
+            $additionalSampleDirectory = (Split-Path -Parent $additionalArticlePath).Replace('\', '/')
+            foreach ($kind in 'bad', 'good') {
+                $additionalCase = [pscustomobject]@{
+                    id = "$domain-$kind-$($additionalArticle.BaseName)"
+                    domain = $domain
+                    input = "$additionalSampleDirectory/$($additionalArticle.BaseName).$kind.al"
+                    expected = if ($kind -eq 'bad') { @($additionalArticlePath) } else { @() }
+                }
+                $caseList.Add($additionalCase) | Out-Null
+            }
+        }
+    }
 }
 $cases = @($caseList)
 
