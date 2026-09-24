@@ -23,13 +23,21 @@ Implementation, Enabled, Default)` rows populated at startup by its own
 to subscribe to that event and insert its own setup row(s). A handler
 enum value with no matching setup row is real and selectable in the enum
 itself, but never chosen for any actual sale, purchase, or job line,
-because `Price Calculation Mgt.` has no setup row that names it. A setup
-row that exists but doesn't match is just as invisible: `FindSetup`
-filters candidates with `SetRange(Default, true)` and `SetRange(Method,
-DtldPriceCalcSetup.Method)` (a document's blank Method is normalized to
-`"Lowest Price"` before that filter runs), so a row inserted without
-`Default := true`, or with a `Method` that doesn't match, is never
-selected either — same symptom, different cause.
+because `Price Calculation Mgt.` has no setup row that names it.
+
+`FindSetup` resolves a handler in two stages, and only the second one
+looks at `Default`. It first asks `codeunit 7004 "Price Calculation Dtld.
+Setup"` to match the line against `table 7008 "Dtld. Price Calculation
+Setup"` ("Detailed Price Calculation Setup", keyed to an exact
+`Method`/`Type`/`Asset Type`/`Source`/`Asset No.` combination via its own
+`"Setup Code"`); on a match it does `PriceCalculationSetup.Get(...
+"Setup Code")` directly, with no `Default` filter. Only when no detailed
+row matches does it fall back to `SetRange(Default, true)` plus
+`SetRange(Method, ...)` to pick the one catch-all row for that
+combination. A row without `Default := true` is invisible to *that*
+fallback, but not invisible outright — a detailed-setup row can still
+select it by naming its `Code`. A row whose `Method` matches neither path
+is invisible either way — same symptom, different cause.
 
 ## Best Practice
 
@@ -37,8 +45,13 @@ Ship a new `Price Calculation Handler` value together with an
 `OnFindSupportedSetup` subscriber that inserts at least one `Price
 Calculation Setup` record naming it as the `Implementation`, for the
 relevant `Method` (e.g. `"Lowest Price"`), `Type` (`Sale`/`Purchase`), and
-`Asset Type` — with `Default := true`, since `FindSetup` only considers
-rows where `Default` is set when resolving a handler for a line.
+`Asset Type`. `Default := true` is required only when this row is the
+*fallback* for that combination — the row `FindSetup`'s own
+`SetRange(Default, true)` branch selects when no more specific setup
+applies. A handler meant to be selected only for specific customers or
+items should instead be reachable through a matching `"Dtld. Price
+Calculation Setup"` row; `FindSetup` resolves that before it ever checks
+`Default`, so it needs no `Default := true`.
 
 See sample: [`activate-new-price-calculation-handler-via-onfindsupportedsetup.good.al`](activate-new-price-calculation-handler-via-onfindsupportedsetup.good.al).
 
@@ -58,25 +71,28 @@ See sample: [`activate-new-price-calculation-handler-via-onfindsupportedsetup.ba
 BCApps (`src/Layers/W1/BaseApp/Pricing/Calculation/`):
 `PriceCalculationHandler.Enum.al` (`enum 7011 "Price Calculation Handler"
 implements "Price Calculation"`); `PriceCalculationMgt.Codeunit.al`
-(`local procedure OnFindSupportedSetup(var TempPriceCalculationSetup:
-Record "Price Calculation Setup" temporary)`, called during setup
-resolution, and `procedure FindSetup(...)`, which requires
-`SetRange(Default, true)` and a matching `SetRange(Method,
-DtldPriceCalcSetup.Method)` before a row can be selected);
-`PriceCalculationSetup.Table.al` (`table 7006 "Price Calculation Setup"`:
-`Code` (Code[100]), `Method` (Enum "Price Calculation Method"), `Type`
-(Enum "Price Type"), `"Asset Type"` (Enum "Price Asset Type"),
-`Implementation` (Enum "Price Calculation Handler"), `Enabled` (Boolean),
-`Default` (Boolean)).
+(`OnFindSupportedSetup(var TempPriceCalculationSetup: Record "Price
+Calculation Setup" temporary)`, and `FindSetup(...): Boolean`, which
+first calls `PriceCalculationDtldSetup.FindSetup(DtldPriceCalcSetup)` and
+on a match does `PriceCalculationSetup.Get(... "Setup Code")` with no
+`Default` filter — only on failure does it fall back to
+`SetRange(Enabled, true)`, `SetRange(Default, true)`, `SetRange(Method,
+...)`); `PriceCalculationSetup.Table.al` (`table 7006 "Price Calculation
+Setup"`: `Code`, `Method`, `Type`, `"Asset Type"`, `Implementation`,
+`Enabled`, `Default`); `PriceCalculationDtldSetup.Codeunit.al` (`codeunit
+7004 "Price Calculation Dtld. Setup"`, `FindSetup(var DtldPriceCalcSetup:
+Record "Dtld. Price Calculation Setup"): Boolean`, matching progressively
+looser `Source Group`/`Source No.`/`Asset Type`/`Asset No.` combinations —
+never `Default`); `DtldPriceCalculationSetup.Table.al` (`table 7008 "Dtld.
+Price Calculation Setup"`, Caption "Detailed Price Calculation Setup",
+`"Setup Code"` relates to `"Price Calculation Setup".Code where(Enabled =
+const(true))` — no `Default` condition).
 
-BCApps (`src/Layers/W1/BaseApp/Pricing/PriceList/`): `PriceType.Enum.al`
-(`enum 7009 "Price Type"`: `Any`(0)/`Sale`(1)/`Purchase`(2)).
-
-Microsoft Learn, "Extending Price Calculations": "For the new codeunit,
-you must extend the Price Calculation Handler enum that implements Price
-Calculation interface... Afterwards you can insert a record in the Price
-Calculation Setup table... Each codeunit that implements the Price
-Calculation interface must subscribe to the OnFindSupportedSetup() event
-of the Price Calculation Mgt codeunit to fill the price calculation setup
-table with new options."
+Microsoft Learn, "Extending Price Calculations": "Each codeunit that
+implements the Price Calculation interface must subscribe to the
+OnFindSupportedSetup() event... to fill the price calculation setup
+table." Same article: "You can enter detailed setup records for
+non-default setup lines... If a matching setup is found its
+implementation is used... If there is no matching setup exception, we
+use the default implementation."
 (https://learn.microsoft.com/dynamics365/business-central/dev-itpro/developer/devenv-extending-best-price-calculations)

@@ -1,3 +1,19 @@
+table 50104 "Sample Posted Document Header"
+{
+    DataClassification = CustomerContent;
+
+    fields
+    {
+        field(1; "No."; Code[20]) { Caption = 'No.'; }
+        field(2; "Posting Date"; Date) { Caption = 'Posting Date'; }
+    }
+
+    keys
+    {
+        key(PK; "No.") { Clustered = true; }
+    }
+}
+
 codeunit 50103 "Sample Navigate Subscribers"
 {
     // WRONG: registers the row, so it appears in the Find Entries result

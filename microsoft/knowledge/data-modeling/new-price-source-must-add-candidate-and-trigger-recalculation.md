@@ -21,11 +21,23 @@ being priced by it. `codeunit "Sales Line - Price"` publishes
 `PriceSourceList.Add(SourceType, SourceNo)` makes the source a candidate
 the calculation considers. But nothing about that subscription causes
 the price to be *recalculated* when the source field's value changes on
-an existing line. That's the second, separate piece: `Sales Line`'s own
-`procedure UpdateUnitPriceByField(CalledByFieldNo: Integer)` must be
-called from the source field's own trigger — the same way Microsoft's
-own Location example is wired from a `Sales Line` validation event, not
-from the price source registration itself.
+an existing line. That's the second, separate piece, and it needs to be
+wired correctly: `Sales Line`'s `procedure
+UpdateUnitPriceByField(CalledByFieldNo: Integer)` only recalculates if
+the field was already *planned* — internally it exits immediately unless
+`procedure PlanPriceCalcByField(CurrPriceFieldNo: Integer)` was already
+called for that same field number. Calling `UpdateUnitPriceByField` on
+its own, without a matching `PlanPriceCalcByField` call first, compiles
+fine and looks correct, but silently recalculates nothing. `Sales Line`
+also exposes `procedure UpdateUnitPrice(CalledByFieldNo: Integer)`, a
+convenience wrapper that does both steps in the right order (plan, then
+update) in one call — this is the method the base app itself calls from
+*outside* `Sales Line` to trigger recalculation for a field it just
+changed (see `Inventory/Item/Catalog/ItemReferenceManagement.Codeunit.al`:
+`SalesLine.UpdateUnitPrice(SalesLine.FieldNo("Item Reference No."))`), and
+it's what a custom price source field's own trigger should call too — the
+same way Microsoft's own Location example is wired from a `Sales Line`
+validation event, not from the price source registration itself.
 
 Add the source without wiring recalculation, and the failure hides
 easily: a *new* line still prices correctly, because the field already
@@ -40,17 +52,22 @@ Wire both halves together whenever a field becomes a price source: an
 `OnAfterAddSources` subscriber that adds it via `PriceSourceList.Add`, and
 a trigger on the field itself (its own `OnValidate`, or a matching
 `OnAfterValidate` integration event) that calls
-`SalesLine.UpdateUnitPriceByField(SalesLine.FieldNo(<TheField>))`.
+`SalesLine.UpdateUnitPrice(SalesLine.FieldNo(<TheField>))`. Calling
+`UpdateUnitPriceByField` directly, without first calling
+`PlanPriceCalcByField` for that same field number, is *not* equivalent —
+it exits immediately and recalculates nothing. `UpdateUnitPrice` does
+both calls, in the correct order, in one step.
 
 See sample: [`new-price-source-must-add-candidate-and-trigger-recalculation.good.al`](new-price-source-must-add-candidate-and-trigger-recalculation.good.al).
 
 ## Anti Pattern
 
 Subscribing to `OnAfterAddSources` to register a custom field as a price
-source, without also triggering recalculation from that field's own
-validation. The field is a genuine, working calculation candidate — new
-lines price correctly — but editing the field on an existing line leaves
-the unit price stale, with nothing to indicate why.
+source, without also triggering recalculation (via `UpdateUnitPrice`, or
+the `PlanPriceCalcByField` + `UpdateUnitPriceByField` pair) from that
+field's own validation. The field is a genuine, working calculation
+candidate — new lines price correctly — but editing the field on an
+existing line leaves the unit price stale, with nothing to indicate why.
 
 See sample: [`new-price-source-must-add-candidate-and-trigger-recalculation.bad.al`](new-price-source-must-add-candidate-and-trigger-recalculation.bad.al).
 
@@ -62,7 +79,13 @@ SalesLine: Record "Sales Line"; PriceType: Enum "Price Type"; var
 PriceSourceList: Codeunit "Price Source List")`); `Pricing/Source/PriceSourceList.Codeunit.al`
 (`procedure Add(SourceType: Enum "Price Source Type"; SourceNo: Code[20])`);
 `Sales/Document/SalesLine.Table.al` (`procedure
-UpdateUnitPriceByField(CalledByFieldNo: Integer)`).
+PlanPriceCalcByField(CurrPriceFieldNo: Integer)`; `procedure
+UpdateUnitPrice(CalledByFieldNo: Integer)`; `procedure
+UpdateUnitPriceByField(CalledByFieldNo: Integer)`, which exits immediately
+unless `FieldCausedPriceCalculation` already equals `CalledByFieldNo` —
+the state `PlanPriceCalcByField` sets). External, idiomatic use of the
+one-call form: `Inventory/Item/Catalog/ItemReferenceManagement.Codeunit.al`
+(`SalesLine.UpdateUnitPrice(SalesLine.FieldNo("Item Reference No."))`).
 
 Microsoft Learn, "Extending Price Calculations" (Location example): "To
 recalculate the price, we can subscribe to events that pass the sales

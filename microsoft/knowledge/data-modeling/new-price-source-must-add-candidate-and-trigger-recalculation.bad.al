@@ -5,8 +5,8 @@ tableextension 50105 "Sample Sales Line Ext" extends "Sales Line"
         // WRONG: no OnValidate trigger. The field is registered as a
         // price source below via OnAfterAddSources, so new lines price
         // correctly - but changing this field on an existing line never
-        // calls UpdateUnitPriceByField, so the unit price silently keeps
-        // its old value.
+        // triggers a recalculation (e.g. via UpdateUnitPrice), so the
+        // unit price silently keeps its old value.
         field(50100; "Sample Loyalty Customer No."; Code[20])
         {
             Caption = 'Sample Loyalty Customer No.';
