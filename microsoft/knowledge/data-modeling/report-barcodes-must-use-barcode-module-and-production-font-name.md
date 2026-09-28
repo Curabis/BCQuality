@@ -78,13 +78,22 @@ evaluation font instead of the purchased one. Both look complete in
 review and fail silently — the first because the data was never a real
 barcode, the second because BC online refuses to render it.
 
+The same gap exists even when the module *is* used: a 1D path that calls
+`EncodeFont` on `"Barcode Font Provider"` without `ValidateInput`.
+IDAutomation 1D Provider's `EncodeFont` does not validate on its own, so
+a value outside the symbology's character set is never rejected — it
+reaches the font as an unscannable barcode. The sample shows this
+variant, because it is visible in AL alone without layout evidence.
+
 See sample: [`report-barcodes-must-use-barcode-module-and-production-font-name.bad.al`](report-barcodes-must-use-barcode-module-and-production-font-name.bad.al).
 
 ## Source
 
 BCApps (`src/System Application/App/Barcode/src/`):
 `Barcode Provider/Font/BarcodeFontProvider.Interface.al` (1D:
-`ValidateInput` + `EncodeFont`); `Barcode Provider 2D/Font/
+`ValidateInput` + `EncodeFont`); `IDAutomation 1D Provider/
+IDAutomation1DProvider.Codeunit.al` (`EncodeFont` goes straight to the
+symbology encoder; only `ValidateInput` calls `IsValidInput`); `Barcode Provider 2D/Font/
 BarcodeFontProvider2D.Interface.al` (2D: only `EncodeFont`); both read
 fresh from source. `IDAutomation 1D Provider/Encoders/
 IDA1DCode39Encoder.Codeunit.al` (`codeunit 9204`, regex accepts literal

@@ -12,30 +12,30 @@ report 50110 "Sample Item Barcode Label"
             column(Barcode; BarcodeText) { }
 
             trigger OnAfterGetRecord()
+            var
+                BarcodeFontProvider: Interface "Barcode Font Provider";
             begin
-                // WRONG: hand-rolled "encoding" instead of the Barcode
-                // module's provider/encoder API. This is not wrong merely
-                // because the delimiter was added by hand - Code 39's own
-                // symbology does use "*" as its start/stop character
-                // (Microsoft Learn, "Barcode Fonts with Business Central
-                // Online"). It's wrong because it's demonstrably mismatched
-                // with what encoding "No." through the real API would
-                // produce:
-                // - it skips ValidateInput, so a "No." value outside Code
-                //   39's character set, or one that needs a checksum this
-                //   code never applies, reaches the font unvalidated;
-                // - IDAutomation 1D Provider's own EncodeFont output for
-                //   Code 39 wraps the value in "(" / ")", not literal "*"
-                //   (BCApps' own encoder test: EncodeFont('1234', Code39)
-                //   = '(1234)') - the paired font maps those parentheses to
-                //   the real start/stop glyph, so a string built with
-                //   literal asterisks is simply the wrong characters for
-                //   that font, on top of carrying no real checksum.
-                BarcodeText := '*' + "No." + '*';
+                // WRONG: a one-dimensional IDAutomation provider path that
+                // calls EncodeFont without ValidateInput. "Barcode Font
+                // Provider" (1D) declares both, and IDAutomation 1D
+                // Provider's EncodeFont does not validate on its own - it
+                // hands the text straight to the font encoder. Code 39
+                // accepts only 0-9, A-Z, space and - . $ / + % *, but an
+                // Item "No." can legally contain characters outside that
+                // set (e.g. "_" or "#"). Such a value is never rejected;
+                // it silently reaches the font as an unscannable barcode.
+                BarcodeFontProvider := Enum::"Barcode Font Provider"::IDAutomation1D;
+                BarcodeText := BarcodeFontProvider.EncodeFont("No.", BarcodeSymbology);
             end;
         }
     }
 
     var
+        BarcodeSymbology: Enum "Barcode Symbology";
         BarcodeText: Text;
+
+    trigger OnInitReport()
+    begin
+        BarcodeSymbology := Enum::"Barcode Symbology"::Code39;
+    end;
 }
