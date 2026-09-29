@@ -25,8 +25,12 @@ page 50101 "Sample Posted Invoice Card"
                     // depends only on this customer's registered report/layout,
                     // not on any Document Sending Profile setting. Calling
                     // DocumentSendingProfile.TrySendToEMail(...) instead would
-                    // be equally correct: it never Get's the customer's
-                    // actually assigned profile, only a local, hardcoded one.
+                    // also be correct, because it never reads the customer's
+                    // assigned profile: it only uses a local record that it
+                    // never retrieves with Get, and sets its "E-Mail" option
+                    // itself. The
+                    // anti-pattern is Get/GetDefaultForCustomer followed by
+                    // Send, which makes the outcome depend on that profile.
                     // "S.Invoice" resolves to a report on "Sales Invoice
                     // Header", which is the record passed here.
                     SalesInvoiceHeader := Rec;
