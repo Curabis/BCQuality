@@ -1,8 +1,9 @@
-page 50101 "Sample Settlement Document Card"
+page 50101 "Sample Posted Invoice Card"
 {
     PageType = Card;
-    SourceTable = Customer;
+    SourceTable = "Sales Invoice Header";
     ApplicationArea = All;
+    Editable = false;
 
     actions
     {
@@ -16,7 +17,9 @@ page 50101 "Sample Settlement Document Card"
 
                 trigger OnAction()
                 var
+                    SalesInvoiceHeader: Record "Sales Invoice Header";
                     ReportSelections: Record "Report Selections";
+                    ReportDistributionMgt: Codeunit "Report Distribution Management";
                 begin
                     // Calls Report Selections directly - the button's outcome
                     // depends only on this customer's registered report/layout,
@@ -24,9 +27,13 @@ page 50101 "Sample Settlement Document Card"
                     // DocumentSendingProfile.TrySendToEMail(...) instead would
                     // be equally correct: it never Get's the customer's
                     // actually assigned profile, only a local, hardcoded one.
+                    // "S.Invoice" resolves to a report on "Sales Invoice
+                    // Header", which is the record passed here.
+                    SalesInvoiceHeader := Rec;
+                    CurrPage.SetSelectionFilter(SalesInvoiceHeader);
                     ReportSelections.SendEmailToCust(
-                        "Report Selection Usage"::"S.Invoice".AsInteger(), Rec, Rec."No.",
-                        Rec.Name, true, Rec."No.");
+                        "Report Selection Usage"::"S.Invoice".AsInteger(), SalesInvoiceHeader, Rec."No.",
+                        ReportDistributionMgt.GetFullDocumentTypeText(Rec), true, Rec."Bill-to Customer No.");
                 end;
             }
             action(PrintDocument)
@@ -37,10 +44,14 @@ page 50101 "Sample Settlement Document Card"
 
                 trigger OnAction()
                 var
+                    SalesInvoiceHeader: Record "Sales Invoice Header";
                     ReportSelections: Record "Report Selections";
                 begin
+                    SalesInvoiceHeader := Rec;
+                    CurrPage.SetSelectionFilter(SalesInvoiceHeader);
                     ReportSelections.PrintWithDialogForCust(
-                        "Report Selection Usage"::"S.Invoice", Rec, true, Rec.FieldNo("No."));
+                        "Report Selection Usage"::"S.Invoice", SalesInvoiceHeader, true,
+                        SalesInvoiceHeader.FieldNo("Bill-to Customer No."));
                 end;
             }
         }

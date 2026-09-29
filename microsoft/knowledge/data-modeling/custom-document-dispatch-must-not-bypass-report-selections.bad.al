@@ -1,28 +1,20 @@
-report 50102 "Sample Settlement Doc Bad"
+codeunit 50102 "Sample Posted Invoice Send"
 {
-    UsageCategory = ReportsAndAnalysis;
-    ApplicationArea = All;
-
-    dataset
-    {
-        dataitem(Customer; Customer)
-        {
-            column(No_Customer; "No.") { }
-        }
-    }
-}
-
-codeunit 50102 "Sample Settlement Document Send"
-{
-    procedure SendSettlementDocument(var Customer: Record Customer)
+    procedure SendPostedInvoice(SalesInvoiceHeader: Record "Sales Invoice Header")
+    var
+        Customer: Record Customer;
     begin
+        Customer.Get(SalesInvoiceHeader."Bill-to Customer No.");
         Customer.TestField("E-Mail");
 
-        // WRONG: hardcoded report, no Report Selections row backing it.
-        // Works for the default case, but there is nowhere for an admin to
-        // change the report or layout for one specific customer - this
-        // document never shows up on "Document Layouts" at all, and the
-        // only way to change it is a code change and a new release.
-        Report.RunModal(Report::"Sample Settlement Doc Bad", false, false, Customer);
+        // WRONG: the report is hardcoded instead of resolved through the
+        // registered "S.Invoice" usage in Report Selections. This alone is
+        // the defect - no hand-built email is needed for it: a Report
+        // Selections row or a per-customer "Document Layouts" override
+        // that points this usage at a different report or layout is
+        // silently ignored, and the only way to change what this code
+        // prints is a code change and a new release.
+        SalesInvoiceHeader.SetRecFilter();
+        Report.RunModal(Report::"Standard Sales - Invoice", false, false, SalesInvoiceHeader);
     end;
 }

@@ -1,8 +1,9 @@
-page 50101 "Sample Settlement Document Card"
+page 50101 "Sample Posted Invoice Card"
 {
     PageType = Card;
-    SourceTable = Customer;
+    SourceTable = "Sales Invoice Header";
     ApplicationArea = All;
+    Editable = false;
 
     actions
     {
@@ -16,7 +17,9 @@ page 50101 "Sample Settlement Document Card"
 
                 trigger OnAction()
                 var
+                    SalesInvoiceHeader: Record "Sales Invoice Header";
                     DocumentSendingProfile: Record "Document Sending Profile";
+                    ReportDistributionMgt: Codeunit "Report Distribution Management";
                 begin
                     // WRONG: this is a plain, on-demand "Email" button, not
                     // part of a combined Post-and-Send action - but this
@@ -28,10 +31,13 @@ page 50101 "Sample Settlement Document Card"
                     // Printer = Yes, "E-Mail" = No) turns this button into a
                     // silent no-op, with no indication an unrelated setup
                     // field is why.
-                    DocumentSendingProfile.GetDefaultForCustomer(Rec."No.", DocumentSendingProfile);
+                    SalesInvoiceHeader := Rec;
+                    CurrPage.SetSelectionFilter(SalesInvoiceHeader);
+                    DocumentSendingProfile.GetDefaultForCustomer(Rec."Bill-to Customer No.", DocumentSendingProfile);
                     DocumentSendingProfile.Send(
-                        "Report Selection Usage"::"S.Invoice".AsInteger(), Rec, Rec."No.", Rec."No.",
-                        Rec.Name, Rec.FieldNo("No."), Rec.FieldNo("No."));
+                        "Report Selection Usage"::"S.Invoice".AsInteger(), SalesInvoiceHeader, Rec."No.",
+                        Rec."Bill-to Customer No.", ReportDistributionMgt.GetFullDocumentTypeText(Rec),
+                        SalesInvoiceHeader.FieldNo("Bill-to Customer No."), SalesInvoiceHeader.FieldNo("No."));
                 end;
             }
         }

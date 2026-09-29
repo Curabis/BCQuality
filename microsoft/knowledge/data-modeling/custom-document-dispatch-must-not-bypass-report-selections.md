@@ -11,11 +11,15 @@ application-area: [all]
 
 ## Description
 
-A codeunit that hardcodes which report to run (`Report.RunModal(MyReportId, ...)`)
-and builds its own email directly, instead of registering the document
+A codeunit that hardcodes which report to run (`Report.RunModal(MyReportId, ...)`),
+or builds its own email directly, instead of registering the document
 through `table 77 "Report Selections"` and calling its own
 Print/Email procedures, works for the one case it was written for — and
-loses everything the platform's registry provides for free. `Report
+loses everything the platform's registry provides for free. Either
+bypass is a defect on its own: a hardcoded report ignores the registered
+report and any per-account layout override even when no email is
+involved, and a hand-built email ignores the registry's attachment and
+email-body configuration even when the report itself came from it. `Report
 Selections` carries its own attachment/email-body configuration per usage
 (`"Use for Email Attachment"`, `"Use for Email Body"`, `"Email Body Layout
 Code"`, `"Email Body Layout Type"`), plus a separate per-usage layout
@@ -44,9 +48,10 @@ See sample: [`custom-document-dispatch-must-not-bypass-report-selections.good.al
 
 ## Anti Pattern
 
-A codeunit that runs a hardcoded report ID and builds its own email
-message directly, with no `Report Selections` row backing it. It works for
-the default case, but the report/layout cannot be changed per account
+A codeunit that runs a hardcoded report ID, or builds its own email
+message directly, for a document that has (or should have) a
+`Report Selections` usage — each is independently a bypass, and the
+sample shows the first on its own. It works for the default case, but the report/layout cannot be changed per account
 without a code change and a new release, and the document is invisible to
 "Document Layouts" — the standard place every other document's
 distribution is configured.

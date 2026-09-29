@@ -56,34 +56,26 @@ See sample: [`report-barcodes-must-use-barcode-module-and-production-font-name.g
 
 ## Anti Pattern
 
-Constructing a barcode string by hand instead of using the module's
-provider/encoder API — not because a manual delimiter is inherently
-wrong (Code 39's own symbology does use `*` as start/stop; Microsoft
-Learn's font table says so), but because hand-rolled construction is
-demonstrably mismatched with what the real encoder produces: it skips
-`ValidateInput` (so a value outside the character set, or needing a
-checksum/extended-charset setting never applied, reaches the font
-unvalidated), and IDAutomation 1D Provider's own Code 39 output is
-wrapped in `(`/`)`, not literal `*` (BCApps test:
-`EncodeFont('1234', Code39) = '(1234)'`) — the paired font maps those
-parentheses to the real start/stop glyph, so `'*' + value + '*'` is
-simply the wrong characters, plus no checksum.
+Constructing a barcode string by hand where that construction has a
+concrete, independently provable defect: a source value that can contain
+characters outside the symbology's character set is never validated, a
+checksum the symbology or setup requires is never applied, or there is
+concrete evidence of an incompatible font binding.
 
-Flag demonstrably invalid or mismatched hand construction, not manual
-delimiter use as a category — a custom provider paired with a font that
-genuinely expects literal `*` delimiters is a different, legitimate case.
+The delimiter itself is not the defect. `*value*` is a documented, valid
+Code 39 form for IDAutomation fonts (Microsoft Learn's font table and
+IDAutomation's own manual both give `*` as start/stop); the `(`/`)` that
+IDAutomation 1D Provider's encoder emits (BCApps test:
+`EncodeFont('1234', Code39) = '(1234)'`) is an alternative start/stop
+form the same fonts accept, used to keep `*` out of the human-readable
+text. Never flag delimiter choice alone.
 
-A second version of the same mistake: encoding correctly, but naming the
-evaluation font instead of the purchased one. Both look complete in
-review and fail silently — the first because the data was never a real
-barcode, the second because BC online refuses to render it.
-
-The same gap exists even when the module *is* used: a 1D path that calls
-`EncodeFont` on `"Barcode Font Provider"` without `ValidateInput`.
-IDAutomation 1D Provider's `EncodeFont` does not validate on its own, so
-a value outside the symbology's character set is never rejected — it
-reaches the font as an unscannable barcode. The sample shows this
-variant, because it is visible in AL alone without layout evidence.
+The same validation gap exists when the module *is* used: a 1D path that
+calls `EncodeFont` on `"Barcode Font Provider"` without `ValidateInput`
+(IDAutomation 1D Provider's `EncodeFont` does not validate on its own).
+The sample shows this variant, visible in AL alone. A last version:
+encoding correctly but naming the evaluation font, which BC online
+refuses to render.
 
 See sample: [`report-barcodes-must-use-barcode-module-and-production-font-name.bad.al`](report-barcodes-must-use-barcode-module-and-production-font-name.bad.al).
 
@@ -93,17 +85,15 @@ BCApps (`src/System Application/App/Barcode/src/`):
 `Barcode Provider/Font/BarcodeFontProvider.Interface.al` (1D:
 `ValidateInput` + `EncodeFont`); `IDAutomation 1D Provider/
 IDAutomation1DProvider.Codeunit.al` (`EncodeFont` goes straight to the
-symbology encoder; only `ValidateInput` calls `IsValidInput`); `Barcode Provider 2D/Font/
-BarcodeFontProvider2D.Interface.al` (2D: only `EncodeFont`); both read
-fresh from source. `IDAutomation 1D Provider/Encoders/
-IDA1DCode39Encoder.Codeunit.al` (`codeunit 9204`, regex accepts literal
-`*` as plain input; `EncodeFont` → `DotNet FontEncoder.Code39`). Split
-and delimiter mismatch both confirmed live: `.../Inventory/Item/
-ItemGTINLabel.Report.al` (`report 6625`, validates+encodes 1D, only
-encodes 2D, same value) and `.../Test/Barcode/.../IDA1DCode39Test.
-Codeunit.al` (`codeunit 135044`): `EncodeFontSuccessTest('1234', Code39,
-'(1234)')` — wrapped in `(`/`)`, never literal `*`.
+symbology encoder; only `ValidateInput` calls `IsValidInput`); `Barcode Provider 2D/Font/BarcodeFontProvider2D.Interface.al`
+(2D: only `EncodeFont`). `IDAutomation 1D Provider/Encoders/IDA1DCode39Encoder.Codeunit.al`
+(`codeunit 9204`, regex accepts literal `*`; `EncodeFont` → `DotNet FontEncoder.Code39`).
+1D/2D split: `.../Inventory/Item/ItemGTINLabel.Report.al` (`report 6625`,
+validates+encodes 1D, only encodes 2D). Encoder output form: `IDA1DCode39Test.Codeunit.al`
+(`codeunit 135044`): `EncodeFontSuccessTest('1234', Code39, '(1234)')`.
 
 Microsoft Learn "Adding Barcodes to Reports" and "Barcode Fonts with
 Business Central Online" — quoted above, incl. the Code39 row ("`*` is
-used for both start and stop delimiters").
+used for both start and stop delimiters"). IDAutomation, "Code 39 Font
+User Manual" (https://idautomation.com/barcode-fonts/code-39/fontnames/):
+`*` start/stop, or parentheses to keep `*` out of the human-readable text.
