@@ -11,12 +11,17 @@ table 50100 "Sample Mailbox Watch"
             var
                 StopWatchingQst: Label 'Email %1 is being watched. Stop watching it?', Comment = '%1 = previous email address';
             begin
-                if (xRec."Watched Email" <> '') and (xRec."Watched Email" <> "Watched Email") then
-                    if Confirm(StopWatchingQst, false, xRec."Watched Email") then
+                if "Watched Email" = xRec."Watched Email" then
+                    exit;
+                if xRec."Watched Email" <> '' then
+                    if Confirm(StopWatchingQst, false, xRec."Watched Email") then begin
                         Unsubscribe("Subscription ID");
-                // On "no" the old subscription is never removed, and the only field
-                // that tracked it is overwritten here: it is orphaned.
-                "Subscription ID" := Subscribe("Watched Email");
+                        Clear("Subscription ID");
+                    end;
+                // On "no" the old subscription is never removed, yet the new value is
+                // kept and the only field that tracked it is overwritten: it is orphaned.
+                if "Watched Email" <> '' then
+                    "Subscription ID" := Subscribe("Watched Email");
             end;
         }
         field(3; "Subscription ID"; Guid)

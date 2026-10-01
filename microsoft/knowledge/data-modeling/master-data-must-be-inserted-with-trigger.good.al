@@ -6,7 +6,7 @@ codeunit 50100 "Sample Customer Import"
     begin
         Customer.Init();
         // Insert(true) runs Customer.OnInsert: "No." from the number series,
-        // contact, default salesperson, dimension sync, and timestamps.
+        // contact and salesperson defaults (when set up), global dimensions, timestamps.
         Customer.Insert(true);
         Customer.Validate(Name, ExternalName);
         Customer.Validate("Country/Region Code", ExternalCountry);

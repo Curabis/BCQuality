@@ -9,15 +9,19 @@ table 50100 "Sample Mailbox Watch"
         {
             trigger OnValidate()
             var
-                ReplaceWatchQst: Label 'Email %1 is being watched. Stop watching it and watch %2 instead?', Comment = '%1 = previous email address, %2 = new email address';
+                StopWatchingQst: Label 'Email %1 is being watched. Stop watching it?', Comment = '%1 = previous email address';
             begin
-                if (xRec."Watched Email" <> '') and (xRec."Watched Email" <> "Watched Email") then begin
+                if "Watched Email" = xRec."Watched Email" then
+                    exit;
+                if xRec."Watched Email" <> '' then begin
                     // Declining cancels the whole change: the field keeps its old value.
-                    if not Confirm(ReplaceWatchQst, false, xRec."Watched Email", "Watched Email") then
+                    if not Confirm(StopWatchingQst, false, xRec."Watched Email") then
                         Error('');
                     Unsubscribe("Subscription ID");
+                    Clear("Subscription ID");
                 end;
-                "Subscription ID" := Subscribe("Watched Email");
+                if "Watched Email" <> '' then
+                    "Subscription ID" := Subscribe("Watched Email");
             end;
         }
         field(3; "Subscription ID"; Guid)
