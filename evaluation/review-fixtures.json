@@ -158,7 +158,9 @@
     "ui": {
       "articles": [
         "default-descending-sort-on-historical-pages",
-        "page-design-must-match-bc-page-type-conventions"
+        "page-design-must-match-bc-page-type-conventions",
+        "page-client-expression-must-not-use-in-list",
+        "rolecenter-permission-gating-must-use-accessbypermission"
       ]
     },
     "upgrade": {
