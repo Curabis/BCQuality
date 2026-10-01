@@ -20,7 +20,7 @@ The length Business Central's own relation check expects depends on whether the 
 - **At least one unconditional relation**, either a plain `TableRelation = X` or an unconditional branch: the field must have the **exact** length of the longest related field and the same type.
 - **Only conditional relations** (`if (...) X else if (...) Y`): the field must be **at least** as long as the longest related field. A longer field is accepted.
 
-A `where(...)` filter on a relation doesn't make it conditional. For the type, the check requires the related field's type, or `Text` when the related fields mix `Code` and `Text`. Only under all-conditional relations, and only when the required type is `Code`, may the field be `Text` instead.
+For the type, the check requires the related field's type, or `Text` when the related fields mix `Code` and `Text`. Only under all-conditional relations, and only when the required type is `Code`, may the field be `Text` instead.
 
 The check skips any field that sets `ValidateTableRelation = false` or `TestTableRelation = false`. The Base Application sets `ValidateTableRelation = false` on filter and totaling fields, which hold a filter expression rather than one key value. Such a field may be longer than the related field. A field that is shorter than the related field is still a defect even with either property set to `false`, because a real related value still overflows it at runtime.
 
