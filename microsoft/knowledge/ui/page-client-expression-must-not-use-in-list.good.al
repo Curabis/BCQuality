@@ -71,7 +71,7 @@ page 50700 "Sample Request Card"
     var
         ApproveEnabled: Boolean;
 
-    trigger OnAfterGetRecord()
+    trigger OnAfterGetCurrRecord()
     begin
         UpdateActionStates();
     end;
