@@ -11,7 +11,7 @@ application-area: [all]
 
 ## Description
 
-`RecordRef.Open(No: Integer [, Temp: Boolean] [, CompanyName: Text])` always takes a real table number. When `Temp` is `true`, though, the `RecordRef` refers to a temporary instance of that table. That instance starts empty and never contains the persisted rows. Microsoft Learn's example opens table 27 temporarily and notes that `Find('-')` "returns false" because "there are no records in a temporary table". So `IsEmpty`, `Find*`, `Get` or `Count` on a temp-opened `RecordRef` only sees rows the same code inserted into it. These calls can't answer "does this value already exist in the table?"
+`RecordRef.Open(No: Integer [, Temp: Boolean] [, CompanyName: Text])` always takes a real table number. When `Temp` is `true`, though, the `RecordRef` refers to a temporary instance of that table. That instance starts empty and never contains the persisted rows. Microsoft Learn's example opens table 27 temporarily and notes that `Find('-')` "returns false" because "there are no records in a temporary table". So `IsEmpty`, `Find*`, `Next`, `Get` or `Count` on a temp-opened `RecordRef` only sees rows the same code inserted into it. These calls can't answer "does this value already exist in the table?"
 
 The defect is easy to miss at the call site. `Temp` is a positional, unnamed Boolean, the table number is genuine, and the code compiles without a diagnostic. The usual shape is a generate-until-unused loop: the code sets a range on a field and repeats `until RecRef.IsEmpty()`. That loop exits on its first pass and returns a value that may already exist. The defect then shows up later as a duplicate-key error or a wrong lookup, often only once the table holds data.
 
@@ -31,7 +31,7 @@ See sample: [`recordref-open-temp-parameter-defeats-real-table-checks.good.al`](
 
 ## Anti Pattern
 
-`RecRef.Open(<table>, true[, ...])` followed, on the same `RecordRef` and with no `Insert` into it, by `IsEmpty`, `Find`, `FindFirst`, `FindSet`, `Get` or `Count` whose result decides whether a value already exists in the table. The classic case is a uniqueness loop ending `until RecRef.IsEmpty()`.
+`RecRef.Open(<table>, true[, ...])` followed, on the same `RecordRef` and with no `Insert` into it, by `IsEmpty`, `Find`, `FindFirst`, `FindLast`, `FindSet`, `Next`, `Get` or `Count` whose result decides whether a value already exists in the table. The classic case is a uniqueness loop ending `until RecRef.IsEmpty()`.
 
 See sample: [`recordref-open-temp-parameter-defeats-real-table-checks.bad.al`](recordref-open-temp-parameter-defeats-real-table-checks.bad.al).
 
@@ -42,4 +42,4 @@ See sample: [`recordref-open-temp-parameter-defeats-real-table-checks.bad.al`](r
 - Legitimate `Temp = true` uses in BCApps W1:
   - [`src/Layers/W1/BaseApp/Inventory/Item/ItemTempl.Table.al`](https://github.com/microsoft/BCApps/blob/main/src/Layers/W1/BaseApp/Inventory/Item/ItemTempl.Table.al) line 1255: temporary `Item` insert plus `Validate`.
   - [`src/Apps/W1/Quality Management/app/src/Utilities/QltyFilterHelpers.Codeunit.al`](https://github.com/microsoft/BCApps/blob/main/src/Apps/W1/Quality%20Management/app/src/Utilities/QltyFilterHelpers.Codeunit.al) line 942: `SetView` plus `GetFilter`.
-  - [`src/Layers/W1/BaseApp/Integration/SynchEngine/IntegrationRecordSynch.Codeunit.al`](https://github.com/microsoft/BCApps/blob/main/src/Layers/W1/BaseApp/Integration/SynchEngine/IntegrationRecordSynch.Codeunit.al) line 221: `SystemIdNo`.
+  - [`src/Layers/W1/BaseApp/Integration/SynchEngine/IntegrationRecordSynch.Codeunit.al`](https://github.com/microsoft/BCApps/blob/main/src/Layers/W1/BaseApp/Integration/SynchEngine/IntegrationRecordSynch.Codeunit.al) line 221: `SplitLocalTableFilter` splits a table filter, reading only `SystemIdNo` from the temporary open.

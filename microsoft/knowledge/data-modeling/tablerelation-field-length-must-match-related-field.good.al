@@ -50,6 +50,13 @@ table 50102 "Sample Contract"
             else
             if ("Source Type" = const(Region)) "Sample Region"."Code";
         }
+        // Filter field: holds a filter expression, not one code, so it is
+        // deliberately longer and opts out of relation validation.
+        field(5; "Category Filter"; Code[250])
+        {
+            TableRelation = "Sample Category"."Code";
+            ValidateTableRelation = false;
+        }
     }
     keys
     {

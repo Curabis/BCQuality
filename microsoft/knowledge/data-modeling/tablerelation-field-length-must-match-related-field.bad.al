@@ -16,8 +16,8 @@ table 50102 "Sample Contract"
     {
         field(1; "Code"; Code[20]) { }
         // Code[10] cannot hold every "Sample Category"."Code" value (Code[20]).
-        // Compiles without a diagnostic; picking a category code longer than
-        // 10 characters through the lookup fails at runtime.
+        // Compiles without a diagnostic; assigning or validating a category code
+        // longer than 10 characters fails at runtime.
         field(2; "Category Code"; Code[10])
         {
             TableRelation = "Sample Category"."Code";

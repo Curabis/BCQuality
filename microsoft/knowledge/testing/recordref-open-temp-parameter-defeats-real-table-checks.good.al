@@ -1,3 +1,4 @@
+// Test-library-style helper (uses "Library - Utility"); not a Subtype = Test codeunit.
 codeunit 50150 "Sample Payment Terms Codes"
 {
     procedure GenerateUnusedPaymentTermsCode(): Code[10]
