@@ -18,6 +18,7 @@
         "code-must-not-change-workdate",
         "custom-document-dispatch-must-not-bypass-report-selections",
         "delete-master-data-with-trigger",
+        "document-line-prices-follow-prices-including-vat",
         "document-print-and-email-actions-call-report-selections-directly",
         "extend-find-entries-navigate-for-new-document-types",
         "extend-price-source-type-must-sync-document-subset-enum",
@@ -39,7 +40,10 @@
       ]
     },
     "events": {
-      "article": "reset-ishandled-only-when-the-value-can-carry-over"
+      "articles": [
+        "reset-ishandled-only-when-the-value-can-carry-over",
+        "changecompany-runs-triggers-in-the-calling-company"
+      ]
     },
     "finance": {
       "articles": [
@@ -61,6 +65,7 @@
     "performance": {
       "articles": [
         "use-isempty-for-existence-check",
+        "use-get-instead-of-findfirst-on-full-primary-key",
         "job-queue-category-code-serializes-conflicting-jobs",
         "job-queue-external-effects-must-be-idempotent",
         "job-queue-handlers-must-not-require-ui",
@@ -161,13 +166,16 @@
     "ui": {
       "articles": [
         "default-descending-sort-on-historical-pages",
-        "page-design-must-match-bc-page-type-conventions"
+        "page-design-must-match-bc-page-type-conventions",
+        "page-client-expression-must-not-use-in-list",
+        "rolecenter-permission-gating-must-use-accessbypermission"
       ]
     },
     "upgrade": {
       "articles": [
         "initvalue-does-not-update-existing-rows",
-        "upgrade-tag-logic-must-not-nest-deeply"
+        "upgrade-tag-logic-must-not-nest-deeply",
+        "no-changecompany-in-upgrade"
       ],
       "context": "The extended table existed in the previous app version and already contains rows."
     },

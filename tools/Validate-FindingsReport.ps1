@@ -1,3 +1,4 @@
+#Requires -Version 7.5
 <#
 .SYNOPSIS
     Validates a BCQuality findings-report against its structural and semantic contract.
@@ -12,6 +13,7 @@ param(
     [string[]] $RetrievedArticlePaths = @(),
     [ValidateSet('leaf', 'super')]
     [string] $SkillKind = 'leaf',
+    [string] $ExpectedCompositionPath,
     [switch] $AllowBoundedNormalization
 )
 
@@ -28,10 +30,103 @@ try {
     if (-not ($raw | Test-Json -SchemaFile $schemaPath -ErrorAction Stop)) {
         throw 'Report does not satisfy schemas/findings-report.schema.json.'
     }
-    $report = $raw | ConvertFrom-Json -Depth 100
+    $report = $raw | ConvertFrom-Json -Depth 100 -DateKind String
 }
 catch {
     throw "Invalid findings-report JSON or schema: $($_.Exception.Message)"
+}
+
+$expectedComposition = $null
+$expectedLeaves = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+$expectedSkips = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+$acceptedLeaves = [Collections.Generic.Dictionary[string, object]]::new([StringComparer]::Ordinal)
+if ($ExpectedCompositionPath) {
+    if ($SkillKind -cne 'super') {
+        throw 'Expected composition is supported only for super-skill reports.'
+    }
+    $contractSchema = Get-Content -LiteralPath $schemaPath -Raw | ConvertFrom-Json -AsHashtable
+    $identitySchema = @{
+        type = 'object'
+        required = @('id', 'version')
+        properties = $contractSchema.definitions.skillReference.properties
+    }
+    $skipProperties = @{
+        id = $identitySchema.properties.id
+        version = $identitySchema.properties.version
+        reason = @{ enum = @('configuration', 'not-applicable') }
+    }
+    $compositionSchema = @{
+        type = 'object'
+        required = @('superSkill', 'subSkills', 'skipped', 'acceptedResults')
+        properties = @{
+            superSkill = $identitySchema
+            subSkills = @{ type = 'array'; items = $identitySchema }
+            acceptedResults = @{
+                type = 'array'
+                items = @{
+                    type = 'object'
+                    required = @('id', 'version', 'reportPath')
+                    properties = @{
+                        id = $identitySchema.properties.id
+                        version = $identitySchema.properties.version
+                        reportPath = @{ type = 'string'; minLength = 1 }
+                    }
+                }
+            }
+            skipped = @{
+                type = 'array'
+                items = @{ type = 'object'; required = @('id', 'version', 'reason'); properties = $skipProperties }
+            }
+        }
+    } | ConvertTo-Json -Depth 20
+    try {
+        $compositionRaw = Get-Content -LiteralPath $ExpectedCompositionPath -Raw
+        if (-not ($compositionRaw | Test-Json -Schema $compositionSchema -ErrorAction Stop)) {
+            throw 'Expected composition does not satisfy its input contract.'
+        }
+        $expectedComposition = $compositionRaw | ConvertFrom-Json -Depth 100 -DateKind String
+        $expectedIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+        foreach ($leaf in @($expectedComposition.subSkills)) {
+            if (-not $expectedIds.Add([string]$leaf.id)) {
+                throw "Duplicate expected skill id '$($leaf.id)'."
+            }
+            $expectedLeaves.Add([string]$leaf.id, $leaf)
+        }
+        foreach ($skip in @($expectedComposition.skipped)) {
+            if (-not $expectedIds.Add([string]$skip.id)) {
+                throw "Duplicate or selected-and-skipped expected skill id '$($skip.id)'."
+            }
+            $expectedSkips.Add([string]$skip.id, $skip)
+        }
+        $compositionDirectory = Split-Path -Parent (Resolve-Path -LiteralPath $ExpectedCompositionPath).Path
+        foreach ($accepted in @($expectedComposition.acceptedResults)) {
+            if (-not $expectedLeaves.ContainsKey([string]$accepted.id) -or
+                $accepted.version -ne $expectedLeaves[$accepted.id].version -or
+                $acceptedLeaves.ContainsKey([string]$accepted.id)) {
+                throw "Accepted result '$($accepted.id)' must uniquely match a selected leaf and version."
+            }
+            $acceptedPath = if ([IO.Path]::IsPathRooted($accepted.reportPath)) {
+                $accepted.reportPath
+            }
+            else {
+                Join-Path $compositionDirectory $accepted.reportPath
+            }
+            $acceptedRaw = Get-Content -LiteralPath $acceptedPath -Raw
+            if (-not ($acceptedRaw | Test-Json -SchemaFile $schemaPath -ErrorAction Stop)) {
+                throw "Accepted result '$($accepted.id)' does not satisfy the report schema."
+            }
+            $acceptedReport = $acceptedRaw | ConvertFrom-Json -Depth 100 -DateKind String
+            if ($acceptedReport.skill.id -cne $accepted.id -or $acceptedReport.skill.version -ne $accepted.version -or
+                $acceptedReport.PSObject.Properties.Name -ccontains 'sub-results' -or
+                $acceptedReport.PSObject.Properties.Name -ccontains 'skipped-sub-skills') {
+                throw "Accepted result '$($accepted.id)' must be a leaf report with the captured identity."
+            }
+            $acceptedLeaves.Add([string]$accepted.id, $acceptedReport)
+        }
+    }
+    catch {
+        throw "Invalid expected composition: $($_.Exception.Message)"
+    }
 }
 
 $retrieved = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
@@ -47,6 +142,43 @@ $lineCounts = @{}
 function Test-HasProperty {
     param([object] $Object, [string] $Name)
     return $null -ne $Object -and $Object.PSObject.Properties.Name -ccontains $Name
+}
+
+function Test-JsonContentEqual {
+    param([object] $First, [object] $Second)
+
+    if ($null -eq $First -or $null -eq $Second) {
+        return $null -eq $First -and $null -eq $Second
+    }
+    if ($First -is [pscustomobject] -or $Second -is [pscustomobject]) {
+        if ($First -isnot [pscustomobject] -or $Second -isnot [pscustomobject] -or
+            @($First.PSObject.Properties).Count -ne @($Second.PSObject.Properties).Count) {
+            return $false
+        }
+        foreach ($property in $First.PSObject.Properties) {
+            if (-not (Test-HasProperty $Second $property.Name) -or
+                -not (Test-JsonContentEqual $property.Value $Second.PSObject.Properties[$property.Name].Value)) {
+                return $false
+            }
+        }
+        return $true
+    }
+    if ($First -is [array] -or $Second -is [array]) {
+        if ($First -isnot [array] -or $Second -isnot [array] -or $First.Count -ne $Second.Count) {
+            return $false
+        }
+        for ($index = 0; $index -lt $First.Count; $index++) {
+            if (-not (Test-JsonContentEqual $First[$index] $Second[$index])) {
+                return $false
+            }
+        }
+        return $true
+    }
+    if ($First -is [string] -or $Second -is [string]) {
+        return $First -is [string] -and $Second -is [string] -and
+            [string]::Equals($First, $Second, [StringComparison]::Ordinal)
+    }
+    return $First.GetType() -eq $Second.GetType() -and $First -ceq $Second
 }
 
 function Get-SourceLineCount {
@@ -79,8 +211,14 @@ function Get-SemanticErrors {
     }
 
     function Get-DerivedSuperOutcome {
-        param([object[]] $SubResults)
+        param([object[]] $SubResults, [int] $MissingResults = 0)
 
+        if ($MissingResults -gt 0) {
+            if (@($SubResults | Where-Object outcome -CNE 'failed').Count) {
+                return 'partial'
+            }
+            return 'failed'
+        }
         if (-not $SubResults.Count) {
             return 'not-applicable'
         }
@@ -138,9 +276,10 @@ function Get-SemanticErrors {
         $firstHasCode = Test-HasProperty $First 'suggested-code'
         $secondHasCode = Test-HasProperty $Second 'suggested-code'
         if ($firstHasCode -or $secondHasCode) {
-            return $firstHasCode -and $secondHasCode -and $First.'suggested-code' -ceq $Second.'suggested-code'
+            return $firstHasCode -and $secondHasCode -and
+                [string]::Equals($First.'suggested-code', $Second.'suggested-code', [StringComparison]::Ordinal)
         }
-        return $First.message -ceq $Second.message
+        return [string]::Equals($First.message, $Second.message, [StringComparison]::Ordinal)
     }
 
     function Test-ReferencesInclude {
@@ -181,7 +320,7 @@ function Get-SemanticErrors {
                 $RolledFinding.id -cne $expectedId -or
                 $RolledFinding.severity -cne $LeafFinding.severity -or
                 $RolledFinding.confidence -cne $LeafFinding.confidence -or
-                $RolledFinding.message -cne $LeafFinding.message -or
+                -not [string]::Equals($RolledFinding.message, $LeafFinding.message, [StringComparison]::Ordinal) -or
                 $rolledReferences.Count -ne $leafReferences.Count -or
                 -not (Test-ReferencesInclude $rolledReferences $leafReferences)) {
                 return $false
@@ -190,7 +329,7 @@ function Get-SemanticErrors {
                 $rolledHasProperty = Test-HasProperty $RolledFinding $name
                 $leafHasProperty = Test-HasProperty $LeafFinding $name
                 if ($rolledHasProperty -ne $leafHasProperty -or
-                    ($rolledHasProperty -and $RolledFinding.$name -cne $LeafFinding.$name)) {
+                    ($rolledHasProperty -and -not [string]::Equals($RolledFinding.$name, $LeafFinding.$name, [StringComparison]::Ordinal))) {
                     return $false
                 }
             }
@@ -206,7 +345,7 @@ function Get-SemanticErrors {
         $sameCorrection = Test-SameCorrection $RolledFinding $LeafFinding
         $correctionsConflict = (Test-HasProperty $RolledFinding 'suggested-code') -and
             (Test-HasProperty $LeafFinding 'suggested-code') -and
-            $RolledFinding.'suggested-code' -cne $LeafFinding.'suggested-code'
+            -not [string]::Equals($RolledFinding.'suggested-code', $LeafFinding.'suggested-code', [StringComparison]::Ordinal)
         $explicitCrossRuleMerge = $leafReferences.Count -and
             $rolledReferences.Count -gt $leafReferences.Count -and
             -not $correctionsConflict -and
@@ -342,20 +481,105 @@ function Get-SemanticErrors {
 
         if ($CurrentSkillKind -ceq 'super' -and $hasSubResults) {
             $subResults = @($Current.'sub-results')
+            $producerIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
             for ($index = 0; $index -lt $subResults.Count; $index++) {
+                if (-not $producerIds.Add([string]$subResults[$index].skill.id)) {
+                    Add-Error 'SUPER_DUPLICATE_SUB_RESULT' "$ReportPathPrefix.sub-results[$index].skill.id" `
+                        'A leaf may appear only once in sub-results.'
+                }
                 Test-Report $subResults[$index] "$ReportPathPrefix.sub-results[$index]" 'leaf'
             }
 
-            $expectedOutcome = Get-DerivedSuperOutcome $subResults
+            $skippedIds = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+            $skips = if ($hasSkippedSubSkills) { @($Current.'skipped-sub-skills') } else { @() }
+            foreach ($skip in $skips) {
+                if (-not $skippedIds.Add([string]$skip.skill.id) -or $producerIds.Contains([string]$skip.skill.id)) {
+                    Add-Error 'SUPER_SKIP_CONFLICT' "$ReportPathPrefix.skipped-sub-skills" `
+                        "Skill '$($skip.skill.id)' is duplicated or both returned and skipped."
+                }
+            }
+
+            $missingResults = 0
+            if ($null -ne $expectedComposition) {
+                if ($Current.skill.id -cne $expectedComposition.superSkill.id -or
+                    $Current.skill.version -ne $expectedComposition.superSkill.version) {
+                    Add-Error 'SUPER_IDENTITY_MISMATCH' "$ReportPathPrefix.skill" 'Super-skill identity differs from expected composition.'
+                }
+                $previousSlot = -1
+                $orderedIds = @($expectedComposition.subSkills | ForEach-Object { $_.id })
+                for ($index = 0; $index -lt $subResults.Count; $index++) {
+                    $identity = $subResults[$index].skill
+                    if (-not $expectedLeaves.ContainsKey([string]$identity.id)) {
+                        Add-Error 'SUPER_UNEXPECTED_SUB_RESULT' "$ReportPathPrefix.sub-results[$index].skill" `
+                            "Skill '$($identity.id)' was not selected."
+                        continue
+                    }
+                    if ($identity.version -ne $expectedLeaves[$identity.id].version) {
+                        Add-Error 'SUPER_LEAF_VERSION_MISMATCH' "$ReportPathPrefix.sub-results[$index].skill.version" `
+                            "Unexpected version for '$($identity.id)'."
+                    }
+                    if (-not $acceptedLeaves.ContainsKey([string]$identity.id)) {
+                        Add-Error 'SUPER_LEAF_NOT_ACCEPTED' "$ReportPathPrefix.sub-results[$index]" `
+                            "Leaf '$($identity.id)' has no host-captured accepted result."
+                    }
+                    elseif (-not (Test-JsonContentEqual $subResults[$index] $acceptedLeaves[$identity.id])) {
+                        Add-Error 'SUPER_LEAF_CONTENT_MISMATCH' "$ReportPathPrefix.sub-results[$index]" `
+                            "Leaf '$($identity.id)' differs from its host-captured accepted result."
+                    }
+                    $slot = [Array]::IndexOf($orderedIds, $identity.id)
+                    if ($slot -le $previousSlot) {
+                        Add-Error 'SUPER_SUB_RESULT_ORDER' "$ReportPathPrefix.sub-results[$index].skill" `
+                            'Sub-results must preserve the selected worklist order.'
+                    }
+                    $previousSlot = $slot
+                }
+                foreach ($leaf in @($expectedComposition.subSkills)) {
+                    if (-not $producerIds.Contains([string]$leaf.id)) {
+                        $missingResults++
+                        if ($acceptedLeaves.ContainsKey([string]$leaf.id)) {
+                            Add-Error 'SUPER_ACCEPTED_LEAF_MISSING' "$ReportPathPrefix.sub-results" `
+                                "Host-captured accepted leaf '$($leaf.id)' must be included."
+                        }
+                        $reason = if (Test-HasProperty $Current 'outcome-reason') { $Current.'outcome-reason' } else { '' }
+                        $idPattern = '(?<![a-zA-Z0-9_-])' + [regex]::Escape($leaf.id) + '(?![a-zA-Z0-9_-])'
+                        if ($reason -cnotmatch $idPattern) {
+                            Add-Error 'SUPER_MISSING_LEAF_REASON' "$ReportPathPrefix.outcome-reason" `
+                                "The reason must name missing selected leaf '$($leaf.id)'."
+                        }
+                    }
+                }
+                foreach ($skip in $skips) {
+                    if (-not $expectedSkips.ContainsKey([string]$skip.skill.id)) {
+                        Add-Error 'SUPER_UNEXPECTED_SKIP' "$ReportPathPrefix.skipped-sub-skills" `
+                            "Skill '$($skip.skill.id)' was not excluded by the coordinator."
+                        continue
+                    }
+                    $expectedSkip = $expectedSkips[$skip.skill.id]
+                    if ($skip.skill.version -ne $expectedSkip.version -or $skip.reason -cne $expectedSkip.reason) {
+                        Add-Error 'SUPER_SKIP_MISMATCH' "$ReportPathPrefix.skipped-sub-skills" `
+                            "Skip identity or reason differs for '$($skip.skill.id)'."
+                    }
+                }
+                foreach ($skip in @($expectedComposition.skipped)) {
+                    if (-not $skippedIds.Contains([string]$skip.id)) {
+                        Add-Error 'SUPER_SKIP_MISSING' "$ReportPathPrefix.skipped-sub-skills" `
+                            "Expected exclusion '$($skip.id)' is missing."
+                    }
+                }
+            }
+
+            $expectedOutcome = Get-DerivedSuperOutcome $subResults $missingResults
             if ($Current.outcome -cne $expectedOutcome) {
                 Add-Error 'SUPER_OUTCOME_MISMATCH' "$ReportPathPrefix.outcome" "Expected '$expectedOutcome' from sub-results."
             }
 
             $includedSubResults = @($subResults | Where-Object outcome -CNE 'failed')
-            $expectedWorklistSize = ($includedSubResults | Measure-Object -Property { $_.summary.coverage.'worklist-size' } -Sum).Sum
-            $expectedItemsEvaluated = ($includedSubResults | Measure-Object -Property { $_.summary.coverage.'items-evaluated' } -Sum).Sum
-            if ($null -eq $expectedWorklistSize) { $expectedWorklistSize = 0 }
-            if ($null -eq $expectedItemsEvaluated) { $expectedItemsEvaluated = 0 }
+            $expectedWorklistSize = 0
+            $expectedItemsEvaluated = 0
+            foreach ($subResult in $includedSubResults) {
+                $expectedWorklistSize += $subResult.summary.coverage.'worklist-size'
+                $expectedItemsEvaluated += $subResult.summary.coverage.'items-evaluated'
+            }
             if ($worklistSize -ne $expectedWorklistSize -or $itemsEvaluated -ne $expectedItemsEvaluated) {
                 Add-Error 'SUPER_COVERAGE_MISMATCH' "$ReportPathPrefix.summary.coverage" `
                     "Expected worklist-size $expectedWorklistSize and items-evaluated $expectedItemsEvaluated from non-failed sub-results."
@@ -378,6 +602,10 @@ function Get-SemanticErrors {
                 $finding = $findings[$index]
                 $producerId = [string]$finding.'from-sub-skill'
                 if ($producerId -ceq 'agent') {
+                    if ($missingResults -gt 0) {
+                        Add-Error 'SUPER_AGENT_REVIEW_INCOMPLETE' "$ReportPathPrefix.findings[$index]" `
+                            'Super-skill self-review is forbidden while selected leaf results are missing.'
+                    }
                     if (@($finding.references).Count -or
                         $finding.id -cnotmatch '^agent:[a-z0-9]+(?:-[a-z0-9]+)*$' -or
                         -not (Test-HasProperty $finding 'domain') -or
@@ -496,7 +724,7 @@ if ($errors.Count -and $AllowBoundedNormalization) {
     $otherErrors = @($errors | Where-Object Code -CNE 'RANGE_START_MISMATCH')
     $rangeErrors = @($errors | Where-Object Code -CEQ 'RANGE_START_MISMATCH')
     if (-not $otherErrors.Count -and $rangeErrors.Count) {
-        $candidate = $report | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100
+        $candidate = $report | ConvertTo-Json -Depth 100 | ConvertFrom-Json -Depth 100 -DateKind String
         $eligible = $true
         foreach ($finding in @($candidate.findings)) {
             if (-not (Test-HasProperty $finding 'location') -or
