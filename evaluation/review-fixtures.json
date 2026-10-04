@@ -138,7 +138,8 @@
         "label-comment-explains-placeholders",
         "dateformula-evaluate-needs-language-independent-literals",
         "al-comments-must-not-restate-what-code-already-shows",
-        "pages-must-not-contain-business-logic"
+        "pages-must-not-contain-business-logic",
+        "mutating-procedure-for-a-page-caller-takes-var-record"
       ]
     },
     "telemetry": {
