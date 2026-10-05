@@ -17,11 +17,13 @@
         "check-blocked-in-referencing-code-not-in-master",
         "code-must-not-change-workdate",
         "custom-document-dispatch-must-not-bypass-report-selections",
+        "delete-master-data-with-trigger",
         "document-line-prices-follow-prices-including-vat",
         "document-print-and-email-actions-call-report-selections-directly",
         "extend-find-entries-navigate-for-new-document-types",
         "extend-price-source-type-must-sync-document-subset-enum",
         "extend-report-selection-usage-for-new-document-types",
+        "master-data-must-be-inserted-with-trigger",
         "new-price-source-must-add-candidate-and-trigger-recalculation",
         "pictures-must-use-media-not-blob",
         "report-barcodes-must-use-barcode-module-and-production-font-name",
@@ -33,6 +35,7 @@
     "error-handling": {
       "articles": [
         "collect-validation-errors-with-errorbehavior",
+        "declined-confirm-must-abort-not-partially-apply",
         "defensive-vs-offensive-code-must-match-blast-radius",
         "log-writes-must-survive-rollback"
       ]
@@ -40,7 +43,8 @@
     "events": {
       "articles": [
         "reset-ishandled-only-when-the-value-can-carry-over",
-        "changecompany-runs-triggers-in-the-calling-company"
+        "changecompany-runs-triggers-in-the-calling-company",
+        "database-trigger-setup-flags-may-only-be-set-to-true"
       ]
     },
     "finance": {
@@ -86,11 +90,16 @@
         "use-setloadfields-for-partial-records",
         "prefer-modifyall-over-per-row-modify",
         "al-methods-limited-during-write-transactions",
-        "avoid-user-prompts-inside-transactions"
+        "avoid-user-prompts-inside-transactions",
+        "use-grouped-query-for-distinct-values-and-duplicates"
       ]
     },
     "privacy": {
-      "article": "no-pii-in-telemetry-message-string"
+      "articles": [
+        "no-pii-in-telemetry-message-string",
+        "register-owned-log-tables-for-retention-policies",
+        "ship-a-default-retention-policy-setup"
+      ]
     },
     "query": {
       "articles": [
@@ -139,7 +148,8 @@
         "label-comment-explains-placeholders",
         "dateformula-evaluate-needs-language-independent-literals",
         "al-comments-must-not-restate-what-code-already-shows",
-        "pages-must-not-contain-business-logic"
+        "pages-must-not-contain-business-logic",
+        "mutating-procedure-for-a-page-caller-takes-var-record"
       ]
     },
     "telemetry": {
