@@ -5,13 +5,14 @@ pageextension 50720 "Sample Customer Card Ext" extends "Customer Card"
         NoCreditLimitNotification: Notification;
     begin
         if Rec."Credit Limit (LCY)" = 0 then begin
-            // No Id is assigned: Send assigns one that this code never keeps.
+            // Send assigns an Id, but this local variable is discarded and
+            // the Id is not saved anywhere.
             NoCreditLimitNotification.Message := NoCreditLimitMsg;
             NoCreditLimitNotification.Scope := NotificationScope::LocalScope;
             NoCreditLimitNotification.Send();
         end else
-            // This new variable has no Id, so the warning sent for the
-            // previous customer is not withdrawn.
+            // A fresh local variable with no Id cannot be the notification
+            // sent for the previous customer, so that warning is not withdrawn.
             NoCreditLimitNotification.Recall();
     end;
 
