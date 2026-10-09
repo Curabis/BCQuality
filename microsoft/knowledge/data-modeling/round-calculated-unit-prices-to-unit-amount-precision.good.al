@@ -11,6 +11,10 @@ codeunit 50651 "Sample Own Sales Price Good"
     begin
         if SalesLine.Type <> SalesLine.Type::Item then
             exit;
+        // Scope: prices excluding VAT only. On a Prices Including VAT document, leave the price
+        // to the standard calculation, which converts to the VAT basis before it rounds.
+        if SalesHeader."Prices Including VAT" then
+            exit;
         Item.Get(SalesLine."No.");
         PriceLCY := Item."Unit Cost" * SalesLine."Qty. per Unit of Measure" * GetMarkupFactor(SalesHeader."Sell-to Customer No.");
 
